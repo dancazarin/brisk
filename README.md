@@ -11,6 +11,10 @@ Brisk is a modern, cross-platform C++ GUI toolkit focused on building responsive
 - **Unicode Support**: Full UTF-8/16/32 support, including RTL text rendering and basic localization.
 - **Modular Architecture**: Core, Graphics, Window, GUI, and Widgets modules for versatile application development.
 
+### Screenshots
+
+<img src="docs/images/Brisk-screenshot1.png" width="400" alt="Brisk screenshot"/> <img src="docs/images/Brisk-screenshot2.png" width="400" alt="Brisk screenshot"/> <img src="docs/images/Brisk-screenshot3.png" width="400" alt="Brisk screenshot"/>
+
 ### Modules
 
 #### **Core**
@@ -63,6 +67,14 @@ Brisk is a modern, cross-platform C++ GUI toolkit focused on building responsive
 | Window System       | Alpha   | Alpha | Alpha |
 | Widgets             | Beta    | Beta  | Beta  |
 | Application Support | Alpha   | Alpha | N/A   |
+
+#### OS Support
+
+|         | Minimum version                 |
+|---------|---------------------------------|
+| Windows | Windows 10, Windows Server 2016 |
+| macOS   | macOS 11 Big Sur                |
+| Linux   | n/a                             |
 
 ### Graphics Backend Support
 
