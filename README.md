@@ -4,6 +4,16 @@ Brisk is a modern, cross-platform C++ GUI toolkit focused on building responsive
 
 🚧 The Brisk library is currently under active development and will remain in the Alpha stage for the next few releases. After that, it will transition to Beta. During this period, expect breaking changes and incomplete documentation
 
+![Build](https://img.shields.io/github/actions/workflow/status/brisklib/brisk/test.yml?style=flat-square&label=Build) 
+![License](https://img.shields.io/badge/License-GPL2%2FCommercial-blue.svg?style=flat-square)
+![Status](https://img.shields.io/badge/Status-alpha-blue.svg?style=flat-square)
+
+![C++](https://img.shields.io/badge/C%2B%2B-20-blue.svg?style=flat-square)
+![Clang 16+](https://img.shields.io/badge/Clang-16%2B-green.svg?style=flat-square)
+![GCC 10+](https://img.shields.io/badge/GCC-10%2B-green.svg?style=flat-square)
+![MSVC 2022](https://img.shields.io/badge/MSVC-2022%2B-green.svg?style=flat-square)
+![Xcode 14+](https://img.shields.io/badge/Xcode-14%2B-green.svg?style=flat-square)
+
 ### Key Features 🌟
 - **Stateful & Stateless Widgets**: Supports both modes with flexible binding for efficient state management.
 - **Hardware-Accelerated Graphics**: Backends include D3D11, D3D12, Vulkan, OpenGL, Metal, and WebGPU.
@@ -83,6 +93,11 @@ Brisk is a modern, cross-platform C++ GUI toolkit focused on building responsive
 | Windows | D3D11 and WebGPU (D3D12/Vulkan) |
 | macOS   | WebGPU (Metal)                  |
 | Linux   | WebGPU (OpenGL/Vulkan)          |
+
+### Example Projects
+
+The `examples` directory contains projects that showcase how to use the Brisk library.  
+For a minimal example, check out the [brisk-helloworld](https://github.com/brisklib/brisk-helloworld) repository.
 
 ### Development 💻
 
