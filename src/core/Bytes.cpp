@@ -1,0 +1,274 @@
+/*
+ * Brisk
+ *
+ * Cross-platform application framework
+ * --------------------------------------------------------------
+ *
+ * Copyright (C) 2024 Brisk Developers
+ *
+ * This file is part of the Brisk library.
+ *
+ * Brisk is dual-licensed under the GNU General Public License, version 2 (GPL-2.0+),
+ * and a commercial license. You may use, modify, and distribute this software under
+ * the terms of the GPL-2.0+ license if you comply with its conditions.
+ *
+ * You should have received a copy of the GNU General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If you do not wish to be bound by the GPL-2.0+ license, you must purchase a commercial
+ * license. For commercial licensing options, please visit: https://brisklib.com
+ */
+#include <brisk/core/Bytes.hpp>
+
+namespace Brisk {
+
+namespace {
+struct Hex {
+    constexpr static std::string_view alphabet[2] = {
+        "0123456789abcdef",
+        "0123456789ABCDEF",
+    };
+
+    constexpr static uint8_t hashmap[] = {
+        0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, /* 01234567 */
+        0x08, 0x09, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 89:;<=>? */
+        0xff, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0xff, /* @ABCDEFG */
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* HIJKLMNO */
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* PQRSTUVW */
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* XYZ[\]^_ */
+        0xff, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0xff, /* `abcdefg */
+    };
+
+    static size_t decode(bytes_mutable_view data, std::string_view encoded) {
+        if (encoded.size() % 2 != 0 || data.size() < encoded.size() / 2) {
+            return SIZE_MAX;
+        }
+        for (size_t i = 0; i < encoded.size() / 2; i++) {
+            char c1 = encoded[i * 2];
+            char c2 = encoded[i * 2 + 1];
+            if (c1 < '0' || c1 > 'g' || c2 < '0' || c2 > 'g')
+                return SIZE_MAX;
+            uint8_t n1 = (c1 & 0x1F) ^ 0x10;
+            uint8_t n2 = (c2 & 0x1F) ^ 0x10;
+            uint8_t h1 = hashmap[n1];
+            uint8_t h2 = hashmap[n2];
+            if (h1 == 0xff || h2 == 0xff)
+                return SIZE_MAX;
+            data[i] = (h1 << 4) | h2;
+        }
+        return encoded.size() / 2;
+    }
+
+    static size_t encode(std::span<char> encoded, bytes_view data, bool upperCase = false) {
+        if (encoded.size() < data.size() * 2) {
+            return SIZE_MAX;
+        }
+        std::string_view alphabet = Hex::alphabet[upperCase];
+        for (size_t i = 0; i < data.size(); i++) {
+            uint8_t b          = data[i];
+            encoded[i * 2]     = alphabet[(b >> 4) & 0x0f];
+            encoded[i * 2 + 1] = alphabet[b & 0x0f];
+        }
+        return encoded.size();
+    }
+};
+
+struct Base64 {
+    constexpr static std::string_view alphabet[2] = {
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_",
+    };
+
+    constexpr static uint8_t hashmap[2][256] = {
+        {
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfd, 0xfd, 0xff, 0xff, 0xfd, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xfd, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3e, 0xff, 0xff, 0xff, 0x3f,
+            0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff,
+            0xff, 0x0,  0x1,  0x2,  0x3,  0x4,  0x5,  0x6,  0x7,  0x8,  0x9,  0xa,  0xb,  0xc,  0xd,  0xe,
+            0xf,  0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
+            0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+        },
+        {
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfd, 0xfd, 0xff, 0xff, 0xfd, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xfd, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3e, 0xff, 0xff,
+            0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff,
+            0xff, 0x0,  0x1,  0x2,  0x3,  0x4,  0x5,  0x6,  0x7,  0x8,  0x9,  0xa,  0xb,  0xc,  0xd,  0xe,
+            0xf,  0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0xff, 0xff, 0xff, 0xff, 0x3f,
+            0xff, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
+            0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+        },
+    };
+
+    static size_t encodedSize(size_t dataSize, bool pad) {
+        size_t chunks    = dataSize / 3;
+        size_t remaining = dataSize % 3;
+        return chunks * 4 + (remaining ? (pad ? 4 : remaining + 1) : 0);
+    }
+
+    static size_t decode(bytes_mutable_view data, std::string_view encoded, bool urlSafe, bool strict) {
+        const uint8_t* hashmap = Base64::hashmap[urlSafe];
+        uint8_t* out           = data.data();
+        int g                  = 0;
+        size_t y               = 0;
+        size_t z               = 0;
+        size_t t               = 0;
+        for (size_t x = 0; x < encoded.size(); x++) {
+            if ((encoded[x] == 0) && (x == (encoded.size() - 1)) && !strict) {
+                continue;
+            }
+            uint8_t c = hashmap[(uint8_t)encoded[x] & 0xFF];
+            if (c == 254) {
+                g++;
+                continue;
+            }
+            if (c == 253) {
+                if (strict) {
+                    return SIZE_MAX;
+                }
+                continue;
+            }
+            if (c == 255) {
+                return SIZE_MAX;
+            }
+            if (g > 0) {
+                return SIZE_MAX;
+            }
+
+            t = (t << 6) | c;
+
+            if (++y == 4) {
+                if (z + 3 > data.size())
+                    return SIZE_MAX;
+                *out++ = (uint8_t)((t >> 16) & 255);
+                *out++ = (uint8_t)((t >> 8) & 255);
+                *out++ = (uint8_t)(t & 255);
+                y = t = 0;
+            }
+        }
+
+        if (y != 0) {
+            if (y == 1)
+                return SIZE_MAX;
+            if (((y + g) != 4) && strict && !urlSafe)
+                return SIZE_MAX;
+            t = t << (6 * (4 - y));
+            if (z + y - 1 > data.size())
+                return SIZE_MAX;
+            if (y >= 2)
+                *out++ = (uint8_t)((t >> 16) & 255);
+            if (y == 3)
+                *out++ = (uint8_t)((t >> 8) & 255);
+        }
+
+        return out - data.data();
+    }
+
+    static size_t encode(std::span<char> encoded, bytes_view data, bool urlSafe, bool pad) {
+        if (encoded.size() < encodedSize(data.size(), pad)) {
+            return SIZE_MAX;
+        }
+        std::string_view alphabet = Base64::alphabet[urlSafe];
+
+        char* out                 = encoded.data();
+        const uint8_t* in         = data.data();
+        size_t round              = data.size() / 3 * 3;
+        for (size_t i = 0; i < round; i += 3) {
+            *out++ = alphabet[(in[0] >> 2) & 0x3F];
+            *out++ = alphabet[(((in[0] & 3) << 4) + (in[1] >> 4)) & 0x3F];
+            *out++ = alphabet[(((in[1] & 0xf) << 2) + (in[2] >> 6)) & 0x3F];
+            *out++ = alphabet[in[2] & 0x3F];
+            in += 3;
+        }
+
+        size_t remaining = data.size() - round;
+        if (remaining) {
+            uint8_t a = in[0];
+            uint8_t b = (remaining == 2) ? in[1] : 0;
+
+            *out++    = alphabet[(a >> 2) & 0x3F];
+            *out++    = alphabet[(((a & 3) << 4) + (b >> 4)) & 0x3F];
+            if (pad) {
+                *out++ = (remaining == 2) ? alphabet[(((b & 0xf) << 2)) & 0x3F] : '=';
+                *out++ = '=';
+            } else {
+                if (remaining == 2)
+                    *out++ = alphabet[(((b & 0xf) << 2)) & 0x3F];
+            }
+        }
+        return out - encoded.data();
+    }
+};
+} // namespace
+
+size_t fromHex(bytes_mutable_view bytes, std::string_view hex) {
+    return Hex::decode(bytes, hex);
+}
+
+size_t toHex(std::span<char> hex, bytes_view bytes, bool upperCase) {
+    return Hex::encode(hex, bytes, upperCase);
+}
+
+optional<Bytes> fromHex(std::string_view hex) {
+    Bytes result(hex.size() / 2);
+    if (size_t sz = fromHex(result, hex); sz != SIZE_MAX) {
+        result.resize(sz);
+        return result;
+    }
+    return nullopt;
+}
+
+std::string toHex(bytes_view data, bool upperCase) {
+    std::string result(data.size() * 2, ' ');
+    if (size_t sz = toHex(result, data, upperCase); sz != SIZE_MAX) {
+        result.resize(sz);
+        return result;
+    }
+    return {};
+}
+
+size_t fromBase64(bytes_mutable_view data, std::string_view encoded, bool urlSafe, bool strict) {
+    return Base64::decode(data, encoded, urlSafe, strict);
+}
+
+size_t toBase64(std::span<char> encoded, bytes_view data, bool urlSafe, bool pad) {
+    return Base64::encode(encoded, data, urlSafe, pad);
+}
+
+optional<Bytes> fromBase64(std::string_view encoded, bool urlSafe, bool strict) {
+    Bytes result((encoded.size() + 3) / 4 * 3);
+    if (size_t sz = fromBase64(result, encoded, urlSafe, strict); sz != SIZE_MAX) {
+        result.resize(sz);
+        return result;
+    }
+    return nullopt;
+}
+
+std::string toBase64(bytes_view data, bool urlSafe, bool pad) {
+    std::string result(Base64::encodedSize(data.size(), pad), ' ');
+    if (size_t sz = toBase64(result, data, urlSafe, pad); sz != SIZE_MAX) {
+        result.resize(sz);
+        return result;
+    }
+    return {};
+}
+
+} // namespace Brisk

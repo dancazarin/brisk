@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+    <Type Name="tl::expected&lt;*&gt;">
+        <Intrinsic Name="has_value" Expression="m_has_val"/>
+        <Intrinsic Name="value" Expression="m_val"/>
+        <Intrinsic Name="error" Expression="m_unexpect.m_val"/>
+        <DisplayString Condition="!has_value()">{error()}</DisplayString>
+        <DisplayString Condition="has_value()">{value()}</DisplayString>
+        <Expand>
+            <Item Condition="has_value()" Name="value">value()</Item>
+            <Item Condition="!has_value()" Name="error">error()</Item>
+        </Expand>
+    </Type>
+</AutoVisualizer>

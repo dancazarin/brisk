@@ -1,0 +1,8 @@
+build
+.vscode
+.cache
+.idea
+cmake-*
+.DS_Store
+vcpkg_installed
+vcpkg

@@ -1,0 +1,125 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+    "dependencies": [
+        {
+            "name": "brotli"
+        },
+        {
+            "name": "catch2"
+        },
+        {
+            "name": "concurrentqueue"
+        },
+        {
+            "name": "curl"
+        },
+        {
+            "name": "fmt"
+        },
+        {
+            "name": "freetype",
+            "default-features": false,
+            "features": [
+                "zlib"
+            ]
+        },
+        {
+            "name": "harfbuzz"
+        },
+        {
+            "name": "libjpeg-turbo"
+        },
+        {
+            "name": "libtomcrypt"
+        },
+        {
+            "name": "libtommath"
+        },
+        {
+            "name": "lunasvg"
+        },
+        {
+            "name": "lz4"
+        },
+        {
+            "name": "msgpack"
+        },
+        {
+            "name": "rapidjson"
+        },
+        {
+            "name": "readerwriterqueue"
+        },
+        {
+            "name": "spdlog"
+        },
+        {
+            "name": "stb"
+        },
+        {
+            "name": "tl-expected"
+        },
+        {
+            "name": "utf8proc"
+        },
+        {
+            "name": "zlib"
+        },
+        {
+            "name": "libuv"
+        },
+        {
+            "name": "zstd",
+            "features": [
+                "tools"
+            ]
+        },
+        {
+            "name": "libwebp"
+        },
+        {
+            "name": "libpng"
+        },
+        {
+            "name": "function2"
+        }
+    ],
+    "builtin-baseline": "898b728edc5e0d12b50015f9cd18247c4257a3eb",
+    "overrides": [
+        {
+            "name": "vcpkg-tool-meson",
+            "version-string": "1.3.2",
+            "port-version": 8
+        }
+    ],
+    "default-features": ["webgpu"],
+    "features": {
+        "webgpu": {
+            "description": "WebGPU backend",
+            "dependencies": [
+                {
+                    "name": "dawn"
+                }
+            ]
+        },
+        "icu": {
+            "description": "ICU for i18n",
+            "dependencies": [
+                {
+                    "name": "icu",
+                    "features": [
+                        "tools"
+                    ]
+                }
+            ]
+        },
+        "advanced-tests": {
+            "description": "Advanced tests",
+            "dependencies": [
+                {
+                    "name": "glfw3"
+                }
+            ]
+        }
+    }
+}

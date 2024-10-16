@@ -1,0 +1,32 @@
+UseTab: Never
+IndentWidth: 4
+BreakBeforeBraces: Attach
+MaxEmptyLinesToKeep: 1
+NamespaceIndentation: None
+AccessModifierOffset: -4
+SpacesInParentheses: false
+SpaceInEmptyParentheses: false
+SpacesInCStyleCastParentheses: false
+PointerAlignment: Left
+Cpp11BracedListStyle: false
+AllowShortBlocksOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortFunctionsOnASingleLine : Empty
+AllowShortLambdasOnASingleLine: Empty
+PenaltyReturnTypeOnItsOwnLine: 50000
+AlignOperands: true
+Standard: c++20
+IndentCaseLabels: false
+AlignTrailingComments : true
+ConstructorInitializerAllOnOneLineOrOnePerLine : false
+ColumnLimit: 110
+BinPackParameters : true
+BinPackArguments : true
+AlwaysBreakTemplateDeclarations : true
+AlignConsecutiveAssignments : AcrossEmptyLinesAndComments
+SortIncludes : false
+SeparateDefinitionBlocks : Always
+---
+Language : Cpp
+---
+Language: ObjC

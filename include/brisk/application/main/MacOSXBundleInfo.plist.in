@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
+	<key>CFBundleIconFile</key>
+	<string>@TARGET@.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>@APP_APPLE_BUNDLE@</string>
+	<key>CFBundleDisplayName</key>
+	<string>@APP_NAME@</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleLongVersionString</key>
+	<string>@APP_VERSION_MAJOR@.@APP_VERSION_MINOR@.@APP_VERSION_RELEASE@</string>
+	<key>CFBundleName</key>
+	<string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>@APP_VERSION_MAJOR@.@APP_VERSION_MINOR@</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>@APP_VERSION_MAJOR@.@APP_VERSION_MINOR@.@APP_VERSION_RELEASE@.@APP_VERSION_PATCH@</string>
+	<key>CSResourcesFileMapped</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>@APP_COPYRIGHT@</string>
+    
+	<key>NSHighResolutionCapable</key>
+    <true/>
+	<key>NSHighResolutionMagnifyAllowed</key>
+	<false/>
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
+</dict>
+</plist>
