@@ -54,9 +54,10 @@ static void visualTest(const std::string& referenceImageName, Size size, Fn&& fn
     bool testOk = false;
     SCOPE_EXIT {
         if (!testOk) {
-            fs::path tmpPath = tempFilePath(referenceImageName + ".png");
-            WARN("PNG saved at " << tmpPath.string());
-            REQUIRE(writeBytes(tmpPath, pngEncode(testImage)));
+            fs::path savePath = uniqueFileName(PROJECT_BINARY_DIR "/" + referenceImageName + ".png",
+                                               PROJECT_BINARY_DIR "/" + referenceImageName + " {}.png");
+            WARN("PNG saved at " << savePath.string());
+            REQUIRE(writeBytes(savePath, pngEncode(testImage)));
         }
     };
 
