@@ -105,7 +105,7 @@ void ImageBackendWebGPU::readFromGPU(const ImageData<UntypedPixel>& data, Point 
 
                                             },
                                     });
-    wgpu::WaitStatus status = m_device->m_instance.WaitAny(1, &future, 2000'000'000); // 2 seconds
+    wgpu::WaitStatus status = m_device->m_instance.WaitAny(1, &future, 10'000'000'000); // 10 seconds
     if (status == wgpu::WaitStatus::Success) {
         const UntypedPixel* bufferData =
             reinterpret_cast<const UntypedPixel*>(buffer.GetConstMappedRange(0, bufDesc.size));
