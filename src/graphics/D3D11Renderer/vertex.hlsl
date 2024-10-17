@@ -95,7 +95,6 @@ VertexOutput vertexMain_inner(uint vidx, uint inst) {
           outPosition = float4(lerp(rect.xy, rect.zw, uv_coord), 0.0f, 1.0f);
           output.uv = (outPosition.xy - rect.xy);
           output.data0 = glyph_data;
-        } else {
         }
       }
     }

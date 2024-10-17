@@ -426,4 +426,35 @@ TEST_CASE("TextureFill", "[gpu]") {
         canvas.fillRect(RectangleF{ 0, 200, 400, 400 });
     });
 }
+
+TEST_CASE("Canvas::drawImage", "[gpu]") {
+    renderTest("rotate-texture", Size{ 300, 300 }, [](RenderContext& context) {
+        Canvas canvas(context);
+        auto bytes = readBytes(fs::path(PROJECT_SOURCE_DIR) / "src/graphics/testdata/16616460-rgba.png");
+        REQUIRE(bytes.has_value());
+        auto image = pngDecode(*bytes, PixelFormat::RGBA);
+        REQUIRE(image.has_value());
+        canvas.drawImage({ 100, 100, 200, 200 }, *image, Matrix2D{}.rotate(15, 150.f, 150.f));
+    });
+    renderTest("rotate-texture-rect", Size{ 300, 300 }, [](RenderContext& context) {
+        Canvas canvas(context);
+        auto bytes = readBytes(fs::path(PROJECT_SOURCE_DIR) / "src/graphics/testdata/16616460-rgba.png");
+        REQUIRE(bytes.has_value());
+        auto image = pngDecode(*bytes, PixelFormat::RGBA);
+        REQUIRE(image.has_value());
+        canvas.setTransform(Matrix2D{}.rotate(15, 150.f, 150.f));
+        canvas.drawImage({ 100, 100, 200, 200 }, *image);
+    });
+    renderTest("rotate-rect", Size{ 300, 300 }, [](RenderContext& context) {
+        Canvas canvas(context);
+        auto bytes = readBytes(fs::path(PROJECT_SOURCE_DIR) / "src/graphics/testdata/16616460-rgba.png");
+        REQUIRE(bytes.has_value());
+        auto image = pngDecode(*bytes, PixelFormat::RGBA);
+        REQUIRE(image.has_value());
+        canvas.setTransform(Matrix2D{}.rotate(15, 150.f, 150.f));
+        canvas.setFillColor(Palette::Standard::green);
+        canvas.fillRect({ 100, 100, 200, 200 });
+    });
+}
+
 } // namespace Brisk

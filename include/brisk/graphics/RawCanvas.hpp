@@ -134,8 +134,6 @@ GeometryGlyphs pathLayout(SpriteResources& sprites, const RasterizedPath& path);
 
 class Canvas;
 
-constexpr inline RectangleF noScissors{ -10000, -10000, +10000, +10000 };
-
 class RawCanvas {
 public:
     explicit RawCanvas(RenderContext& context);

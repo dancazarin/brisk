@@ -85,7 +85,7 @@ struct UniformBlock {
     multigradient: i32,
     blur_directions: i32,
     texture_channel: i32,
-    reserved_3: i32,
+    clipInScreenspace: i32,
 
     texture_matrix_a: f32,
     texture_matrix_b: f32,
@@ -143,6 +143,10 @@ struct UniformBlockPerFrame {
 
 fn to_screen(xy: vec2f) -> vec2f {
     return xy * perFrame.viewport.zw * vec2f(2, -2) + vec2f(-1, 1);
+}
+
+fn from_screen(xy: vec2f) -> vec2f {
+    return (xy - vec2f(-1, 1)) * vec2f(0.5, -0.5) * perFrame.viewport.xy;
 }
 
 fn max2(pt: vec2f) -> f32 {
@@ -220,7 +224,6 @@ fn norm_rect(rect: vec4f) -> vec4f {
         outPosition = vec4f(mix(rect.xy, rect.zw, uv_coord), 0, 1);
         output.uv = outPosition.xy - rect.xy;
         output.data0 = glyph_data;
-    } else {
     }
 
     output.canvas_coord = outPosition.xy;
@@ -357,14 +360,12 @@ fn remixColors(value: vec4f) -> vec4f {
     return constants.fill_color1 * value.x + constants.fill_color2 * value.y + constants.stroke_color1 * value.z + constants.stroke_color2 * value.w;
 }
 
-
-fn transformedTexCoord(uv: vec2f, rectSize: vec2f) -> vec2f {
+fn transformedTexCoord(uv: vec2f) -> vec2f {
     let texture_matrix = mat3x2f(constants.texture_matrix_a, constants.texture_matrix_b, constants.texture_matrix_c,
         constants.texture_matrix_d, constants.texture_matrix_e, constants.texture_matrix_f);
 
-    let c_uv = uv + 0.5 * rectSize;
     let tex_size = textureDimensions(boundTexture_t);
-    let transformed_uv = (texture_matrix * vec3f(c_uv, 1.0)).xy / vec2f(tex_size);
+    let transformed_uv = (texture_matrix * vec3f(uv, 1.0)).xy / vec2f(tex_size);
     return transformed_uv;
 }
 
@@ -383,7 +384,7 @@ fn simpleCalcColors(canvas_coord: vec2f) -> Colors {
 fn calcColors(canvas_coord: vec2f) -> Colors {
     var result: Colors;
     if constants.texture_index != -1 { // texture
-        let transformed_uv = transformedTexCoord(canvas_coord, vec2f(0, 0));
+        let transformed_uv = transformedTexCoord(canvas_coord);
         // if constants.blur_radius > 0.0 {
             // brush = sampleBlur(transformed_uv);
         // } else {
@@ -468,11 +469,9 @@ fn get_pattern(x: u32, pattern: u32) -> u32 {
     return (pattern >> (x % u32(24))) & u32(1);
 }
 
-fn mask(in: VertexOutput) -> f32 {
-    let pt = in.canvas_coord;
+fn mask(pt: vec2f) -> f32 {
     let scissor_size = constants.scissor.zw - constants.scissor.xy;
-
-    return toCoverage(sd_rectangle(in.canvas_coord - (constants.scissor.xy + scissor_size * 0.5), scissor_size,
+    return toCoverage(sd_rectangle(pt - (constants.scissor.xy + scissor_size * 0.5), scissor_size,
         constants.scissors_border_radius, constants.scissors_corners));
 }
 
@@ -593,7 +592,13 @@ fn postprocessColor(in: FragOut, mask_value: f32, canvas_coord: vec2u) -> FragOu
 
 @fragment /**/fn fragmentMain(in: VertexOutput) -> FragOut {
 
-    let mask_value = mask(in);
+    var pt: vec2<f32>;
+    if constants.clipInScreenspace != 0 {
+        pt = in.position.xy;
+    } else {
+        pt = in.canvas_coord;
+    }
+    let mask_value = mask(pt);
     if mask_value <= 0 {
         discard;
     }

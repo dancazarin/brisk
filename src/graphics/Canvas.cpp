@@ -310,7 +310,7 @@ void Canvas::setPaint(RenderStateEx& renderState, const Paint& paint) {
     }
     case 2: { // Texture
         const Texture& texture     = std::get<Texture>(paint);
-        renderState.texture_matrix = texture.matrix;
+        renderState.texture_matrix = texture.matrix.invert().value_or(Matrix2D{});
         renderState.imageHandle    = texture.image;
         break;
     }
@@ -362,7 +362,8 @@ void Canvas::fillPath(Path path) {
 }
 
 static void applier(RenderState* target, Matrix2D* matrix) {
-    target->coordMatrix = *matrix;
+    target->coordMatrix       = *matrix;
+    target->clipInScreenspace = 1;
 }
 
 void Canvas::drawImage(RectangleF rect, RC<Image> image, Matrix2D matrix) {

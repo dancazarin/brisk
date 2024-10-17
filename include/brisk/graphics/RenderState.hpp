@@ -250,6 +250,8 @@ using ImageHandle                        = RC<ImageAny>;
 
 struct RenderBuffer;
 
+constexpr inline RectangleF noScissors{ -16777216, -16777216, 16777216, 16777216 };
+
 struct RenderState {
     bool operator==(const RenderState& state) const;
 
@@ -276,7 +278,7 @@ public:
     int pattern_scale          = 1;
     float opacity              = 1.f; ///< Opacity. Defaults to 1
 
-    RectangleF scissor         = { -10000.0f, -10000.0f, +10000.0f, +10000.0f }; ///< Clip area
+    RectangleF scissor         = noScissors; ///< Clip area in screen space
 
 public:
     // ---------------- texture [4] ----------------
@@ -284,7 +286,7 @@ public:
     int32_t multigradient = -1; ///< Gradient (-1 - disabled)
     int blurDirections    = 3;  ///< 0 - disable, 1 - H, 2 - V, 3 - H&V
     int textureChannel    = 0;  ///<
-    int reserved_3        = 0;
+    int clipInScreenspace = 0;
 
     Matrix2D texture_matrix{ 1.f, 0.f, 0.f, 1.f, 0.f, 0.f }; ///<
     float reserved_4 = 0;                                    ///<
