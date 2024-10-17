@@ -517,6 +517,30 @@ struct Matrix2DOf {
             points[i] = transform(points[i]);
         }
     }
+
+    /**
+     * @brief Inverts the matrix, if possible.
+     *
+     * @return std::optional<Matrix2DOf> The inverse of the matrix if it is invertible, or `std::nullopt` if
+     * the matrix is singular (non-invertible).
+     */
+    std::optional<Matrix2DOf> invert() const {
+        T det = a * d - b * c; // determinant
+
+        if (det < std::numeric_limits<T>::epsilon()) {
+            return std::nullopt; // Matrix is not invertible
+        }
+
+        Matrix2DOf result;
+        // Calculate the inverse of the matrix
+        result.a = d / det;
+        result.b = -b / det;
+        result.c = -c / det;
+        result.d = a / det;
+        result.e = (c * f - d * e) / det;
+        result.f = (b * e - a * f) / det;
+        return result;
+    }
 };
 
 using Matrix2D = Matrix2DOf<float>;
