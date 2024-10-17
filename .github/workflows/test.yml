@@ -24,7 +24,7 @@ jobs:
       uses: actions/checkout@v4
     - name: Install prerequisites
       run: |        
-        sudo apt-get update && sudo apt-get install -y ninja-build wget xorg-dev libgl-dev libgl1-mesa-dev libvulkan-dev autoconf autoconf-archive libxrandr-dev libxinerama-dev libxcursor-dev mesa-common-dev libx11-xcb-dev
+        sudo apt-get update && sudo apt-get install -y ninja-build mesa-vulkan-drivers vulkan-tools wget xorg-dev libgl-dev libgl1-mesa-dev libvulkan-dev autoconf autoconf-archive libxrandr-dev libxinerama-dev libxcursor-dev mesa-common-dev libx11-xcb-dev
         wget -O - https://apt.llvm.org/llvm.sh | sudo bash -s - 19
     - name: Vcpkg
       run: |
@@ -37,7 +37,7 @@ jobs:
         cmake --build build
     - name: Test
       run: |
-        ctest --test-dir build --output-on-failure -E "graphics_autotests|window_autotests"
+        WGPU_LONG_TIMEOUT=1 ctest --test-dir build --output-on-failure -E "window_autotests"
 
   windows-ninja-clang-x86-64:
     runs-on: windows-latest
