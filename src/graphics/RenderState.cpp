@@ -119,4 +119,8 @@ void Tag::CoordMatrix::apply(const Tag::CoordMatrix::Type& value, RenderStateEx&
     state.coordMatrix = value;
 }
 
+void Tag::SamplerMode::apply(const Tag::SamplerMode::Type& value, RenderStateEx& state) {
+    state.samplerMode = value;
+}
+
 } // namespace Brisk

@@ -94,7 +94,7 @@ struct UniformBlock {
 
     texture_matrix_e: f32,
     texture_matrix_f: f32,
-    reserved_4: f32,
+    samplerMode: i32,
     blur_radius: f32,
 
     fill_color1: vec4f,
@@ -364,9 +364,12 @@ fn transformedTexCoord(uv: vec2f) -> vec2f {
     let texture_matrix = mat3x2f(constants.texture_matrix_a, constants.texture_matrix_b, constants.texture_matrix_c,
         constants.texture_matrix_d, constants.texture_matrix_e, constants.texture_matrix_f);
 
-    let tex_size = textureDimensions(boundTexture_t);
-    let transformed_uv = (texture_matrix * vec3f(uv, 1.0)).xy / vec2f(tex_size);
-    return transformed_uv;
+    let tex_size = vec2f(textureDimensions(boundTexture_t));
+    var transformed_uv = (texture_matrix * vec3f(uv, 1.0)).xy;
+    if constants.samplerMode == 0 {
+        transformed_uv = clamp(transformed_uv, vec2f(0.5), tex_size - 0.5);
+    }
+    return transformed_uv / tex_size;
 }
 
 fn simpleCalcColors(canvas_coord: vec2f) -> Colors {

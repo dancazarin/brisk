@@ -27,8 +27,9 @@ using DashArray = inline_vector<float, 7>;
  * applied to a surface.
  */
 struct Texture {
-    RC<Image> image; ///< The image used as the texture.
-    Matrix2D matrix; ///< The transformation matrix applied to the texture.
+    RC<Image> image;                      ///< The image used as the texture.
+    Matrix2D matrix;                      ///< The transformation matrix applied to the texture.
+    SamplerMode mode = SamplerMode::Wrap; ///< The sampler mode.
 };
 
 /**
@@ -359,7 +360,8 @@ public:
      * @param image The Image to draw.
      * @param matrix The transformation matrix to apply to the image. Defaults to the identity matrix.
      */
-    void drawImage(RectangleF rect, RC<Image> image, Matrix2D matrix = {});
+    void drawImage(RectangleF rect, RC<Image> image, Matrix2D matrix = {},
+                   SamplerMode samplerMode = SamplerMode::Clamp);
 
     /**
      * @brief Retrieves the current transformation matrix.

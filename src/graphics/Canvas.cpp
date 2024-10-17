@@ -312,6 +312,7 @@ void Canvas::setPaint(RenderStateEx& renderState, const Paint& paint) {
         const Texture& texture     = std::get<Texture>(paint);
         renderState.texture_matrix = texture.matrix.invert().value_or(Matrix2D{});
         renderState.imageHandle    = texture.image;
+        renderState.samplerMode    = texture.mode;
         break;
     }
     }
@@ -366,8 +367,8 @@ static void applier(RenderState* target, Matrix2D* matrix) {
     target->clipInScreenspace = 1;
 }
 
-void Canvas::drawImage(RectangleF rect, RC<Image> image, Matrix2D matrix) {
-    drawTexture(rect, image, matrix, &m_state.transform);
+void Canvas::drawImage(RectangleF rect, RC<Image> image, Matrix2D matrix, SamplerMode samplerMode) {
+    drawTexture(rect, image, matrix, &m_state.transform, Arg::samplerMode = samplerMode);
 }
 
 void Canvas::fillText(const PrerenderedText& text) {

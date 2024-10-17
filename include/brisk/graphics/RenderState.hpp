@@ -119,6 +119,11 @@ struct ConstantPerFrame {
 struct RenderState;
 struct RenderStateEx;
 
+enum class SamplerMode : int32_t {
+    Clamp = 0,
+    Wrap  = 1,
+};
+
 namespace Tag {
 
 struct SubpixelMode {
@@ -212,6 +217,11 @@ struct CoordMatrix {
     static void apply(const Type& value, RenderStateEx& state);
 };
 
+struct SamplerMode {
+    using Type = Brisk::SamplerMode;
+    static void apply(const Type& value, RenderStateEx& state);
+};
+
 } // namespace Tag
 
 inline namespace Arg {
@@ -236,12 +246,13 @@ constexpr inline Argument<Tag::BlurDirections> blurDirections{};
 constexpr inline Argument<Tag::TextureChannel> textureChannel{};
 constexpr inline Argument<Tag::ContourFlags> contourFlags{};
 constexpr inline Argument<Tag::CoordMatrix> coordMatrix{};
+constexpr inline Argument<Tag::SamplerMode> samplerMode{};
 
 } // namespace Arg
 
-constexpr float defaultGamma             = 2.2f;
+constexpr float defaultGamma        = 2.2f;
 
-constexpr int multigradientColorMix      = -10;
+constexpr int multigradientColorMix = -10;
 
 using TextureId                          = uint32_t;
 constexpr inline TextureId textureIdNone = static_cast<TextureId>(-1);
@@ -289,8 +300,8 @@ public:
     int clipInScreenspace = 0;
 
     Matrix2D texture_matrix{ 1.f, 0.f, 0.f, 1.f, 0.f, 0.f }; ///<
-    float reserved_4 = 0;                                    ///<
-    float blurRadius = 0.f;                                  ///<
+    SamplerMode samplerMode = SamplerMode::Clamp;            ///<
+    float blurRadius        = 0.f;                           ///<
 
 public:
     // ---------------- rectangles, arcs [6] ----------------

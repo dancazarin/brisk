@@ -171,9 +171,12 @@ float2 transformedTexCoord(float2 uv) {
   float3x2 texture_matrix = float3x2(float2(asfloat(constants[7].x), asfloat(constants[7].y)), float2(asfloat(constants[7].z), asfloat(constants[7].w)), float2(asfloat(constants[8].x), asfloat(constants[8].y)));
   uint2 tint_tmp_1;
   boundTexture_t.GetDimensions(tint_tmp_1.x, tint_tmp_1.y);
-  uint2 tex_size = tint_tmp_1;
-  float2 transformed_uv = (mul(float3(uv, 1.0f), texture_matrix).xy / float2(tex_size));
-  return transformed_uv;
+  float2 tex_size = float2(tint_tmp_1);
+  float2 transformed_uv = mul(float3(uv, 1.0f), texture_matrix).xy;
+  if ((asint(constants[8].z) == 0)) {
+    transformed_uv = clamp(transformed_uv, (0.5f).xx, (tex_size - 0.5f));
+  }
+  return (transformed_uv / tex_size);
 }
 
 float positionAlongLine(float2 from_, float2 to, float2 tint_symbol) {
