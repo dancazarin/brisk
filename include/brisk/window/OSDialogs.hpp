@@ -174,7 +174,7 @@ struct FileDialogFilter {
      * @param filters A vector of file filters.
      * @param description The description of the filter.
      */
-    constexpr FileDialogFilter(std::vector<std::string> filters, std::string description) {
+    FileDialogFilter(std::vector<std::string> filters, std::string description) {
         this->filters     = std::move(filters);
         this->description = std::move(description);
     }
@@ -185,7 +185,7 @@ struct FileDialogFilter {
      * @param filter A single file filter.
      * @param description The description of the filter.
      */
-    constexpr FileDialogFilter(std::string filter, std::string description) {
+    FileDialogFilter(std::string filter, std::string description) {
         this->filters.push_back(std::move(filter));
         this->description = std::move(description);
     }
@@ -195,7 +195,7 @@ struct FileDialogFilter {
      *
      * @param filter A single file filter.
      */
-    constexpr FileDialogFilter(std::string filter) {
+    FileDialogFilter(std::string filter) {
         this->filters.push_back(std::move(filter));
         this->description = this->filters.back();
     }
@@ -207,7 +207,7 @@ struct FileDialogFilter {
  * @param description An optional description for the filter.
  * @return FileDialogFilter A file dialog filter for any file.
  */
-constexpr FileDialogFilter anyFile(std::string description = {}) {
+inline FileDialogFilter anyFile(std::string description = {}) {
     return FileDialogFilter{ std::vector<std::string>{ "*.*" },
                              description.empty() ? "Any file" : std::move(description) };
 }
