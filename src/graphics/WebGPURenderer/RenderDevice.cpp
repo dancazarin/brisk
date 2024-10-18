@@ -397,6 +397,12 @@ void RenderDeviceWebGPU::wait() {
 }
 
 void RenderDeviceWebGPU::createImageBackend(RC<ImageAny> image) {
+    BRISK_ASSERT(image);
+    if (wgFormat(image->type(), image->format()) == wgpu::TextureFormat::Undefined) {
+        throwException(EImageError("WebGPU backend does not support the image type or format: {}, {}. "
+                                   "Consider converting the image before sending it to the GPU.",
+                                   image->type(), image->format()));
+    }
     std::ignore = getOrCreateBackend(shared_from_this(), std::move(image), true, false);
 }
 

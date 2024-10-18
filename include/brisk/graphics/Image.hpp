@@ -933,4 +933,14 @@ inline void setBackend(RC<ImageAny> image, ImageBackend* backend) {
 
 } // namespace Internal
 
+/**
+ * @brief Custom exception class for image-related errors.
+ *
+ * This class derives from the standard runtime_error to provide specific error handling for image processing.
+ */
+class EImageError : public Exception<std::runtime_error> {
+public:
+    using Exception<std::runtime_error>::Exception; ///< Inherit constructors from the base exception class
+};
+
 } // namespace Brisk

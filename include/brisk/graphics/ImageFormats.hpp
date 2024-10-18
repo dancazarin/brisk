@@ -166,14 +166,4 @@ inline ColorSubsampling defaultColorSubsampling = ColorSubsampling::S420;
 [[nodiscard]] expected<RC<Image>, ImageIOError> imageDecode(bytes_view bytes,
                                                             PixelFormat format = PixelFormat::Unknown);
 
-/**
- * @brief Custom exception class for image-related errors.
- *
- * This class derives from the standard runtime_error to provide specific error handling for image processing.
- */
-class EImageError : public Exception<std::runtime_error> {
-public:
-    using Exception<std::runtime_error>::Exception; ///< Inherit constructors from the base exception class
-};
-
 } // namespace Brisk
