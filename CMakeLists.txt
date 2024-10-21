@@ -89,10 +89,6 @@ if (BRISK_LOG_TO_STDERR)
     add_compile_definitions(BRISK_LOG_TO_STDERR=1)
 endif ()
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    add_compile_options(-fdiagnostics-absolute-paths)
-endif ()
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 include(cmake/add_license.cmake)

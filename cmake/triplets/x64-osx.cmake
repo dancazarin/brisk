@@ -8,6 +8,3 @@ set(VCPKG_OSX_ARCHITECTURES x86_64)
 set(VCPKG_OSX_DEPLOYMENT_TARGET "11")
 
 set(ENV{MACOSX_DEPLOYMENT_TARGET} "11")
-
-set(VCPKG_CXX_FLAGS -ffunction-sections -fdata-sections)
-set(VCPKG_C_FLAGS -ffunction-sections -fdata-sections)
