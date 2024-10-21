@@ -6,3 +6,4 @@ cmake-*
 .DS_Store
 vcpkg_installed
 vcpkg
+vcpkg_cache
