@@ -33,7 +33,7 @@ public:
 
     template <WidgetArgument... Args>
     ImageView(bytes_view image, const Args&... args)
-        : ImageView(Construction{ widgetType }, imageDecode(image, PixelFormat::RGBA).value(),
+        : ImageView(Construction{ widgetType }, imageDecode(image, ImageFormat::RGBA).value(),
                     std::tuple{ args... }) {
         endConstruction();
     }
@@ -71,7 +71,7 @@ public:
 
 protected:
     SVGImage m_svg;
-    mutable RC<ImageRGBA> m_image;
+    mutable RC<Image> m_image;
 
     void paint(Canvas& canvas) const override;
     Ptr cloneThis() override;

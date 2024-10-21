@@ -42,7 +42,7 @@ TEST_CASE("computeY") {
 
 TEST_CASE("Pixel") {
     const auto pix  = PixelRGBA8{ 11, 22, 33, 255 };
-    const auto pixf = PixelRGBA<float>{ 0.1f, 0.2f, 0.3f, 1.f };
+    const auto pixf = PixelRGBA<PixelType::F32>{ 0.1f, 0.2f, 0.3f, 1.f };
     CHECK(cvtPixel<PixelFormat::RGB>(pix) == PixelRGB8{ 11, 22, 33 });
     CHECK(cvtPixel<PixelFormat::RGBA>(pix) == PixelRGBA8{ 11, 22, 33, 255 });
     CHECK(cvtPixel<PixelFormat::ARGB>(pix) == PixelARGB8{ 255, 11, 22, 33 });
@@ -56,11 +56,11 @@ TEST_CASE("Pixel") {
     CHECK(cvtPixel<PixelFormat::RGBA>(PixelAlpha8{ 255 }) == PixelRGBA8{ 0, 0, 0, 255 });
     CHECK(cvtPixel<PixelFormat::RGBA>(PixelGreyscale8{ 111 }) == PixelRGBA8{ 111, 111, 111, 255 });
 
-    CHECK(pixelToColor<PixelType::U8Gamma>(pix) == Color{ 11, 22, 33, 255 });
-    CHECK(pixelToColor<PixelType::F32>(pixf) == ColorF{ 0.1f, 0.2f, 0.3f, 1.f });
+    CHECK(pixelToColor(pix) == Color{ 11, 22, 33, 255 });
+    CHECK(pixelToColor(pixf) == ColorF{ 0.1f, 0.2f, 0.3f, 1.f });
 
-    CHECK(colorToPixel<PixelType::U8Gamma, PixelFormat::RGBA>(Color{ 11, 22, 33, 255 }) == pix);
-    CHECK(colorToPixel<PixelType::F32, PixelFormat::RGBA>(ColorF{ 0.1f, 0.2f, 0.3f, 1.f }) == pixf);
+    CHECK(colorToPixel(Color{ 11, 22, 33, 255 }) == pix);
+    CHECK(colorToPixel(ColorF{ 0.1f, 0.2f, 0.3f, 1.f }) == pixf);
 }
 
 TEST_CASE("PixelType,PixelFormat") {

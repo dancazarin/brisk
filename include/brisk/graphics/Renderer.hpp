@@ -285,17 +285,7 @@ public:
      * @brief Returns the rendered image.
      * @return The rendered image.
      */
-    virtual RC<ImageAny> image() const = 0;
-
-    /**
-     * @brief Converts the rendered image to a specific pixel format.
-     * @tparam Type The pixel type.
-     * @return The image in the specified format.
-     */
-    template <PixelType Type>
-    RC<ImageRGBATyped<Type>> imageAs() const {
-        return image()->template as<Type, PixelFormat::RGBA>();
-    }
+    virtual RC<Image> image() const    = 0;
 };
 
 /**
@@ -408,7 +398,7 @@ public:
      * @brief Creates a backend representation of an image.
      * @param image The image to create a backend for.
      */
-    virtual void createImageBackend(RC<ImageAny> image)                = 0;
+    virtual void createImageBackend(RC<Image> image)                   = 0;
 };
 
 /**

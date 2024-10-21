@@ -58,7 +58,7 @@ private:
     void initSystemCursors();
     bool m_systemCursorsInitialized = false;
     static RC<SystemCursor> getSystemCursor(Cursor cursor);
-    static RC<SystemCursor> cursorFromImage(const RC<ImageRGBA>& image, Point point, float scale);
+    static RC<SystemCursor> cursorFromImage(const RC<Image>& image, Point point, float scale);
 };
 
 extern PlatformCursors platformCursors;

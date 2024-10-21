@@ -43,11 +43,11 @@ SVGImage::SVGImage(bytes_view svg) : SVGImage(toStringView(svg)) {}
 
 SVGImage::~SVGImage() = default;
 
-RC<ImageRGBA> SVGImage::render(Size size, ColorF background) const {
+RC<Image> SVGImage::render(Size size, ColorF background) const {
     Color color         = background;
     lunasvg::Bitmap bmp = m_impl->renderToBitmap(size.width, size.height, std::bit_cast<uint32_t>(color));
-    RC<ImageRGBA> image = createImage<PixelFormat::RGBA>(size);
-    convertPixels(image->format(), image->data().to<uint8_t>(), lunaFormat,
+    RC<Image> image     = rcnew Image(size, ImageFormat::RGBA);
+    convertPixels(image->pixelFormat(), image->data().to<uint8_t>(), lunaFormat,
                   StridedData<const uint8_t>{
                       reinterpret_cast<const uint8_t*>(bmp.data()),
                       int32_t(bmp.stride()),

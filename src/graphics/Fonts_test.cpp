@@ -259,19 +259,19 @@ TEST_CASE("FontManager") {
         if (!icuAvailable && requiresIcu.contains(i)) {
             continue;
         }
-        visualTestMono(fmt::format("hello{}", i), { 512, 64 }, [&](RC<ImageGreyscale> image) {
+        visualTestMono(fmt::format("hello{}", i), { 512, 64 }, [&](RC<Image> image) {
             Font font{ latoPlusNoto, 36.f };
             auto run = fontManager->prerender(font, helloWorld[i]);
             fontManager->testRender(image, run, { 5, 42 });
         });
     }
 
-    visualTestMono("nl-multi", { 256, 128 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("nl-multi", { 256, 128 }, [&](RC<Image> image) {
         auto run = fontManager->prerender(bigFont,
                                           TextWithOptions{ utf8ToUtf32("ABC\nDEF"), LayoutOptions::Default });
         fontManager->testRender(image, run, { 5, 42 });
     });
-    visualTestMono("nl-single", { 256, 128 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("nl-single", { 256, 128 }, [&](RC<Image> image) {
         auto run = fontManager->prerender(
             bigFont, TextWithOptions{ utf8ToUtf32("ABC\nDEF"), LayoutOptions::SingleLine });
         fontManager->testRender(image, run, { 5, 42 });
@@ -285,53 +285,53 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
 Њ	Њ̀	Њ̂	Њ̆	Њ̊	Њ̋	Њ̈	Њ̧	Њ̌	Њ̃	Њ́	Њ̈́	Њ́̈
 )";
 
-    visualTestMono("diacritics-lato", { 650, 290 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("diacritics-lato", { 650, 290 }, [&](RC<Image> image) {
         Font font{ lato, 36.f };
         font.tabWidth = 5.f;
         auto run      = fontManager->prerender(font, diac);
         fontManager->testRender(image, run, { 5, 42 });
     });
-    visualTestMono("diacritics-noto", { 650, 290 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("diacritics-noto", { 650, 290 }, [&](RC<Image> image) {
         Font font{ noto, 36.f };
         font.tabWidth = 5.f;
         auto run      = fontManager->prerender(font, diac);
         fontManager->testRender(image, run, { 5, 42 });
     });
-    visualTestMono("bounds-text", { 128, 64 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("bounds-text", { 128, 64 }, [&](RC<Image> image) {
         Font font{ lato, 36.f };
         auto run = fontManager->prerender(font, U"a");
         fontManager->testRender(image, run, { 5, 42 }, TestRenderFlags::TextBounds);
     });
-    visualTestMono("bounds-text-bar", { 128, 64 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("bounds-text-bar", { 128, 64 }, [&](RC<Image> image) {
         Font font{ lato, 36.f };
         auto run = fontManager->prerender(font, U"|");
         fontManager->testRender(image, run, { 5, 42 }, TestRenderFlags::TextBounds);
     });
-    visualTestMono("bounds-text2", { 128, 64 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("bounds-text2", { 128, 64 }, [&](RC<Image> image) {
         Font font{ lato, 36.f };
         auto run = fontManager->prerender(font, U"a  ");
         fontManager->testRender(image, run, { 5, 42 }, TestRenderFlags::TextBounds);
     });
-    visualTestMono("bounds-text3", { 128, 64 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("bounds-text3", { 128, 64 }, [&](RC<Image> image) {
         Font font{ lato, 36.f };
         auto run = fontManager->prerender(font, U"  a");
         fontManager->testRender(image, run, { 5, 42 }, TestRenderFlags::TextBounds);
     });
 
-    visualTestMono("lineHeight1", { 64, 64 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("lineHeight1", { 64, 64 }, [&](RC<Image> image) {
         Font font{ lato, 16.f };
         font.lineHeight = 1.f;
         auto run        = fontManager->prerender(font, U"1st line\n2nd line");
         fontManager->testRender(image, run, { 3, 20 }, TestRenderFlags::TextBounds);
     });
-    visualTestMono("lineHeight1dot5", { 64, 64 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("lineHeight1dot5", { 64, 64 }, [&](RC<Image> image) {
         Font font{ lato, 16.f };
         font.lineHeight = 1.5f;
         auto run        = fontManager->prerender(font, U"1st line\n2nd line");
         fontManager->testRender(image, run, { 3, 20 }, TestRenderFlags::TextBounds);
     });
 
-    visualTestMono("unicode-suppl", { 256, 64 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("unicode-suppl", { 256, 64 }, [&](RC<Image> image) {
         Font font{ noto, 36.f };
         auto run = fontManager->prerender(
             font, U"\U00010140\U00010141\U00010142\U00010143\U00010144\U00010145\U00010146\U00010147");
@@ -339,33 +339,33 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
     });
 
     if (icuAvailable) {
-        visualTestMono("mixed", { 512, 64 }, [&](RC<ImageGreyscale> image) {
+        visualTestMono("mixed", { 512, 64 }, [&](RC<Image> image) {
             Font font{ noto, 36.f };
             auto run = fontManager->prerender(font, U"abcdef مرحبا بالعالم!");
             fontManager->testRender(image, run, { 5, 42 });
         });
 
-        visualTestMono("mixed2", { 512, 64 }, [&](RC<ImageGreyscale> image) {
+        visualTestMono("mixed2", { 512, 64 }, [&](RC<Image> image) {
             Font font{ noto, 36.f };
             auto run = fontManager->prerender(font, U"123456 مرحبا بالعالم!");
             fontManager->testRender(image, run, { 5, 42 });
         });
 
-        visualTestMono("mixed3", { 512, 64 }, [&](RC<ImageGreyscale> image) {
+        visualTestMono("mixed3", { 512, 64 }, [&](RC<Image> image) {
             Font font{ noto, 36.f };
             auto run = fontManager->prerender(font, U"مرحبا (بالعالم)!");
             fontManager->testRender(image, run, { 5, 42 });
         });
     }
 
-    visualTestMono("wrapped-abc", { 128, 128 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("wrapped-abc", { 128, 128 }, [&](RC<Image> image) {
         Font font{ noto, 18.f };
         auto t      = U"A B C D E F G H I J K L M N O P Q R S T U V W X Y Z";
         auto shaped = fontManager->shape(font, t);
         auto run    = shaped.prerender(font, 120);
         fontManager->testRender(image, run, { 3, 20 }, TestRenderFlags::None, { 3, 3 + 120 }, { 20 });
     });
-    visualTestMono("wrapped-abc-big", { 4 * 128, 4 * 128 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("wrapped-abc-big", { 4 * 128, 4 * 128 }, [&](RC<Image> image) {
         Font font{ noto, 4 * 18.f };
         auto t      = U"A B C D E F G H I J K L M N O P Q R S T U V W X Y Z";
         auto shaped = fontManager->shape(font, t);
@@ -373,21 +373,21 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
         fontManager->testRender(image, run, { 4 * 3, 4 * 20 }, TestRenderFlags::None,
                                 { 4 * 3, 4 * 3 + 4 * 120 }, { 4 * 20 });
     });
-    visualTestMono("wrapped-abc2", { 128, 128 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("wrapped-abc2", { 128, 128 }, [&](RC<Image> image) {
         Font font{ noto, 18.f };
         auto t      = U"A B C D E F G H I J K L M N O P Q R S T U V W X Y Z";
         auto shaped = fontManager->shape(font, t);
         auto run    = shaped.prerender(font, 110);
         fontManager->testRender(image, run, { 3, 20 }, TestRenderFlags::None, { 3, 3 + 110 }, { 20 });
     });
-    visualTestMono("wrapped-abc3", { 128, 128 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("wrapped-abc3", { 128, 128 }, [&](RC<Image> image) {
         Font font{ noto, 16.f };
         auto t      = U"ABCDEFGHIJKLM N O P Q R S T U V W X Y Z";
         auto shaped = fontManager->shape(font, t);
         auto run    = shaped.prerender(font, 100);
         fontManager->testRender(image, run, { 3, 20 }, TestRenderFlags::None, { 3, 3 + 100 }, { 20 });
     });
-    visualTestMono("wrapped-abc4", { 128, 128 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("wrapped-abc4", { 128, 128 }, [&](RC<Image> image) {
         Font font{ noto, 16.f };
         auto t      = U"A               B C D E F G H";
         auto shaped = fontManager->shape(font, t);
@@ -395,7 +395,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
         fontManager->testRender(image, run, { 3, 20 }, TestRenderFlags::None, { 3, 3 + 24 }, { 20 });
     });
     if (icuAvailable) {
-        visualTestMono("wrapped-rtl4", { 128, 128 }, [&](RC<ImageGreyscale> image) {
+        visualTestMono("wrapped-rtl4", { 128, 128 }, [&](RC<Image> image) {
             Font font{ noto, 16.f };
             auto t      = U"א          ב ג ד ה ו ז ח ט י";
             auto shaped = fontManager->shape(font, t);
@@ -404,7 +404,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
             fontManager->testRender(image, run, { 3, 20 }, TestRenderFlags::None, { 3, 3 + 24 }, { 20 });
         });
     }
-    visualTestMono("wrapped-abc0", { 128, 128 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("wrapped-abc0", { 128, 128 }, [&](RC<Image> image) {
         Font font{ noto, 16.f };
         auto t      = U"ABCDEFGHIJKLM N O P Q R S T U V W X Y Z";
         auto shaped = fontManager->shape(font, t);
@@ -412,7 +412,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
         fontManager->testRender(image, run, { 3, 20 }, TestRenderFlags::None, { 3 }, { 20 });
     });
     if (icuAvailable) {
-        visualTestMono("wrapped-cn", { 490, 384 }, [&](RC<ImageGreyscale> image) {
+        visualTestMono("wrapped-cn", { 490, 384 }, [&](RC<Image> image) {
             Font font{ noto, 32.f };
             auto t =
                 U"人人生而自由，在尊严和权利上一律平等。他们赋有理性和良心，并应以兄弟关系的精神相对待。";
@@ -420,7 +420,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
             auto run    = shaped.prerender(font, 460);
             fontManager->testRender(image, run, { 3, 36 }, TestRenderFlags::None, { 3, 3 + 460 }, { 36 });
         });
-        visualTestMono("wrapped-ar-left", { 490, 384 }, [&](RC<ImageGreyscale> image) {
+        visualTestMono("wrapped-ar-left", { 490, 384 }, [&](RC<Image> image) {
             Font font{ noto, 32.f };
             // clang-format off
         auto t = U"يولد جميع الناس أحرارًا متساوين في الكرامة والحقوق. وقد وهبوا عقلاً وضميرًا وعليهم أن يعامل بعضهم بعضًا بروح الإخاء.";
@@ -429,7 +429,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
             auto run    = shaped.prerender(font, 360);
             fontManager->testRender(image, run, { 23, 36 }, TestRenderFlags::None, { 23, 23 + 360 }, { 36 });
         });
-        visualTestMono("wrapped-ar-right", { 490, 384 }, [&](RC<ImageGreyscale> image) {
+        visualTestMono("wrapped-ar-right", { 490, 384 }, [&](RC<Image> image) {
             Font font{ noto, 32.f };
             // clang-format off
         auto t = U"يولد جميع الناس أحرارًا متساوين في الكرامة والحقوق. وقد وهبوا عقلاً وضميرًا وعليهم أن يعامل بعضهم بعضًا بروح الإخاء.";
@@ -440,7 +440,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
             fontManager->testRender(image, run, { 23, 36 }, TestRenderFlags::None, { 23, 23 + 360 }, { 36 });
         });
     }
-    visualTestMono("letter-spacing", { 640, 64 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("letter-spacing", { 640, 64 }, [&](RC<Image> image) {
         Font font{ noto, 22.f };
         font.letterSpacing = 12.f;
         auto t             = U"Letter spacing fi fl ff áb́ć";
@@ -448,7 +448,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
         auto run           = shaped.prerender(font, HUGE_VALF);
         fontManager->testRender(image, run, { 5, 36 });
     });
-    visualTestMono("word-spacing", { 640, 64 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("word-spacing", { 640, 64 }, [&](RC<Image> image) {
         Font font{ noto, 22.f };
         font.wordSpacing = 12.f;
         auto t           = U"Word spacing fi fl ff áb́ć";
@@ -456,7 +456,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
         auto run         = shaped.prerender(font, HUGE_VALF);
         fontManager->testRender(image, run, { 5, 36 });
     });
-    visualTestMono("letter-spacing-cn", { 640, 64 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("letter-spacing-cn", { 640, 64 }, [&](RC<Image> image) {
         Font font{ noto, 22.f };
         font.letterSpacing = 12.f;
         auto t             = U"人人生而自由，在尊严和权利上一律平等。";
@@ -464,7 +464,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
         auto run           = shaped.prerender(font, HUGE_VALF);
         fontManager->testRender(image, run, { 5, 36 });
     });
-    visualTestMono("word-spacing-cn", { 640, 64 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("word-spacing-cn", { 640, 64 }, [&](RC<Image> image) {
         Font font{ noto, 22.f };
         font.wordSpacing = 12.f;
         auto t           = U"人人生而自由，在尊严和权利上一律平等。";
@@ -473,7 +473,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
         fontManager->testRender(image, run, { 5, 36 });
     });
     if (icuAvailable) {
-        visualTestMono("letter-spacing-ar", { 640, 64 }, [&](RC<ImageGreyscale> image) {
+        visualTestMono("letter-spacing-ar", { 640, 64 }, [&](RC<Image> image) {
             Font font{ noto, 22.f };
             font.letterSpacing = 12.f;
             auto t             = U"abcdef مرحبا بالعالم!";
@@ -481,7 +481,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
             auto run           = shaped.prerender(font, HUGE_VALF);
             fontManager->testRender(image, run, { 5, 36 });
         });
-        visualTestMono("word-spacing-ar", { 640, 64 }, [&](RC<ImageGreyscale> image) {
+        visualTestMono("word-spacing-ar", { 640, 64 }, [&](RC<Image> image) {
             Font font{ noto, 22.f };
             font.wordSpacing = 12.f;
             auto t           = U"abcdef مرحبا بالعالم!";
@@ -491,7 +491,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
         });
     }
 
-    visualTestMono("alignment-ltr", { 256, 64 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("alignment-ltr", { 256, 64 }, [&](RC<Image> image) {
         Font font{ noto, 32.f };
         auto t   = U"Hello, world!";
         auto run = fontManager->prerender(font, t);
@@ -499,7 +499,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
         fontManager->testRender(image, run, { 0, 0 }, TestRenderFlags::TextBounds);
     });
     if (icuAvailable) {
-        visualTestMono("alignment-rtl", { 256, 64 }, [&](RC<ImageGreyscale> image) {
+        visualTestMono("alignment-rtl", { 256, 64 }, [&](RC<Image> image) {
             Font font{ noto, 32.f };
             auto t   = U"مرحبا بالعالم!";
             auto run = fontManager->prerender(font, t);
@@ -508,7 +508,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
         });
     }
 
-    visualTestMono("wrapped-align-left", { 256, 256 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("wrapped-align-left", { 256, 256 }, [&](RC<Image> image) {
         Font font{ noto, 22.f };
         auto t = U"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla scelerisque posuere urna "
                  U"sit amet luctus.";
@@ -516,7 +516,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
         run.alignLines(RectangleF(PointF(0, 0), image->size()).withPadding(2, 2), 0.f, 0.5f);
         fontManager->testRender(image, run, { 0, 0 }, TestRenderFlags::TextBounds);
     });
-    visualTestMono("wrapped-align-center", { 256, 256 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("wrapped-align-center", { 256, 256 }, [&](RC<Image> image) {
         Font font{ noto, 22.f };
         auto t = U"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla scelerisque posuere urna "
                  U"sit amet luctus.";
@@ -524,7 +524,7 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
         run.alignLines(RectangleF(PointF(0, 0), image->size()).withPadding(2, 2), 0.5f, 0.5f);
         fontManager->testRender(image, run, { 0, 0 }, TestRenderFlags::TextBounds);
     });
-    visualTestMono("wrapped-align-right", { 256, 256 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("wrapped-align-right", { 256, 256 }, [&](RC<Image> image) {
         Font font{ noto, 22.f };
         auto t = U"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla scelerisque posuere urna "
                  U"sit amet luctus.";
@@ -532,14 +532,14 @@ I	Ì	Î	Ĭ	I̊	I̋	Ï	I̧	Ǐ	Ĩ	Í	Ḯ	Í̈
         run.alignLines(RectangleF(PointF(0, 0), image->size()).withPadding(2, 2), 1.f, 0.5f);
         fontManager->testRender(image, run, { 0, 0 }, TestRenderFlags::TextBounds);
     });
-    visualTestMono("indented-left", { 256, 256 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("indented-left", { 256, 256 }, [&](RC<Image> image) {
         Font font{ noto, 22.f };
         auto t   = U"0\n  2\n    4\n  2\n   3\n0";
         auto run = fontManager->prerender(font, t, image->width() - 4);
         run.alignLines(RectangleF(PointF(0, 0), image->size()).withPadding(2, 2), 0.f, 0.5f);
         fontManager->testRender(image, run, { 0, 0 }, TestRenderFlags::TextBounds);
     });
-    visualTestMono("indented-right", { 256, 256 }, [&](RC<ImageGreyscale> image) {
+    visualTestMono("indented-right", { 256, 256 }, [&](RC<Image> image) {
         Font font{ noto, 22.f };
         auto t   = U"0\n  2\n    4\n  2\n   3\n0";
         auto run = fontManager->prerender(font, t, image->width() - 4);

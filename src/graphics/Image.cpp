@@ -57,7 +57,7 @@ constexpr size_constants<0, 1, 2> pixFmtOrder3<PixelFormat::RGB>{};
 template <>
 constexpr size_constants<2, 1, 0> pixFmtOrder3<PixelFormat::BGR>{};
 
-template <PixelFormat dstFmt, PixelFormat srcFmt, typename T>
+template <PixelType typ, PixelFormat dstFmt, PixelFormat srcFmt, typename T = PixelTypeOf<typ>>
 void cvtPixels(T* dst, const T* src, uint32_t size) {
     if constexpr (srcFmt == dstFmt) {
         memcpy(dst, src, size * pixelComponents(dstFmt));
@@ -106,8 +106,8 @@ void cvtPixels(T* dst, const T* src, uint32_t size) {
             dst += 3;
         }
     } else {
-        Pixel<T, dstFmt>* dest         = reinterpret_cast<Pixel<T, dstFmt>*>(dst);
-        const Pixel<T, srcFmt>* source = reinterpret_cast<const Pixel<T, srcFmt>*>(src);
+        Pixel<typ, dstFmt>* dest         = reinterpret_cast<Pixel<typ, dstFmt>*>(dst);
+        const Pixel<typ, srcFmt>* source = reinterpret_cast<const Pixel<typ, srcFmt>*>(src);
         for (int32_t x = 0; x < size; ++x) {
             dest[x] = cvtPixel<dstFmt>(source[x]);
         }
@@ -116,114 +116,114 @@ void cvtPixels(T* dst, const T* src, uint32_t size) {
 
 constexpr int numPixelFormats = std::size(pixelFormatDesc);
 
-template <typename T> //          dst              src
-const cvtPixelsFn<T> cvtTable[numPixelFormats][numPixelFormats]{
+template <PixelType typ> //                  dst              src
+const cvtPixelsFn<PixelTypeOf<typ>> cvtTable[numPixelFormats][numPixelFormats]{
     /* RGB  */ {
-        &cvtPixels<PixelFormat::RGB, PixelFormat::RGB>, // reorder
-        &cvtPixels<PixelFormat::RGB, PixelFormat::RGBA>,
-        &cvtPixels<PixelFormat::RGB, PixelFormat::ARGB>,
-        &cvtPixels<PixelFormat::RGB, PixelFormat::BGR>, // reorder
-        &cvtPixels<PixelFormat::RGB, PixelFormat::BGRA>,
-        &cvtPixels<PixelFormat::RGB, PixelFormat::ABGR>,
-        &cvtPixels<PixelFormat::RGB, PixelFormat::GreyscaleAlpha>,
-        &cvtPixels<PixelFormat::RGB, PixelFormat::Greyscale>,
-        &cvtPixels<PixelFormat::RGB, PixelFormat::Alpha>,
+        &cvtPixels<typ, PixelFormat::RGB, PixelFormat::RGB>, // reorder
+        &cvtPixels<typ, PixelFormat::RGB, PixelFormat::RGBA>,
+        &cvtPixels<typ, PixelFormat::RGB, PixelFormat::ARGB>,
+        &cvtPixels<typ, PixelFormat::RGB, PixelFormat::BGR>, // reorder
+        &cvtPixels<typ, PixelFormat::RGB, PixelFormat::BGRA>,
+        &cvtPixels<typ, PixelFormat::RGB, PixelFormat::ABGR>,
+        &cvtPixels<typ, PixelFormat::RGB, PixelFormat::GreyscaleAlpha>,
+        &cvtPixels<typ, PixelFormat::RGB, PixelFormat::Greyscale>,
+        &cvtPixels<typ, PixelFormat::RGB, PixelFormat::Alpha>,
     },
     /* RGBA */
     {
-        &cvtPixels<PixelFormat::RGBA, PixelFormat::RGB>,
-        &cvtPixels<PixelFormat::RGBA, PixelFormat::RGBA>, // reorder
-        &cvtPixels<PixelFormat::RGBA, PixelFormat::ARGB>, // reorder
-        &cvtPixels<PixelFormat::RGBA, PixelFormat::BGR>,
-        &cvtPixels<PixelFormat::RGBA, PixelFormat::BGRA>, // reorder
-        &cvtPixels<PixelFormat::RGBA, PixelFormat::ABGR>, // reorder
-        &cvtPixels<PixelFormat::RGBA, PixelFormat::GreyscaleAlpha>,
-        &cvtPixels<PixelFormat::RGBA, PixelFormat::Greyscale>,
-        &cvtPixels<PixelFormat::RGBA, PixelFormat::Alpha>,
+        &cvtPixels<typ, PixelFormat::RGBA, PixelFormat::RGB>,
+        &cvtPixels<typ, PixelFormat::RGBA, PixelFormat::RGBA>, // reorder
+        &cvtPixels<typ, PixelFormat::RGBA, PixelFormat::ARGB>, // reorder
+        &cvtPixels<typ, PixelFormat::RGBA, PixelFormat::BGR>,
+        &cvtPixels<typ, PixelFormat::RGBA, PixelFormat::BGRA>, // reorder
+        &cvtPixels<typ, PixelFormat::RGBA, PixelFormat::ABGR>, // reorder
+        &cvtPixels<typ, PixelFormat::RGBA, PixelFormat::GreyscaleAlpha>,
+        &cvtPixels<typ, PixelFormat::RGBA, PixelFormat::Greyscale>,
+        &cvtPixels<typ, PixelFormat::RGBA, PixelFormat::Alpha>,
     },
     /* ARGB */
     {
-        &cvtPixels<PixelFormat::ARGB, PixelFormat::RGB>,
-        &cvtPixels<PixelFormat::ARGB, PixelFormat::RGBA>, // reorder
-        &cvtPixels<PixelFormat::ARGB, PixelFormat::ARGB>, // reorder
-        &cvtPixels<PixelFormat::ARGB, PixelFormat::BGR>,
-        &cvtPixels<PixelFormat::ARGB, PixelFormat::BGRA>, // reorder
-        &cvtPixels<PixelFormat::ARGB, PixelFormat::ABGR>, // reorder
-        &cvtPixels<PixelFormat::ARGB, PixelFormat::GreyscaleAlpha>,
-        &cvtPixels<PixelFormat::ARGB, PixelFormat::Greyscale>,
-        &cvtPixels<PixelFormat::ARGB, PixelFormat::Alpha>,
+        &cvtPixels<typ, PixelFormat::ARGB, PixelFormat::RGB>,
+        &cvtPixels<typ, PixelFormat::ARGB, PixelFormat::RGBA>, // reorder
+        &cvtPixels<typ, PixelFormat::ARGB, PixelFormat::ARGB>, // reorder
+        &cvtPixels<typ, PixelFormat::ARGB, PixelFormat::BGR>,
+        &cvtPixels<typ, PixelFormat::ARGB, PixelFormat::BGRA>, // reorder
+        &cvtPixels<typ, PixelFormat::ARGB, PixelFormat::ABGR>, // reorder
+        &cvtPixels<typ, PixelFormat::ARGB, PixelFormat::GreyscaleAlpha>,
+        &cvtPixels<typ, PixelFormat::ARGB, PixelFormat::Greyscale>,
+        &cvtPixels<typ, PixelFormat::ARGB, PixelFormat::Alpha>,
     },
     /* BGR  */
     {
-        &cvtPixels<PixelFormat::BGR, PixelFormat::RGB>, // reorder
-        &cvtPixels<PixelFormat::BGR, PixelFormat::RGBA>,
-        &cvtPixels<PixelFormat::BGR, PixelFormat::ARGB>,
-        &cvtPixels<PixelFormat::BGR, PixelFormat::BGR>, // reorder
-        &cvtPixels<PixelFormat::BGR, PixelFormat::BGRA>,
-        &cvtPixels<PixelFormat::BGR, PixelFormat::ABGR>,
-        &cvtPixels<PixelFormat::BGR, PixelFormat::GreyscaleAlpha>,
-        &cvtPixels<PixelFormat::BGR, PixelFormat::Greyscale>,
-        &cvtPixels<PixelFormat::BGR, PixelFormat::Alpha>,
+        &cvtPixels<typ, PixelFormat::BGR, PixelFormat::RGB>, // reorder
+        &cvtPixels<typ, PixelFormat::BGR, PixelFormat::RGBA>,
+        &cvtPixels<typ, PixelFormat::BGR, PixelFormat::ARGB>,
+        &cvtPixels<typ, PixelFormat::BGR, PixelFormat::BGR>, // reorder
+        &cvtPixels<typ, PixelFormat::BGR, PixelFormat::BGRA>,
+        &cvtPixels<typ, PixelFormat::BGR, PixelFormat::ABGR>,
+        &cvtPixels<typ, PixelFormat::BGR, PixelFormat::GreyscaleAlpha>,
+        &cvtPixels<typ, PixelFormat::BGR, PixelFormat::Greyscale>,
+        &cvtPixels<typ, PixelFormat::BGR, PixelFormat::Alpha>,
     },
     /* BGRA */
     {
-        &cvtPixels<PixelFormat::BGRA, PixelFormat::RGB>,
-        &cvtPixels<PixelFormat::BGRA, PixelFormat::RGBA>, // reorder
-        &cvtPixels<PixelFormat::BGRA, PixelFormat::ARGB>, // reorder
-        &cvtPixels<PixelFormat::BGRA, PixelFormat::BGR>,
-        &cvtPixels<PixelFormat::BGRA, PixelFormat::BGRA>, // reorder
-        &cvtPixels<PixelFormat::BGRA, PixelFormat::ABGR>, // reorder
-        &cvtPixels<PixelFormat::BGRA, PixelFormat::GreyscaleAlpha>,
-        &cvtPixels<PixelFormat::BGRA, PixelFormat::Greyscale>,
-        &cvtPixels<PixelFormat::BGRA, PixelFormat::Alpha>,
+        &cvtPixels<typ, PixelFormat::BGRA, PixelFormat::RGB>,
+        &cvtPixels<typ, PixelFormat::BGRA, PixelFormat::RGBA>, // reorder
+        &cvtPixels<typ, PixelFormat::BGRA, PixelFormat::ARGB>, // reorder
+        &cvtPixels<typ, PixelFormat::BGRA, PixelFormat::BGR>,
+        &cvtPixels<typ, PixelFormat::BGRA, PixelFormat::BGRA>, // reorder
+        &cvtPixels<typ, PixelFormat::BGRA, PixelFormat::ABGR>, // reorder
+        &cvtPixels<typ, PixelFormat::BGRA, PixelFormat::GreyscaleAlpha>,
+        &cvtPixels<typ, PixelFormat::BGRA, PixelFormat::Greyscale>,
+        &cvtPixels<typ, PixelFormat::BGRA, PixelFormat::Alpha>,
     },
     /* ABGR */
     {
-        &cvtPixels<PixelFormat::ABGR, PixelFormat::RGB>,
-        &cvtPixels<PixelFormat::ABGR, PixelFormat::RGBA>, // reorder
-        &cvtPixels<PixelFormat::ABGR, PixelFormat::ARGB>, // reorder
-        &cvtPixels<PixelFormat::ABGR, PixelFormat::BGR>,
-        &cvtPixels<PixelFormat::ABGR, PixelFormat::BGRA>, // reorder
-        &cvtPixels<PixelFormat::ABGR, PixelFormat::ABGR>, // reorder
-        &cvtPixels<PixelFormat::ABGR, PixelFormat::GreyscaleAlpha>,
-        &cvtPixels<PixelFormat::ABGR, PixelFormat::Greyscale>,
-        &cvtPixels<PixelFormat::ABGR, PixelFormat::Alpha>,
+        &cvtPixels<typ, PixelFormat::ABGR, PixelFormat::RGB>,
+        &cvtPixels<typ, PixelFormat::ABGR, PixelFormat::RGBA>, // reorder
+        &cvtPixels<typ, PixelFormat::ABGR, PixelFormat::ARGB>, // reorder
+        &cvtPixels<typ, PixelFormat::ABGR, PixelFormat::BGR>,
+        &cvtPixels<typ, PixelFormat::ABGR, PixelFormat::BGRA>, // reorder
+        &cvtPixels<typ, PixelFormat::ABGR, PixelFormat::ABGR>, // reorder
+        &cvtPixels<typ, PixelFormat::ABGR, PixelFormat::GreyscaleAlpha>,
+        &cvtPixels<typ, PixelFormat::ABGR, PixelFormat::Greyscale>,
+        &cvtPixels<typ, PixelFormat::ABGR, PixelFormat::Alpha>,
     },
     /* GreyscaleAlpha */
     {
-        &cvtPixels<PixelFormat::GreyscaleAlpha, PixelFormat::RGB>,
-        &cvtPixels<PixelFormat::GreyscaleAlpha, PixelFormat::RGBA>,
-        &cvtPixels<PixelFormat::GreyscaleAlpha, PixelFormat::ARGB>,
-        &cvtPixels<PixelFormat::GreyscaleAlpha, PixelFormat::BGR>,
-        &cvtPixels<PixelFormat::GreyscaleAlpha, PixelFormat::BGRA>,
-        &cvtPixels<PixelFormat::GreyscaleAlpha, PixelFormat::ABGR>,
-        &cvtPixels<PixelFormat::GreyscaleAlpha, PixelFormat::GreyscaleAlpha>,
-        &cvtPixels<PixelFormat::GreyscaleAlpha, PixelFormat::Greyscale>,
-        &cvtPixels<PixelFormat::GreyscaleAlpha, PixelFormat::Alpha>,
+        &cvtPixels<typ, PixelFormat::GreyscaleAlpha, PixelFormat::RGB>,
+        &cvtPixels<typ, PixelFormat::GreyscaleAlpha, PixelFormat::RGBA>,
+        &cvtPixels<typ, PixelFormat::GreyscaleAlpha, PixelFormat::ARGB>,
+        &cvtPixels<typ, PixelFormat::GreyscaleAlpha, PixelFormat::BGR>,
+        &cvtPixels<typ, PixelFormat::GreyscaleAlpha, PixelFormat::BGRA>,
+        &cvtPixels<typ, PixelFormat::GreyscaleAlpha, PixelFormat::ABGR>,
+        &cvtPixels<typ, PixelFormat::GreyscaleAlpha, PixelFormat::GreyscaleAlpha>,
+        &cvtPixels<typ, PixelFormat::GreyscaleAlpha, PixelFormat::Greyscale>,
+        &cvtPixels<typ, PixelFormat::GreyscaleAlpha, PixelFormat::Alpha>,
     },
     /* Greyscale */
     {
-        &cvtPixels<PixelFormat::Greyscale, PixelFormat::RGB>,
-        &cvtPixels<PixelFormat::Greyscale, PixelFormat::RGBA>,
-        &cvtPixels<PixelFormat::Greyscale, PixelFormat::ARGB>,
-        &cvtPixels<PixelFormat::Greyscale, PixelFormat::BGR>,
-        &cvtPixels<PixelFormat::Greyscale, PixelFormat::BGRA>,
-        &cvtPixels<PixelFormat::Greyscale, PixelFormat::ABGR>,
-        &cvtPixels<PixelFormat::Greyscale, PixelFormat::GreyscaleAlpha>,
-        &cvtPixels<PixelFormat::Greyscale, PixelFormat::Greyscale>,
-        &cvtPixels<PixelFormat::Greyscale, PixelFormat::Alpha>,
+        &cvtPixels<typ, PixelFormat::Greyscale, PixelFormat::RGB>,
+        &cvtPixels<typ, PixelFormat::Greyscale, PixelFormat::RGBA>,
+        &cvtPixels<typ, PixelFormat::Greyscale, PixelFormat::ARGB>,
+        &cvtPixels<typ, PixelFormat::Greyscale, PixelFormat::BGR>,
+        &cvtPixels<typ, PixelFormat::Greyscale, PixelFormat::BGRA>,
+        &cvtPixels<typ, PixelFormat::Greyscale, PixelFormat::ABGR>,
+        &cvtPixels<typ, PixelFormat::Greyscale, PixelFormat::GreyscaleAlpha>,
+        &cvtPixels<typ, PixelFormat::Greyscale, PixelFormat::Greyscale>,
+        &cvtPixels<typ, PixelFormat::Greyscale, PixelFormat::Alpha>,
     },
     /* A   */
     {
-        &cvtPixels<PixelFormat::Alpha, PixelFormat::RGB>,
-        &cvtPixels<PixelFormat::Alpha, PixelFormat::RGBA>,
-        &cvtPixels<PixelFormat::Alpha, PixelFormat::ARGB>,
-        &cvtPixels<PixelFormat::Alpha, PixelFormat::BGR>,
-        &cvtPixels<PixelFormat::Alpha, PixelFormat::BGRA>,
-        &cvtPixels<PixelFormat::Alpha, PixelFormat::ABGR>,
-        &cvtPixels<PixelFormat::Alpha, PixelFormat::GreyscaleAlpha>,
-        &cvtPixels<PixelFormat::Alpha, PixelFormat::Greyscale>,
-        &cvtPixels<PixelFormat::Alpha, PixelFormat::Alpha>,
+        &cvtPixels<typ, PixelFormat::Alpha, PixelFormat::RGB>,
+        &cvtPixels<typ, PixelFormat::Alpha, PixelFormat::RGBA>,
+        &cvtPixels<typ, PixelFormat::Alpha, PixelFormat::ARGB>,
+        &cvtPixels<typ, PixelFormat::Alpha, PixelFormat::BGR>,
+        &cvtPixels<typ, PixelFormat::Alpha, PixelFormat::BGRA>,
+        &cvtPixels<typ, PixelFormat::Alpha, PixelFormat::ABGR>,
+        &cvtPixels<typ, PixelFormat::Alpha, PixelFormat::GreyscaleAlpha>,
+        &cvtPixels<typ, PixelFormat::Alpha, PixelFormat::Greyscale>,
+        &cvtPixels<typ, PixelFormat::Alpha, PixelFormat::Alpha>,
     },
 };
 
@@ -231,7 +231,7 @@ const cvtPixelsFn<T> cvtTable[numPixelFormats][numPixelFormats]{
 
 void convertPixels(PixelFormat dstFmt, StridedData<uint8_t> dst, PixelFormat srcFmt,
                    StridedData<const uint8_t> src, Size size) {
-    cvtPixelsFn<uint8_t> fn = cvtTable<uint8_t>[+dstFmt][+srcFmt];
+    cvtPixelsFn<uint8_t> fn = cvtTable<PixelType::U8Gamma>[+dstFmt][+srcFmt];
     for (int32_t y = 0; y < size.height; ++y) {
         fn(dst.line(y), src.line(y), size.width);
     }

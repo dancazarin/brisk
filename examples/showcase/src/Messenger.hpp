@@ -19,7 +19,7 @@ private:
     struct Message {
         Status status;
         std::chrono::system_clock::time_point date;
-        std::variant<std::string, RC<ImageAny>> content;
+        std::variant<std::string, RC<Image>> content;
         std::string reaction;
     };
 

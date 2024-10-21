@@ -12,6 +12,132 @@
 
 namespace Brisk {
 
+/**
+ * @brief Custom exception class for image-related errors.
+ *
+ * This class derives from the standard runtime_error to provide specific error handling for image processing.
+ */
+class EImageError : public Exception<std::runtime_error> {
+public:
+    using Exception<std::runtime_error>::Exception; ///< Inherit constructors from the base exception class
+};
+
+enum class ImageFormat : uint16_t;
+
+constexpr uint16_t operator+(ImageFormat fmt) noexcept {
+    return static_cast<uint16_t>(fmt);
+}
+
+constexpr ImageFormat imageFormat(PixelType type, PixelFormat format) {
+    return static_cast<ImageFormat>((+type << 8) | +format);
+}
+
+enum class ImageFormat : uint16_t {
+    Unknown                = 0xFFFF,
+
+    Unknown_U8Gamma        = +imageFormat(PixelType::U8Gamma, PixelFormat::Unknown),
+    RGB_U8Gamma            = +imageFormat(PixelType::U8Gamma, PixelFormat::RGB),
+    RGBA_U8Gamma           = +imageFormat(PixelType::U8Gamma, PixelFormat::RGBA),
+    ARGB_U8Gamma           = +imageFormat(PixelType::U8Gamma, PixelFormat::ARGB),
+    BGR_U8Gamma            = +imageFormat(PixelType::U8Gamma, PixelFormat::BGR),
+    BGRA_U8Gamma           = +imageFormat(PixelType::U8Gamma, PixelFormat::BGRA),
+    ABGR_U8Gamma           = +imageFormat(PixelType::U8Gamma, PixelFormat::ABGR),
+    GreyscaleAlpha_U8Gamma = +imageFormat(PixelType::U8Gamma, PixelFormat::GreyscaleAlpha),
+    Greyscale_U8Gamma      = +imageFormat(PixelType::U8Gamma, PixelFormat::Greyscale),
+    Alpha_U8Gamma          = +imageFormat(PixelType::U8Gamma, PixelFormat::Alpha),
+
+    Unknown_U8             = +imageFormat(PixelType::U8, PixelFormat::Unknown),
+    RGB_U8                 = +imageFormat(PixelType::U8, PixelFormat::RGB),
+    RGBA_U8                = +imageFormat(PixelType::U8, PixelFormat::RGBA),
+    ARGB_U8                = +imageFormat(PixelType::U8, PixelFormat::ARGB),
+    BGR_U8                 = +imageFormat(PixelType::U8, PixelFormat::BGR),
+    BGRA_U8                = +imageFormat(PixelType::U8, PixelFormat::BGRA),
+    ABGR_U8                = +imageFormat(PixelType::U8, PixelFormat::ABGR),
+    GreyscaleAlpha_U8      = +imageFormat(PixelType::U8, PixelFormat::GreyscaleAlpha),
+    Greyscale_U8           = +imageFormat(PixelType::U8, PixelFormat::Greyscale),
+    Alpha_U8               = +imageFormat(PixelType::U8, PixelFormat::Alpha),
+
+    Unknown_U16            = +imageFormat(PixelType::U16, PixelFormat::Unknown),
+    RGB_U16                = +imageFormat(PixelType::U16, PixelFormat::RGB),
+    RGBA_U16               = +imageFormat(PixelType::U16, PixelFormat::RGBA),
+    ARGB_U16               = +imageFormat(PixelType::U16, PixelFormat::ARGB),
+    BGR_U16                = +imageFormat(PixelType::U16, PixelFormat::BGR),
+    BGRA_U16               = +imageFormat(PixelType::U16, PixelFormat::BGRA),
+    ABGR_U16               = +imageFormat(PixelType::U16, PixelFormat::ABGR),
+    GreyscaleAlpha_U16     = +imageFormat(PixelType::U16, PixelFormat::GreyscaleAlpha),
+    Greyscale_U16          = +imageFormat(PixelType::U16, PixelFormat::Greyscale),
+    Alpha_U16              = +imageFormat(PixelType::U16, PixelFormat::Alpha),
+
+    Unknown_F32            = +imageFormat(PixelType::F32, PixelFormat::Unknown),
+    RGB_F32                = +imageFormat(PixelType::F32, PixelFormat::RGB),
+    RGBA_F32               = +imageFormat(PixelType::F32, PixelFormat::RGBA),
+    ARGB_F32               = +imageFormat(PixelType::F32, PixelFormat::ARGB),
+    BGR_F32                = +imageFormat(PixelType::F32, PixelFormat::BGR),
+    BGRA_F32               = +imageFormat(PixelType::F32, PixelFormat::BGRA),
+    ABGR_F32               = +imageFormat(PixelType::F32, PixelFormat::ABGR),
+    GreyscaleAlpha_F32     = +imageFormat(PixelType::F32, PixelFormat::GreyscaleAlpha),
+    Greyscale_F32          = +imageFormat(PixelType::F32, PixelFormat::Greyscale),
+    Alpha_F32              = +imageFormat(PixelType::F32, PixelFormat::Alpha),
+
+    RGB_Unknown            = +imageFormat(PixelType::Unknown, PixelFormat::RGB),
+    RGBA_Unknown           = +imageFormat(PixelType::Unknown, PixelFormat::RGBA),
+    ARGB_Unknown           = +imageFormat(PixelType::Unknown, PixelFormat::ARGB),
+    BGR_Unknown            = +imageFormat(PixelType::Unknown, PixelFormat::BGR),
+    BGRA_Unknown           = +imageFormat(PixelType::Unknown, PixelFormat::BGRA),
+    ABGR_Unknown           = +imageFormat(PixelType::Unknown, PixelFormat::ABGR),
+    GreyscaleAlpha_Unknown = +imageFormat(PixelType::Unknown, PixelFormat::GreyscaleAlpha),
+    Greyscale_Unknown      = +imageFormat(PixelType::Unknown, PixelFormat::Greyscale),
+    Alpha_Unknown          = +imageFormat(PixelType::Unknown, PixelFormat::Alpha),
+
+    RGB                    = RGB_U8Gamma,
+    RGBA                   = RGBA_U8Gamma,
+    ARGB                   = ARGB_U8Gamma,
+    BGR                    = BGR_U8Gamma,
+    BGRA                   = BGRA_U8Gamma,
+    ABGR                   = ABGR_U8Gamma,
+    GreyscaleAlpha         = GreyscaleAlpha_U8Gamma,
+    Greyscale              = Greyscale_U8Gamma,
+    Alpha                  = Alpha_U8Gamma,
+};
+
+constexpr PixelType toPixelType(ImageFormat format) noexcept {
+    return static_cast<PixelType>((+format >> 8) & 0xFF);
+}
+
+constexpr PixelFormat toPixelFormat(ImageFormat format) noexcept {
+    return static_cast<PixelFormat>(+format & 0xFF);
+}
+
+constexpr bool pixelFormatCompatible(PixelFormat requestedFormat, PixelFormat actualFormat) noexcept {
+    return requestedFormat == actualFormat || requestedFormat == PixelFormat::Unknown;
+}
+
+constexpr bool pixelTypeCompatible(PixelType requestedType, PixelType actualType) noexcept {
+    return requestedType == actualType || requestedType == PixelType::Unknown;
+}
+
+constexpr bool imageFormatCompatible(ImageFormat requestedFormat, ImageFormat actualFormat) noexcept {
+    return pixelFormatCompatible(toPixelFormat(requestedFormat), toPixelFormat(actualFormat)) &&
+           pixelTypeCompatible(toPixelType(requestedFormat), toPixelType(actualFormat));
+}
+
+} // namespace Brisk
+
+template <>
+struct fmt::formatter<Brisk::ImageFormat> : fmt::formatter<std::string> {
+    template <typename FormatContext>
+    auto format(const Brisk::ImageFormat& val, FormatContext& ctx) const {
+        std::string str;
+        if (val == Brisk::ImageFormat::Unknown)
+            str = "Unknown";
+        else
+            str = fmt::to_string(Brisk::toPixelFormat(val)) + "_" + fmt::to_string(Brisk::toPixelType(val));
+        return fmt::formatter<std::string>::format(str, ctx);
+    }
+};
+
+namespace Brisk {
+
 template <typename T>
 struct StridedData {
     T* data;
@@ -162,30 +288,40 @@ struct MappedRegion {
 };
 
 namespace Internal {
-template <PixelFormat Format, typename ComponentType>
-struct PixelOfFormat {
-    using Type = Pixel<ComponentType, Format>;
+template <ImageFormat format>
+struct PixelOf {
+    using Type = Pixel<toPixelType(format), toPixelFormat(format)>;
 };
 
-template <typename ComponentType>
-struct PixelOfFormat<PixelFormat::Unknown, ComponentType> {
-    using Type = ComponentType;
+template <ImageFormat format>
+    requires(toPixelFormat(format) == PixelFormat::Unknown)
+struct PixelOf<format> {
+    using Type = PixelTypeOf<toPixelType(format)>;
 };
 } // namespace Internal
 
-template <PixelType Type, PixelFormat Format, AccessMode Mode>
+template <ImageFormat format>
+using PixelOf = typename Internal::PixelOf<format>::Type;
+
+template <ImageFormat ImageFmt, AccessMode Mode>
 struct ImageAccess {
-    ImageAccess()                              = delete;
-    ImageAccess(const ImageAccess&)            = delete;
-    ImageAccess& operator=(const ImageAccess&) = delete;
-    ImageAccess& operator=(ImageAccess&&)      = delete;
+    ImageAccess()                               = delete;
+    ImageAccess(const ImageAccess&)             = delete;
+    ImageAccess& operator=(const ImageAccess&)  = delete;
+    ImageAccess& operator=(ImageAccess&&)       = delete;
+
+    constexpr static PixelFormat FmtPixelFormat = toPixelFormat(ImageFmt);
+    constexpr static PixelType FmtPixelType     = toPixelType(ImageFmt);
+
+    constexpr static bool pixelTypeKnown =
+        FmtPixelFormat != PixelFormat::Unknown && FmtPixelType != PixelType::Unknown;
 
     ImageAccess(ImageAccess&& other) : m_data{}, m_mapped{}, m_commit{}, m_format{} {
         swap(other);
     }
 
-    using ComponentType = PixelTypeOf<Type>;
-    using StorageType   = typename Internal::PixelOfFormat<Format, ComponentType>::Type;
+    using ComponentType = PixelTypeOf<FmtPixelType>;
+    using StorageType   = PixelOf<ImageFmt>;
 
     using value_type    = ConstIfR<StorageType, Mode>;
     using reference     = value_type&;
@@ -202,22 +338,12 @@ struct ImageAccess {
     };
 
     ImageAccess(const std::tuple<ImageData<value_type>, MappedRegion>& dataMapped, UnmapFn commit,
-                PixelFormat format)
-        requires(Format == PixelFormat::Unknown)
+                ImageFormat format)
         : ImageAccess(std::get<0>(dataMapped), std::get<1>(dataMapped), commit, format) {}
 
     ImageAccess(const ImageData<value_type>& data, const MappedRegion& mapped, UnmapFn commit,
-                PixelFormat format)
-        requires(Format == PixelFormat::Unknown)
+                ImageFormat format)
         : m_data(data), m_mapped(mapped), m_commit(std::move(commit)), m_format(format) {}
-
-    ImageAccess(const std::tuple<ImageData<value_type>, MappedRegion>& dataMapped, UnmapFn commit)
-        requires(Format != PixelFormat::Unknown)
-        : ImageAccess(std::get<0>(dataMapped), std::get<1>(dataMapped), commit, Format) {}
-
-    ImageAccess(const ImageData<value_type>& data, const MappedRegion& mapped, UnmapFn commit)
-        requires(Format != PixelFormat::Unknown)
-        : m_data(data), m_mapped(mapped), m_commit(std::move(commit)), m_format(Format) {}
 
     void swap(ImageAccess& other) {
         std::swap(m_data, other.m_data);
@@ -232,7 +358,9 @@ struct ImageAccess {
         throwException(ERange(str.c_str()));
     }
 
-    reference operator()(int32_t x, int32_t y) const {
+    reference operator()(int32_t x, int32_t y) const
+        requires(FmtPixelType != PixelType::Unknown)
+    {
 #ifndef NDEBUG
         if (x < 0 || x >= width())
             throwRangeError(
@@ -257,16 +385,11 @@ struct ImageAccess {
         return m_data.memoryWidth();
     }
 
-    void copyFrom(const ImageAccess<Type, Format, AccessMode::R>& src)
+    template <ImageFormat SrcImageFmt, AccessMode SrcMode>
+    void copyFrom(const ImageAccess<SrcImageFmt, SrcMode>& src)
         requires(Mode != AccessMode::R)
     {
-        return copyFrom(src.m_data);
-    }
-
-    void copyFrom(const ImageAccess<Type, Format, AccessMode::RW>& src)
-        requires(Mode != AccessMode::R)
-    {
-        return copyFrom(src.m_data);
+        return copyFrom<SrcImageFmt>(src.m_data);
     }
 
     ~ImageAccess() {
@@ -289,8 +412,16 @@ struct ImageAccess {
         return m_data.byteSize();
     }
 
-    PixelFormat format() const {
+    ImageFormat format() const {
         return m_format;
+    }
+
+    PixelType pixelType() const {
+        return toPixelType(m_format);
+    }
+
+    PixelFormat pixelFormat() const {
+        return toPixelFormat(m_format);
     }
 
     int32_t components() const {
@@ -349,14 +480,12 @@ struct ImageAccess {
         return m_data.stride > 0;
     }
 
-    void clear(StorageType value) const
+    void clear(ColorF fillColor)
         requires(Mode != AccessMode::R)
     {
-        LineIterator l = lineIterator();
-        int32_t w      = m_data.memoryWidth();
-        for (int32_t y = 0; y < m_data.size.height; ++y, ++l) {
-            std::fill_n(l.data, w, value);
-        }
+        forPixels([fillColor](int32_t, int32_t, auto& pix) {
+            colorToPixel(pix, fillColor);
+        });
     }
 
     void flip(FlipAxis axis) const
@@ -400,28 +529,37 @@ struct ImageAccess {
         }
     }
 
-    template <PixelFormat PFormat = Format, typename Fn>
+    template <ImageFormat Hint = ImageFmt, typename Fn>
     void forPixels(Fn&& fn) {
-        if constexpr (PFormat != PixelFormat::Unknown) {
-            LineIterator l = lineIterator();
-            int32_t w      = m_data.size.width;
+        constexpr PixelType typeHint     = toPixelType(Hint);
+        constexpr PixelFormat typeFormat = toPixelFormat(Hint);
+        if constexpr (typeHint == PixelType::Unknown) {
+            DO_PIX_TYP(pixelType(), return forPixels<imageFormat(TYP, typeFormat)>(std::forward<Fn>(fn)););
+        } else if constexpr (typeFormat == PixelFormat::Unknown) {
+            DO_PIX_FMT(pixelFormat(), return forPixels<imageFormat(typeHint, FMT)>(std::forward<Fn>(fn)););
+        } else {
+            auto data = m_data.template to<Pixel<typeHint, typeFormat>>();
+            static_assert(typeHint != PixelType::Unknown);
+            static_assert(typeFormat != PixelFormat::Unknown);
+            auto l    = data.lineIterator();
+            int32_t w = m_data.size.width;
             for (int32_t y = 0; y < m_data.size.height; ++y, ++l) {
                 for (int32_t x = 0; x < w; ++x) {
                     fn(x, y, l.data[x]);
                 }
             }
-        } else {
-            DO_PIX_FMT(format(), return forPixels<FMT>(std::forward<Fn>(fn)););
         }
     }
 
     void premultiplyAlpha()
-        requires(Mode != AccessMode::R && Type != PixelType::Unknown)
+        requires(Mode != AccessMode::R)
     {
-        if (pixelAlpha(format()) != PixelFlagAlpha::None && format() != PixelFormat::Alpha) {
+        if (pixelAlpha(pixelFormat()) != PixelFlagAlpha::None && pixelFormat() != PixelFormat::Alpha) {
             forPixels([](int32_t, int32_t, auto& pix) {
-                pix = colorToPixel<Type, std::remove_cvref_t<decltype(pix)>::format>(
-                    pixelToColor<Type>(pix).premultiply());
+                ColorF color;
+                pixelToColor(color, pix);
+                color = color.premultiply();
+                colorToPixel(pix, color);
             });
         }
     }
@@ -430,10 +568,11 @@ struct ImageAccess {
         return m_data;
     }
 
-    template <PixelType, PixelFormat, AccessMode>
+    template <ImageFormat format, AccessMode>
     friend struct ImageAccess;
 
-    void copyFrom(const ImageData<const StorageType>& src)
+    template <ImageFormat SrcImageFmt = ImageFmt>
+    void copyFrom(const ImageData<const PixelOf<SrcImageFmt>>& src)
         requires(Mode != AccessMode::R)
     {
 #ifndef NDEBUG
@@ -446,14 +585,20 @@ struct ImageAccess {
                                         src.components, m_data.components));
         }
 #endif
-        m_data.copyFrom(src);
+        if constexpr (SrcImageFmt == ImageFmt) {
+            m_data.copyFrom(src);
+        } else {
+            forPixels([](int32_t x, int32_t y, auto& pix) {
+
+            });
+        }
     }
 
 private:
     ImageData<value_type> m_data;
     MappedRegion m_mapped;
     UnmapFn m_commit;
-    PixelFormat m_format;
+    ImageFormat m_format;
 
     void swapItem(value_type* a, int32_t ax, value_type* b, int32_t bx) const {
         if constexpr (Mode != AccessMode::R) {
@@ -466,10 +611,7 @@ private:
     }
 };
 
-template <PixelType Type = PixelType::Unknown, PixelFormat Format = PixelFormat::Unknown>
-class ImageTyped;
-
-using ImageAny = ImageTyped<>;
+class Image;
 
 namespace Internal {
 struct ImageBackend {
@@ -480,8 +622,8 @@ struct ImageBackend {
     virtual void end(AccessMode mode, Rectangle rect)   = 0;
 };
 
-ImageBackend* getBackend(RC<ImageAny> image);
-void setBackend(RC<ImageAny> image, ImageBackend* backend);
+ImageBackend* getBackend(RC<Image> image);
+void setBackend(RC<Image> image, ImageBackend* backend);
 } // namespace Internal
 
 template <typename T>
@@ -503,17 +645,13 @@ inline void deallocateImageData(const ImageData<T>& data) {
     alignedFree(data.data);
 }
 
-template <>
-class ImageTyped<PixelType::Unknown, PixelFormat::Unknown>
-    : public std::enable_shared_from_this<ImageTyped<PixelType::Unknown, PixelFormat::Unknown>> {
+class Image : public std::enable_shared_from_this<Image> {
 public:
-    ImageTyped()                             = delete;
-    ImageTyped(const ImageTyped&)            = delete;
-    ImageTyped(ImageTyped&&)                 = delete;
-    ImageTyped& operator=(const ImageTyped&) = delete;
-    ImageTyped& operator=(ImageTyped&&)      = delete;
-
-    using value_type                         = UntypedPixel;
+    Image()                        = delete;
+    Image(const Image&)            = delete;
+    Image(Image&&)                 = delete;
+    Image& operator=(const Image&) = delete;
+    Image& operator=(Image&&)      = delete;
 
     int32_t width() const noexcept {
         return m_data.size.width;
@@ -535,412 +673,176 @@ public:
         return m_data.byteSize();
     }
 
-    PixelType type() const noexcept {
+    PixelType pixelType() const noexcept {
         return m_type;
     }
 
-    PixelFormat format() const noexcept {
+    ImageFormat format() const noexcept {
+        return imageFormat(m_type, m_format);
+    }
+
+    PixelFormat pixelFormat() const noexcept {
         return m_format;
     }
 
     int32_t componentsPerPixel() const noexcept {
-        return pixelComponents(format());
+        return pixelComponents(pixelFormat());
     }
 
     int32_t bytesPerPixel() const noexcept {
-        return pixelSize(type(), format());
+        return pixelSize(pixelType(), pixelFormat());
     }
 
     bool isGreyscale() const noexcept {
-        return pixelColor(format()) == PixelFlagColor::Greyscale;
+        return pixelColor(pixelFormat()) == PixelFlagColor::Greyscale;
     }
 
     bool isColor() const noexcept {
-        return pixelColor(format()) == PixelFlagColor::RGB;
+        return pixelColor(pixelFormat()) == PixelFlagColor::RGB;
     }
 
     bool hasAlpha() const noexcept {
-        return pixelAlpha(format()) != PixelFlagAlpha::None;
+        return pixelAlpha(pixelFormat()) != PixelFlagAlpha::None;
     }
 
     bool isAlphaOnly() const noexcept {
-        return pixelColor(format()) == PixelFlagColor::None;
+        return pixelColor(pixelFormat()) == PixelFlagColor::None;
     }
 
     bool isLinear() const noexcept {
-        return type() != PixelType::U8Gamma;
+        return pixelType() != PixelType::U8Gamma;
     }
 
-    template <AccessMode Mode>
-    using ImageAccessT = ImageAccess<PixelType::Unknown, PixelFormat::Unknown, Mode>;
-
-    using AccessR      = ImageAccessT<AccessMode::R>;
-    using AccessW      = ImageAccessT<AccessMode::W>;
-    using AccessRW     = ImageAccessT<AccessMode::RW>;
-
-    AccessR mapRead() const {
-        return map<AccessMode::R>(data(), this->bounds(), m_backend.get(), m_format);
+    template <ImageFormat format = ImageFormat::Unknown>
+    ImageAccess<format, AccessMode::R> mapRead() const {
+        return map<format, AccessMode::R>(data(), this->bounds(), m_backend.get(), this->format());
     }
 
-    AccessW mapWrite() {
-        return map<AccessMode::W>(data(), this->bounds(), m_backend.get(), m_format);
+    template <ImageFormat format = ImageFormat::Unknown>
+    ImageAccess<format, AccessMode::W> mapWrite() {
+        return map<format, AccessMode::W>(data(), this->bounds(), m_backend.get(), this->format());
     }
 
-    AccessRW mapReadWrite() {
-        return map<AccessMode::RW>(data(), this->bounds(), m_backend.get(), m_format);
+    template <ImageFormat format = ImageFormat::Unknown>
+    ImageAccess<format, AccessMode::RW> mapReadWrite() {
+        return map<format, AccessMode::RW>(data(), this->bounds(), m_backend.get(), this->format());
     }
 
-    AccessR mapRead(Rectangle rect) const {
-        return map<AccessMode::R>(data(), rect, m_backend.get(), m_format);
+    template <ImageFormat format = ImageFormat::Unknown>
+    ImageAccess<format, AccessMode::R> mapRead(Rectangle rect) const {
+        return map<format, AccessMode::R>(data(), rect, m_backend.get(), this->format());
     }
 
-    AccessW mapWrite(Rectangle rect) {
-        return map<AccessMode::W>(data(), rect, m_backend.get(), m_format);
+    template <ImageFormat format = ImageFormat::Unknown>
+    ImageAccess<format, AccessMode::W> mapWrite(Rectangle rect) {
+        return this->map<format, AccessMode::W>(data(), rect, m_backend.get(), this->format());
     }
 
-    AccessRW mapReadWrite(Rectangle rect) {
-        return map<AccessMode::RW>(data(), rect, m_backend.get(), m_format);
+    template <ImageFormat format = ImageFormat::Unknown>
+    ImageAccess<format, AccessMode::RW> mapReadWrite(Rectangle rect) {
+        return map<format, AccessMode::RW>(data(), rect, m_backend.get(), this->format());
     }
 
-    void clear(value_type value) {
-        AccessW w = mapWrite();
+    void clear(ColorF value) {
+        auto w = mapWrite();
         w.clear(value);
     }
 
-    void copyFrom(const RC<ImageTyped>& source, Rectangle sourceRect, Rectangle destRect) {
-        AccessR r = source->mapRead(sourceRect);
-        AccessW w = mapWrite(destRect);
+    void copyFrom(const RC<const Image>& source, Rectangle sourceRect, Rectangle destRect) {
+        auto r = source->mapRead(sourceRect);
+        auto w = mapWrite(destRect);
         w.copyFrom(r);
     }
 
-    void copyFrom(const RC<ImageTyped>& source) {
+    void copyFrom(const RC<const Image>& source) {
         return copyFrom(source, source->bounds(), this->bounds());
     }
 
-    ImageData<value_type> data() const noexcept {
+    ImageData<UntypedPixel> data() const noexcept {
         return m_data;
-    }
-
-    template <PixelType Type, PixelFormat Format = PixelFormat::Unknown>
-    RC<const ImageTyped<Type, Format>> as() const {
-        if (Type != this->type() || Format != this->format()) {
-            throwException(
-                EArgument("Image: cannot cast to an image of type {} and format {}", Type, Format));
-        }
-        // Casting to a derived type.
-        // In case this class was not created as ImageTyped<Type, Format>
-        // this is technically an Undefined Behavior.
-        // But as long as the derived types have no extra fields
-        // the memory layout matches exactly, so
-        // this is ok with all modern compilers.
-        return adopt(static_cast<const ImageTyped<Type, Format>*>(this));
-    }
-
-    template <PixelType Type, PixelFormat Format = PixelFormat::Unknown>
-    RC<ImageTyped<Type, Format>> as() {
-        if (Type != this->type() || Format != this->format()) {
-            throwException(
-                EArgument("Image: cannot cast to an image of type {} and format {}", Type, Format));
-        }
-        // Casting to a derived type.
-        // In case this class was not created as ImageTyped<Type, Format>
-        // this is technically an Undefined Behavior.
-        // But as long as the derived types have no extra fields
-        // the memory layout matches exactly, so
-        // this is ok with all modern compilers.
-        return std::static_pointer_cast<ImageTyped<Type, Format>>(this->shared_from_this());
     }
 
     /// Create image with given size, pixel type and pixel format and allocates memory for it.
     /// Defaults to creating an 8-bit RGBA image with gamma-corrected sRGB color space
-    explicit ImageTyped(Size size, PixelType type = PixelType::U8Gamma,
-                        PixelFormat format = PixelFormat::RGBA)
-        : ImageTyped(allocateImageData<UntypedPixel>(size, pixelSize(type, format)), type, format,
-                     &deallocateImageData<UntypedPixel>) {}
+    explicit Image(Size size, ImageFormat format = ImageFormat::RGBA)
+        : Image(allocateImageData<UntypedPixel>(size, pixelSize(toPixelType(format), toPixelFormat(format))),
+                format, &deallocateImageData<UntypedPixel>) {}
+
+    explicit Image(Size size, ImageFormat format, ColorF fillColor) : Image(size, format) {
+        auto w = mapWrite();
+        w.forPixels([fillColor](int32_t, int32_t, auto& pix) {
+            colorToPixel(pix, fillColor);
+        });
+    }
 
     /// Create image with given size, pixel type and pixel format and reference existing data.
     /// Data is not copied. Caller is responsible for data lifetime.
-    /// Defaults to creating an 8-bit RGBA image with gamma-corrected sRGB color space
-    explicit ImageTyped(void* data, Size size, int32_t byteStride, PixelType type = PixelType::U8Gamma,
-                        PixelFormat format = PixelFormat::RGBA)
-        : ImageTyped(ImageData<value_type>{ reinterpret_cast<UntypedPixel*>(data), size, byteStride,
-                                            pixelComponents(format) },
-                     type, format, nullptr) {}
+    explicit Image(void* data, Size size, int32_t byteStride, ImageFormat format)
+        : Image(ImageData<UntypedPixel>{ reinterpret_cast<UntypedPixel*>(data), size, byteStride,
+                                         pixelComponents(toPixelFormat(format)) },
+                format, nullptr) {}
 
-    ~ImageTyped() {
+    ~Image() {
         if (m_deleter)
             m_deleter(m_data);
+    }
+
+    RC<Image> copy(bool copyPixels = true) const {
+        RC<Image> result = rcnew Image(size(), format());
+        if (copyPixels) {
+            result->copyFrom(this->shared_from_this());
+        }
+        return result;
     }
 
 protected:
     using ImageDataDeleter = void (*)(const ImageData<UntypedPixel>& data);
 
-    ImageTyped(ImageData<value_type> data, PixelType type, PixelFormat format, ImageDataDeleter deleter,
-               std::unique_ptr<Internal::ImageBackend> backend = nullptr)
-        : m_data(std::move(data)), m_type(type), m_format(format), m_deleter(deleter),
-          m_backend(std::move(backend)) {}
+    Image(ImageData<UntypedPixel> data, ImageFormat format, ImageDataDeleter deleter,
+          std::unique_ptr<Internal::ImageBackend> backend = nullptr)
+        : m_data(std::move(data)), m_type(toPixelType(format)), m_format(toPixelFormat(format)),
+          m_deleter(deleter), m_backend(std::move(backend)) {}
 
-    template <AccessMode Mode>
-    static ImageAccessT<Mode> map(const ImageData<value_type>& data, Rectangle rect,
-                                  Internal::ImageBackend* backend, PixelFormat format) {
+    template <ImageFormat requestedFormat, AccessMode Mode>
+    static ImageAccess<requestedFormat, Mode> map(const ImageData<UntypedPixel>& data, Rectangle rect,
+                                                  Internal::ImageBackend* backend, ImageFormat actualFormat) {
+        using ImgAcc = ImageAccess<requestedFormat, Mode>;
+        using T      = typename ImgAcc::value_type;
         if (backend)
             backend->begin(Mode, rect);
-        return ImageAccessT<Mode>(data.subrect(rect), MappedRegion{ rect.p1 },
-                                  typename ImageAccessT<Mode>::UnmapFn{ &unmap<Mode>, backend }, format);
+        if (!imageFormatCompatible(requestedFormat, actualFormat)) {
+            throwException(EImageError("Cannot map {} image to {} data", actualFormat, requestedFormat));
+        }
+        return ImgAcc(data.template to<T>().subrect(rect), MappedRegion{ rect.p1 },
+                      typename ImgAcc::UnmapFn{ &unmap<Mode, T>, backend }, actualFormat);
     }
 
-    template <AccessMode M>
-    static void unmap(void* backend_, ImageData<ConstIfR<value_type, M>>& data, MappedRegion& mapped) {
+    template <AccessMode M, typename T>
+    static void unmap(void* backend_, ImageData<ConstIfR<T, M>>& data, MappedRegion& mapped) {
         Internal::ImageBackend* backend = static_cast<Internal::ImageBackend*>(backend_);
         if (backend)
             backend->end(M, Rectangle{ mapped.origin, data.size });
     }
 
-    ImageData<value_type> m_data;
+    ImageData<UntypedPixel> m_data;
     PixelType m_type;
     PixelFormat m_format;
     ImageDataDeleter m_deleter;
 
-    friend Internal::ImageBackend* Internal::getBackend(RC<ImageTyped> image);
-    friend void Internal::setBackend(RC<ImageTyped> image, Internal::ImageBackend* backend);
+    friend Internal::ImageBackend* Internal::getBackend(RC<Image> image);
+    friend void Internal::setBackend(RC<Image> image, Internal::ImageBackend* backend);
     mutable std::unique_ptr<Internal::ImageBackend> m_backend;
 };
 
-template <PixelType Type>
-class ImageTyped<Type, PixelFormat::Unknown> : public ImageTyped<> {
-public:
-    using value_subtype = PixelTypeOf<Type>;
-    using value_type    = value_subtype;
-
-    template <AccessMode Mode>
-    using ImageAccessT = ImageAccess<Type, PixelFormat::Unknown, Mode>;
-
-    using AccessR      = ImageAccessT<AccessMode::R>;
-    using AccessW      = ImageAccessT<AccessMode::W>;
-    using AccessRW     = ImageAccessT<AccessMode::RW>;
-
-    AccessR mapRead() const {
-        return map<AccessMode::R>(data(), this->bounds(), this->m_backend.get(), m_format);
-    }
-
-    AccessW mapWrite() {
-        return map<AccessMode::W>(data(), this->bounds(), this->m_backend.get(), m_format);
-    }
-
-    AccessRW mapReadWrite() {
-        return map<AccessMode::RW>(data(), this->bounds(), this->m_backend.get(), m_format);
-    }
-
-    AccessR mapRead(Rectangle rect) const {
-        return map<AccessMode::R>(data(), rect, this->m_backend.get(), m_format);
-    }
-
-    AccessW mapWrite(Rectangle rect) {
-        return map<AccessMode::W>(data(), rect, this->m_backend.get(), m_format);
-    }
-
-    AccessRW mapReadWrite(Rectangle rect) {
-        return map<AccessMode::RW>(data(), rect, this->m_backend.get(), m_format);
-    }
-
-    void clear(value_type value) {
-        AccessW w = mapWrite();
-        w.clear(value);
-    }
-
-    ImageData<value_type> data() const {
-        return this->m_data.template to<value_type>();
-    }
-
-    /// Create image with given size, pixel type and pixel format and allocates memory for it.
-    /// Defaults to creating an 8-bit RGBA image with gamma-corrected sRGB color space
-    explicit ImageTyped(Size size, PixelFormat format = PixelFormat::RGBA)
-        : ImageTyped<>(size, Type, format) {}
-
-    /// Create image with given size, pixel type and pixel format and reference existing data.
-    /// Data is not copied. Caller is responsible for data lifetime.
-    /// Defaults to creating an 8-bit RGBA image with gamma-corrected sRGB color space
-    explicit ImageTyped(void* data, Size size, int32_t byteStride, PixelFormat format = PixelFormat::RGBA)
-        : ImageTyped<>(data, size, byteStride, Type, format) {}
-
-protected:
-    using ImageTyped<>::ImageTyped;
-
-    template <AccessMode Mode>
-    static ImageAccessT<Mode> map(const ImageData<value_type>& data, Rectangle rect,
-                                  Internal::ImageBackend* backend, PixelFormat format) {
-        if (backend)
-            backend->begin(Mode, rect);
-        return ImageAccessT<Mode>(data.subrect(rect), MappedRegion{ rect.p1 },
-                                  typename ImageAccessT<Mode>::UnmapFn{ &unmap<Mode>, backend }, format);
-    }
-
-    template <AccessMode M>
-    static void unmap(void* backend_, ImageData<ConstIfR<value_type, M>>& data, MappedRegion& mapped) {
-        Internal::ImageBackend* backend = static_cast<Internal::ImageBackend*>(backend_);
-        if (backend)
-            backend->end(M, Rectangle{ mapped.origin, data.size });
-    }
-};
-
-template <PixelType Type, PixelFormat Format>
-class ImageTyped : public ImageTyped<Type, PixelFormat::Unknown> {
-public:
-    using value_subtype = PixelTypeOf<Type>;
-    using value_type    = Pixel<value_subtype, Format>;
-
-    template <AccessMode Mode>
-    using ImageAccessT = ImageAccess<Type, Format, Mode>;
-
-    using AccessR      = ImageAccessT<AccessMode::R>;
-    using AccessW      = ImageAccessT<AccessMode::W>;
-    using AccessRW     = ImageAccessT<AccessMode::RW>;
-
-    AccessR mapRead() const {
-        return map<AccessMode::R>(data(), this->bounds(), this->m_backend.get());
-    }
-
-    AccessW mapWrite() {
-        return map<AccessMode::W>(data(), this->bounds(), this->m_backend.get());
-    }
-
-    AccessRW mapReadWrite() {
-        return map<AccessMode::RW>(data(), this->bounds(), this->m_backend.get());
-    }
-
-    AccessR mapRead(Rectangle rect) const {
-        return map<AccessMode::R>(data(), rect, this->m_backend.get());
-    }
-
-    AccessW mapWrite(Rectangle rect) {
-        return map<AccessMode::W>(data(), rect, this->m_backend.get());
-    }
-
-    AccessRW mapReadWrite(Rectangle rect) {
-        return map<AccessMode::RW>(data(), rect, this->m_backend.get());
-    }
-
-    void clear(value_type value) {
-        AccessW w = mapWrite();
-        w.clear(value);
-    }
-
-    ImageData<value_type> data() const {
-        return this->m_data.template to<value_type>();
-    }
-
-    /// Create image with given size, pixel type and pixel format and allocates memory for it.
-    /// Defaults to creating an 8-bit RGBA image with gamma-corrected sRGB color space
-    explicit ImageTyped(Size size, optional<value_type> clearValue = nullopt)
-        : ImageTyped<Type, PixelFormat::Unknown>(size, Type, Format) {
-        if (clearValue) {
-            clear(*clearValue);
-        }
-    }
-
-    /// Create image with given size, pixel type and pixel format and reference existing data.
-    /// Data is not copied. Caller is responsible for data lifetime.
-    /// Defaults to creating an 8-bit RGBA image with gamma-corrected sRGB color space
-    explicit ImageTyped(void* data, Size size, int32_t byteStride)
-        : ImageTyped<Type, PixelFormat::Unknown>(data, size, byteStride, Type, Format) {}
-
-protected:
-    template <AccessMode Mode>
-    static ImageAccessT<Mode> map(const ImageData<value_type>& data, Rectangle rect,
-                                  Internal::ImageBackend* backend) {
-        if (backend)
-            backend->begin(Mode, rect);
-        return ImageAccessT<Mode>(data.subrect(rect), MappedRegion{ rect.p1 },
-                                  typename ImageAccessT<Mode>::UnmapFn{ &unmap<Mode>, backend });
-    }
-
-    template <AccessMode M>
-    static void unmap(void* backend_, ImageData<ConstIfR<value_type, M>>& data, MappedRegion& mapped) {
-        Internal::ImageBackend* backend = static_cast<Internal::ImageBackend*>(backend_);
-        if (backend)
-            backend->end(M, Rectangle{ mapped.origin, data.size });
-    }
-};
-
-template <PixelType Type>
-using ImageRGBTyped = ImageTyped<Type, PixelFormat::RGB>;
-template <PixelType Type>
-using ImageRGBATyped = ImageTyped<Type, PixelFormat::RGBA>;
-template <PixelType Type>
-using ImageGreyscaleTyped = ImageTyped<Type, PixelFormat::Greyscale>;
-template <PixelType Type>
-using ImageATyped        = ImageTyped<Type, PixelFormat::Alpha>;
-
-using Image              = ImageTyped<PixelType::U8Gamma>;
-using ImageRGB           = ImageRGBTyped<PixelType::U8Gamma>;
-using ImageRGBA          = ImageRGBATyped<PixelType::U8Gamma>;
-using ImageGreyscale     = ImageGreyscaleTyped<PixelType::U8Gamma>;
-using ImageA             = ImageATyped<PixelType::U8Gamma>;
-
-using Image_U8           = ImageTyped<PixelType::U16>;
-using ImageRGB_U8        = ImageRGBTyped<PixelType::U8>;
-using ImageRGBA_U8       = ImageRGBATyped<PixelType::U8>;
-using ImageGreyscale_U8  = ImageGreyscaleTyped<PixelType::U8>;
-using ImageA_U8          = ImageATyped<PixelType::U8>;
-
-using Image_U16          = ImageTyped<PixelType::U16>;
-using ImageRGB_U16       = ImageRGBTyped<PixelType::U16>;
-using ImageRGBA_U16      = ImageRGBATyped<PixelType::U16>;
-using ImageGreyscale_U16 = ImageGreyscaleTyped<PixelType::U16>;
-using ImageA_U16         = ImageATyped<PixelType::U16>;
-
-using Image_F32          = ImageTyped<PixelType::F32>;
-using ImageRGB_F32       = ImageRGBTyped<PixelType::F32>;
-using ImageRGBA_F32      = ImageRGBATyped<PixelType::F32>;
-using ImageGreyscale_F32 = ImageGreyscaleTyped<PixelType::F32>;
-using ImageA_F32         = ImageATyped<PixelType::F32>;
-
-inline RC<ImageTyped<PixelType::U8Gamma>> createImage(Size size, PixelFormat fmt = PixelFormat::RGBA) {
-    return rcnew ImageTyped<PixelType::U8Gamma>(size, fmt);
-}
-
-inline RC<ImageAny> createImage(Size size, PixelType type, PixelFormat fmt) {
-    return rcnew ImageAny(size, type, fmt);
-}
-
-template <PixelType Type, PixelFormat Format>
-inline RC<ImageTyped<Type, Format>> createImage(
-    Size size, optional<Pixel<PixelTypeOf<Type>, Format>> clearValue = nullopt) {
-    static_assert(Format != PixelFormat::Unknown);
-    return rcnew ImageTyped<Type, Format>(size, std::move(clearValue));
-}
-
-template <PixelFormat Format>
-inline RC<ImageTyped<PixelType::U8Gamma, Format>> createImage(
-    Size size, optional<Pixel<uint8_t, Format>> clearValue = nullopt) {
-    return createImage<PixelType::U8Gamma, Format>(size, std::move(clearValue));
-}
-
-template <PixelType Type, PixelFormat Format>
-inline RC<ImageTyped<Type, Format>> createImageLike(RC<ImageTyped<Type, Format>> reference) {
-    return createImage(reference->size(), reference->type(), reference->format())
-        ->template as<Type, Format>();
-}
-
 namespace Internal {
-inline ImageBackend* getBackend(RC<ImageAny> image) {
+inline ImageBackend* getBackend(RC<Image> image) {
     return image->m_backend.get();
 }
 
-inline void setBackend(RC<ImageAny> image, ImageBackend* backend) {
+inline void setBackend(RC<Image> image, ImageBackend* backend) {
     image->m_backend.reset(backend);
 }
 
 } // namespace Internal
-
-/**
- * @brief Custom exception class for image-related errors.
- *
- * This class derives from the standard runtime_error to provide specific error handling for image processing.
- */
-class EImageError : public Exception<std::runtime_error> {
-public:
-    using Exception<std::runtime_error>::Exception; ///< Inherit constructors from the base exception class
-};
 
 } // namespace Brisk

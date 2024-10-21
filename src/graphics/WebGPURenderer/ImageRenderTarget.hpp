@@ -29,7 +29,7 @@ public:
     Size size() const final;
     void setSize(Size newSize) final;
 
-    RC<ImageAny> image() const final;
+    RC<Image> image() const final;
 
     ImageRenderTargetWebGPU(RC<RenderDeviceWebGPU> device, Size frameSize, PixelType type,
                             DepthStencilType depthStencil, int samples);
@@ -45,7 +45,7 @@ private:
     PixelType m_type;
     DepthStencilType m_depthStencilType;
     int m_samples;
-    RC<ImageAny> m_image;
+    RC<Image> m_image;
     BackBufferWebGPU m_backBuffer;
     bool updateImage();
 };

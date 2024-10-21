@@ -64,5 +64,4 @@ void Component::closeWindow() {
         win->close();
 }
 
-
 } // namespace Brisk

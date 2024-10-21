@@ -24,7 +24,7 @@
 
 namespace Brisk {
 
-ImageBackendWebGPU* getOrCreateBackend(RC<RenderDeviceWebGPU> device, RC<ImageAny> image, bool uploadImage,
+ImageBackendWebGPU* getOrCreateBackend(RC<RenderDeviceWebGPU> device, RC<Image> image, bool uploadImage,
                                        bool renderTarget) {
     ImageBackendWebGPU* backend = dynamic_cast<ImageBackendWebGPU*>(Internal::getBackend(image));
     if (backend)
@@ -34,7 +34,7 @@ ImageBackendWebGPU* getOrCreateBackend(RC<RenderDeviceWebGPU> device, RC<ImageAn
     return newBackend;
 }
 
-ImageBackendWebGPU::ImageBackendWebGPU(RC<RenderDeviceWebGPU> device, ImageAny* image, bool uploadImage,
+ImageBackendWebGPU::ImageBackendWebGPU(RC<RenderDeviceWebGPU> device, Image* image, bool uploadImage,
                                        bool renderTarget)
     : m_device(std::move(device)), m_image(image) {
     Size size                = image->size();
@@ -47,7 +47,7 @@ ImageBackendWebGPU::ImageBackendWebGPU(RC<RenderDeviceWebGPU> device, ImageAny* 
     const wgpu::TextureDescriptor descriptor{
         .usage  = usage,
         .size   = wgpu::Extent3D{ uint32_t(size.x), uint32_t(size.y) },
-        .format = wgFormat(Internal::fixPixelType(image->type()), image->format()),
+        .format = wgFormat(Internal::fixPixelType(image->pixelType()), image->pixelFormat()),
     };
     m_texture     = m_device->m_device.CreateTexture(&descriptor);
     m_textureView = m_texture.CreateView();

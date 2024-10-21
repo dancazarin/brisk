@@ -35,7 +35,7 @@ TEST_CASE("Rules") {
         fmt::print("sizeof(Rules) = {}\n", sizeof(Rules));
         fmt::print("sizeof(Rule) = {}\n", sizeof(Rule));
     }
-    
+
     CHECK(decltype(Widget::borderColor)::name == "borderColor"sv);
     CHECK(decltype(Widget::shadowSize)::name == "shadowSize"sv);
     CHECK(decltype(Widget::opacity)::name == "opacity"sv);

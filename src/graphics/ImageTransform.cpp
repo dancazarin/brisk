@@ -37,42 +37,41 @@ static int alphaChannelIndex(PixelFormat fmt) {
                      0, STBIR_ALPHA_CHANNEL_NONE);
 }
 
-void imageResizeTo(RC<ImageAny> destination, RC<ImageAny> source, ResizingFilter filter) {
-    if (source->type() != destination->type() || source->format() != destination->format())
-        throwException(EArgument("imageResizeTo: incompatible type or format: destination={}/{} source={}/{}",
-                                 destination->type(), destination->format(), source->type(),
-                                 source->format()));
-    ImageAny::AccessR r = source->mapRead();
-    ImageAny::AccessW w = destination->mapWrite();
+void imageResizeTo(RC<Image> destination, RC<Image> source, ResizingFilter filter) {
+    if (source->format() != destination->format())
+        throwException(EArgument("imageResizeTo: incompatible type or format: destination={} source={}",
+                                 destination->format(), source->format()));
+    auto r = source->mapRead();
+    auto w = destination->mapWrite();
 
-    switch (source->type()) {
+    switch (source->pixelType()) {
     case PixelType::U8Gamma:
         // Ignore the return value because all preconditions have been checked
         std::ignore = stbir_resize_uint8_generic(
             reinterpret_cast<const uint8_t*>(r.data()), r.width(), r.height(), r.byteStride(),
             reinterpret_cast<uint8_t*>(w.data()), w.width(), w.height(), w.byteStride(), r.components(),
-            alphaChannelIndex(source->format()), 0, STBIR_EDGE_CLAMP, static_cast<stbir_filter>(filter),
+            alphaChannelIndex(source->pixelFormat()), 0, STBIR_EDGE_CLAMP, static_cast<stbir_filter>(filter),
             STBIR_COLORSPACE_SRGB, nullptr);
         break;
     case PixelType::U8:
         std::ignore = stbir_resize_uint8_generic(
             reinterpret_cast<const uint8_t*>(r.data()), r.width(), r.height(), r.byteStride(),
             reinterpret_cast<uint8_t*>(w.data()), w.width(), w.height(), w.byteStride(), r.components(),
-            alphaChannelIndex(source->format()), 0, STBIR_EDGE_CLAMP, static_cast<stbir_filter>(filter),
+            alphaChannelIndex(source->pixelFormat()), 0, STBIR_EDGE_CLAMP, static_cast<stbir_filter>(filter),
             STBIR_COLORSPACE_LINEAR, nullptr);
         break;
     case PixelType::U16:
         std::ignore = stbir_resize_uint16_generic(
             reinterpret_cast<const uint16_t*>(r.data()), r.width(), r.height(), r.byteStride(),
             reinterpret_cast<uint16_t*>(w.data()), w.width(), w.height(), w.byteStride(), r.components(),
-            alphaChannelIndex(source->format()), 0, STBIR_EDGE_CLAMP, static_cast<stbir_filter>(filter),
+            alphaChannelIndex(source->pixelFormat()), 0, STBIR_EDGE_CLAMP, static_cast<stbir_filter>(filter),
             STBIR_COLORSPACE_LINEAR, nullptr);
         break;
     case PixelType::F32:
         std::ignore = stbir_resize_float_generic(
             reinterpret_cast<const float*>(r.data()), r.width(), r.height(), r.byteStride(),
             reinterpret_cast<float*>(w.data()), w.width(), w.height(), w.byteStride(), r.components(),
-            alphaChannelIndex(source->format()), 0, STBIR_EDGE_CLAMP, static_cast<stbir_filter>(filter),
+            alphaChannelIndex(source->pixelFormat()), 0, STBIR_EDGE_CLAMP, static_cast<stbir_filter>(filter),
             STBIR_COLORSPACE_LINEAR, nullptr);
         break;
     default:

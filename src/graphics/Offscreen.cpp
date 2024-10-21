@@ -52,11 +52,11 @@ Canvas& OffscreenRendering::canvas() {
     return *m_canvas;
 }
 
-RC<ImageRGBA> OffscreenRendering::render() {
+RC<Image> OffscreenRendering::render() {
     m_canvas.reset();  // Finish painting.
     m_context.reset(); // Finish rendering.
     m_encoder->wait(); // Wait until the image is fully rendered on the GPU.
-    return m_target->imageAs<PixelType::U8Gamma>();
+    return m_target->image();
 }
 
 OffscreenRendering::~OffscreenRendering() {}

@@ -60,7 +60,7 @@ bytes imageEncode(ImageCodec codec, RC<Image> image, optional<int> quality, opti
     }
 }
 
-expected<RC<Image>, ImageIOError> imageDecode(ImageCodec codec, bytes_view bytes, PixelFormat format) {
+expected<RC<Image>, ImageIOError> imageDecode(ImageCodec codec, bytes_view bytes, ImageFormat format) {
     switch (codec) {
     case ImageCodec::BMP:
         return bmpDecode(bytes, format);
@@ -75,7 +75,7 @@ expected<RC<Image>, ImageIOError> imageDecode(ImageCodec codec, bytes_view bytes
     }
 }
 
-expected<RC<Image>, ImageIOError> imageDecode(bytes_view bytes, PixelFormat format) {
+expected<RC<Image>, ImageIOError> imageDecode(bytes_view bytes, ImageFormat format) {
     auto codec = guessImageCodec(bytes);
     if (!codec)
         return unexpected(ImageIOError::CodecError);

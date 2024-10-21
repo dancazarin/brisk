@@ -35,13 +35,17 @@ struct webp_deleter {
 } // namespace
 
 [[nodiscard]] bytes webpEncode(RC<Image> image, optional<float> quality, bool lossless) {
-    auto rd         = image->mapRead();
+    if (image->pixelType() != PixelType::U8Gamma) {
+        throwException(EImageError("Webp codec doesn't support encoding {} format", image->format()));
+    }
+
+    auto rd         = image->mapRead<ImageFormat::Unknown_U8Gamma>();
 
     uint8_t* output = nullptr;
     bytes result;
     size_t sz;
     if (lossless) {
-        switch (image->format()) {
+        switch (image->pixelFormat()) {
         case PixelFormat::RGBA:
             sz = WebPEncodeLosslessRGBA(rd.data(), rd.width(), rd.height(), rd.byteStride(), &output);
             break;
@@ -58,7 +62,7 @@ struct webp_deleter {
             return result;
         }
     } else {
-        switch (image->format()) {
+        switch (image->pixelFormat()) {
         case PixelFormat::RGBA:
             sz = WebPEncodeRGBA(rd.data(), rd.width(), rd.height(), rd.byteStride(),
                                 quality.value_or(defaultImageQuality), &output);
@@ -91,10 +95,14 @@ struct webp_deleter {
     return result;
 }
 
-[[nodiscard]] expected<RC<Image>, ImageIOError> webpDecode(bytes_view bytes, PixelFormat format) {
+[[nodiscard]] expected<RC<Image>, ImageIOError> webpDecode(bytes_view bytes, ImageFormat format) {
+    if (toPixelType(format) != PixelType::U8Gamma && toPixelType(format) != PixelType::Unknown) {
+        throwException(EImageError("Webp codec doesn't support decoding to {} format", format));
+    }
+
     int width = 0, height = 0;
     std::unique_ptr<uint8_t[], webp_deleter> pixels;
-    switch (format) {
+    switch (toPixelFormat(format)) {
     case PixelFormat::RGBA:
         pixels.reset(WebPDecodeRGBA(bytes.data(), bytes.size(), &width, &height));
         break;

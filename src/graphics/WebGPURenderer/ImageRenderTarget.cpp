@@ -38,7 +38,7 @@ ImageRenderTargetWebGPU::ImageRenderTargetWebGPU(RC<RenderDeviceWebGPU> device, 
 ImageRenderTargetWebGPU::~ImageRenderTargetWebGPU() = default;
 
 bool ImageRenderTargetWebGPU::updateImage() {
-    m_image                     = createImage(m_frameSize, m_type, format);
+    m_image                     = rcnew Image(m_frameSize, imageFormat(m_type, format));
     ImageBackendWebGPU* backend = getOrCreateBackend(m_device, m_image, false, true);
     m_backBuffer.color          = backend->m_texture;
     if (!m_device->updateBackBuffer(m_backBuffer, m_type, m_depthStencilType, m_samples)) {
@@ -58,7 +58,7 @@ void ImageRenderTargetWebGPU::setSize(Size newSize) {
     }
 }
 
-RC<ImageAny> ImageRenderTargetWebGPU::image() const {
+RC<Image> ImageRenderTargetWebGPU::image() const {
     return m_image;
 }
 } // namespace Brisk

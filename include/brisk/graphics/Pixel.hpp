@@ -300,11 +300,13 @@ template <>
 template <>
 [[maybe_unused]] constexpr inline float alpha<double> = 1.;
 
-template <SIMDCompatible T, PixelFormat fmt>
+template <PixelType Type, PixelFormat fmt>
 struct PixelStruct;
 
-template <SIMDCompatible T>
-struct PixelStruct<T, PixelFormat::RGBA> {
+template <PixelType Type>
+struct PixelStruct<Type, PixelFormat::RGBA> {
+    using T = PixelTypeOf<Type>;
+
     union {
         struct {
             T r, g, b, a;
@@ -325,8 +327,10 @@ struct PixelStruct<T, PixelFormat::RGBA> {
     };
 };
 
-template <SIMDCompatible T>
-struct PixelStruct<T, PixelFormat::ARGB> {
+template <PixelType Type>
+struct PixelStruct<Type, PixelFormat::ARGB> {
+    using T = PixelTypeOf<Type>;
+
     union {
         struct {
             T a, r, g, b;
@@ -347,8 +351,10 @@ struct PixelStruct<T, PixelFormat::ARGB> {
     };
 };
 
-template <SIMDCompatible T>
-struct PixelStruct<T, PixelFormat::BGRA> {
+template <PixelType Type>
+struct PixelStruct<Type, PixelFormat::BGRA> {
+    using T = PixelTypeOf<Type>;
+
     union {
         struct {
             T b, g, r, a;
@@ -369,8 +375,10 @@ struct PixelStruct<T, PixelFormat::BGRA> {
     };
 };
 
-template <SIMDCompatible T>
-struct PixelStruct<T, PixelFormat::ABGR> {
+template <PixelType Type>
+struct PixelStruct<Type, PixelFormat::ABGR> {
+    using T = PixelTypeOf<Type>;
+
     union {
         struct {
             T a, b, g, r;
@@ -391,8 +399,10 @@ struct PixelStruct<T, PixelFormat::ABGR> {
     };
 };
 
-template <SIMDCompatible T>
-struct PixelStruct<T, PixelFormat::RGB> {
+template <PixelType Type>
+struct PixelStruct<Type, PixelFormat::RGB> {
+    using T = PixelTypeOf<Type>;
+
     union {
         struct {
             T r, g, b;
@@ -412,8 +422,10 @@ struct PixelStruct<T, PixelFormat::RGB> {
     };
 };
 
-template <SIMDCompatible T>
-struct PixelStruct<T, PixelFormat::BGR> {
+template <PixelType Type>
+struct PixelStruct<Type, PixelFormat::BGR> {
+    using T = PixelTypeOf<Type>;
+
     union {
         struct {
             T b, g, r;
@@ -433,8 +445,10 @@ struct PixelStruct<T, PixelFormat::BGR> {
     };
 };
 
-template <SIMDCompatible T>
-struct PixelStruct<T, PixelFormat::Greyscale> {
+template <PixelType Type>
+struct PixelStruct<Type, PixelFormat::Greyscale> {
+    using T = PixelTypeOf<Type>;
+
     union {
         struct {
             T grey;
@@ -460,8 +474,10 @@ struct PixelStruct<T, PixelFormat::Greyscale> {
     };
 };
 
-template <SIMDCompatible T>
-struct PixelStruct<T, PixelFormat::GreyscaleAlpha> {
+template <PixelType Type>
+struct PixelStruct<Type, PixelFormat::GreyscaleAlpha> {
+    using T = PixelTypeOf<Type>;
+
     union {
         struct {
             T grey;
@@ -481,8 +497,10 @@ struct PixelStruct<T, PixelFormat::GreyscaleAlpha> {
     };
 };
 
-template <SIMDCompatible T>
-struct PixelStruct<T, PixelFormat::Alpha> {
+template <PixelType Type>
+struct PixelStruct<Type, PixelFormat::Alpha> {
+    using T = PixelTypeOf<Type>;
+
     union {
         struct {
             T a;
@@ -508,14 +526,16 @@ struct PixelStruct<T, PixelFormat::Alpha> {
     };
 };
 
-template <SIMDCompatible T, PixelFormat fmt>
+template <PixelType typ, PixelFormat fmt>
 struct Pixel;
 
-template <SIMDCompatible T, PixelFormat dstFmt, PixelFormat srcFmt>
-Pixel<T, dstFmt> cvtPixel(const Pixel<T, srcFmt>& src) noexcept;
+template <PixelFormat dstFmt, PixelType typ, PixelFormat srcFmt>
+Pixel<typ, dstFmt> cvtPixel(Pixel<typ, srcFmt> src) noexcept;
 
-template <SIMDCompatible T, PixelFormat fmt>
-struct Pixel : public PixelStruct<T, fmt> {
+template <PixelType typ, PixelFormat fmt>
+struct Pixel : public PixelStruct<typ, fmt> {
+
+    using T                             = PixelTypeOf<typ>;
 
     constexpr static PixelFormat format = fmt;
 
@@ -527,14 +547,14 @@ struct Pixel : public PixelStruct<T, fmt> {
         return this->c[n];
     }
 
-    using PixelStruct<T, fmt>::PixelStruct;
+    using PixelStruct<typ, fmt>::PixelStruct;
 
     constexpr Pixel() noexcept                        = default;
     constexpr Pixel(const Pixel&) noexcept            = default;
     constexpr Pixel& operator=(const Pixel&) noexcept = default;
 
     template <PixelFormat srcFmt>
-    Pixel(Pixel<T, srcFmt> pixel) noexcept {
+    Pixel(Pixel<typ, srcFmt> pixel) noexcept {
         *this = cvtPixel<fmt>(pixel);
     }
 
@@ -551,34 +571,34 @@ struct Pixel : public PixelStruct<T, fmt> {
     }
 };
 
-template <typename T>
-using PixelRGB = Pixel<T, PixelFormat::RGB>;
-template <typename T>
-using PixelRGBA = Pixel<T, PixelFormat::RGBA>;
-template <typename T>
-using PixelARGB = Pixel<T, PixelFormat::ARGB>;
-template <typename T>
-using PixelBGR = Pixel<T, PixelFormat::BGR>;
-template <typename T>
-using PixelBGRA = Pixel<T, PixelFormat::BGRA>;
-template <typename T>
-using PixelABGR = Pixel<T, PixelFormat::ABGR>;
-template <typename T>
-using PixelGreyscaleAlpha = Pixel<T, PixelFormat::GreyscaleAlpha>;
-template <typename T>
-using PixelGreyscale = Pixel<T, PixelFormat::Greyscale>;
-template <typename T>
-using PixelAlpha           = Pixel<T, PixelFormat::Alpha>;
+template <PixelType typ>
+using PixelRGB = Pixel<typ, PixelFormat::RGB>;
+template <PixelType typ>
+using PixelRGBA = Pixel<typ, PixelFormat::RGBA>;
+template <PixelType typ>
+using PixelARGB = Pixel<typ, PixelFormat::ARGB>;
+template <PixelType typ>
+using PixelBGR = Pixel<typ, PixelFormat::BGR>;
+template <PixelType typ>
+using PixelBGRA = Pixel<typ, PixelFormat::BGRA>;
+template <PixelType typ>
+using PixelABGR = Pixel<typ, PixelFormat::ABGR>;
+template <PixelType typ>
+using PixelGreyscaleAlpha = Pixel<typ, PixelFormat::GreyscaleAlpha>;
+template <PixelType typ>
+using PixelGreyscale = Pixel<typ, PixelFormat::Greyscale>;
+template <PixelType typ>
+using PixelAlpha           = Pixel<typ, PixelFormat::Alpha>;
 
-using PixelRGB8            = PixelRGB<uint8_t>;
-using PixelRGBA8           = PixelRGBA<uint8_t>;
-using PixelARGB8           = PixelARGB<uint8_t>;
-using PixelBGR8            = PixelBGR<uint8_t>;
-using PixelBGRA8           = PixelBGRA<uint8_t>;
-using PixelABGR8           = PixelABGR<uint8_t>;
-using PixelGreyscale8      = PixelGreyscale<uint8_t>;
-using PixelGreyscaleAlpha8 = PixelGreyscaleAlpha<uint8_t>;
-using PixelAlpha8          = PixelAlpha<uint8_t>;
+using PixelRGB8            = PixelRGB<PixelType::U8Gamma>;
+using PixelRGBA8           = PixelRGBA<PixelType::U8Gamma>;
+using PixelARGB8           = PixelARGB<PixelType::U8Gamma>;
+using PixelBGR8            = PixelBGR<PixelType::U8Gamma>;
+using PixelBGRA8           = PixelBGRA<PixelType::U8Gamma>;
+using PixelABGR8           = PixelABGR<PixelType::U8Gamma>;
+using PixelGreyscale8      = PixelGreyscale<PixelType::U8Gamma>;
+using PixelGreyscaleAlpha8 = PixelGreyscaleAlpha<PixelType::U8Gamma>;
+using PixelAlpha8          = PixelAlpha<PixelType::U8Gamma>;
 
 /**
  * @brief Computes the luminance (Y) component from RGB values using the BT.601 formula.
@@ -623,9 +643,10 @@ BRISK_INLINE T computeY(T r, T g, T b) noexcept {
  * @param a The alpha value to multiply by.
  * @return The modified pixel with adjusted color components.
  */
-template <PixelFormat fmt, typename T>
-BRISK_INLINE Pixel<T, fmt> mulAlpha(Pixel<T, fmt> src, T a) noexcept {
-    if constexpr (std::is_floating_point_v<T>) {
+template <PixelFormat fmt, PixelType typ>
+BRISK_INLINE Pixel<typ, fmt> mulAlpha(Pixel<typ, fmt> src, PixelTypeOf<typ> a) noexcept {
+    using T = PixelTypeOf<typ>;
+    if constexpr (typ == PixelType::F32) {
         if constexpr (pixelColor(fmt) == PixelFlagColor::RGB) {
             src.r *= a;
             src.g *= a;
@@ -658,9 +679,10 @@ BRISK_INLINE Pixel<T, fmt> mulAlpha(Pixel<T, fmt> src, T a) noexcept {
  * @param src The source pixel to be converted.
  * @return The converted pixel in the destination format.
  */
-template <PixelFormat dstFmt, typename T, PixelFormat srcFmt>
-BRISK_INLINE Pixel<T, dstFmt> cvtPixel(Pixel<T, srcFmt> src) noexcept {
-    Pixel<T, dstFmt> dst;
+template <PixelFormat dstFmt, PixelType typ, PixelFormat srcFmt>
+BRISK_INLINE Pixel<typ, dstFmt> cvtPixel(Pixel<typ, srcFmt> src) noexcept {
+    using T = PixelTypeOf<typ>;
+    Pixel<typ, dstFmt> dst;
     if constexpr (pixelColor(dstFmt) == PixelFlagColor::RGB && pixelColor(srcFmt) == PixelFlagColor::RGB) {
         // Color -> Color
         dst.r = src.r;
@@ -706,6 +728,44 @@ BRISK_INLINE Pixel<T, dstFmt> cvtPixel(Pixel<T, srcFmt> src) noexcept {
 }
 
 /**
+ * @brief Macro to assist with pixel type handling.
+ *
+ * This macro provides a way to handle operations for different pixel types in a concise manner.
+ *
+ * @param typ The pixel type.
+ * @param ... The operation(s) to perform for the specified pixel type.
+ */
+#define DO_PIX_TYP_HLP(typ, ...)                                                                             \
+    {                                                                                                        \
+        constexpr PixelType TYP = typ;                                                                       \
+        __VA_ARGS__                                                                                          \
+    }
+
+/**
+ * @brief Macro to define behavior based on pixel type.
+ *
+ * This macro utilizes a switch statement to execute specific operations based on the provided pixel type.
+ *
+ * @param typ The pixel type.
+ * @param ... The operation(s) to perform for each case of the specified pixel type.
+ */
+#define DO_PIX_TYP(typ, ...)                                                                                 \
+    {                                                                                                        \
+        switch (typ) {                                                                                       \
+        case PixelType::U8:                                                                                  \
+            DO_PIX_TYP_HLP(PixelType::U8, __VA_ARGS__);                                                      \
+        case PixelType::U8Gamma:                                                                             \
+            DO_PIX_TYP_HLP(PixelType::U8Gamma, __VA_ARGS__);                                                 \
+        case PixelType::U16:                                                                                 \
+            DO_PIX_TYP_HLP(PixelType::U16, __VA_ARGS__);                                                     \
+        case PixelType::F32:                                                                                 \
+            DO_PIX_TYP_HLP(PixelType::F32, __VA_ARGS__);                                                     \
+        default:                                                                                             \
+            BRISK_UNREACHABLE();                                                                             \
+        }                                                                                                    \
+    }
+
+/**
  * @brief Macro to assist with pixel format handling.
  *
  * This macro provides a way to handle operations for different pixel formats in a concise manner.
@@ -749,7 +809,7 @@ BRISK_INLINE Pixel<T, dstFmt> cvtPixel(Pixel<T, srcFmt> src) noexcept {
         case PixelFormat::Alpha:                                                                             \
             DO_PIX_FMT_HLP(PixelFormat::Alpha, __VA_ARGS__);                                                 \
         default:                                                                                             \
-            break;                                                                                           \
+            BRISK_UNREACHABLE();                                                                             \
         }                                                                                                    \
     }
 
@@ -765,9 +825,9 @@ BRISK_INLINE Pixel<T, dstFmt> cvtPixel(Pixel<T, srcFmt> src) noexcept {
  * @param src The source pixel to convert.
  * @param dstFmt The destination pixel format.
  */
-template <PixelFormat srcFmt, typename T>
-void cvtPixelTo(T* dst, Pixel<T, srcFmt> src, PixelFormat dstFmt) noexcept {
-    DO_PIX_FMT(dstFmt, *reinterpret_cast<Pixel<T, FMT>*>(dst) = cvtPixel<FMT, T, srcFmt>(src); break;)
+template <PixelFormat srcFmt, PixelType typ, typename T = PixelTypeOf<typ>>
+void cvtPixelTo(T* dst, Pixel<typ, srcFmt> src, PixelFormat dstFmt) noexcept {
+    DO_PIX_FMT(dstFmt, *reinterpret_cast<Pixel<typ, FMT>*>(dst) = cvtPixel<FMT>(src); break;)
 }
 
 /**
@@ -782,9 +842,9 @@ void cvtPixelTo(T* dst, Pixel<T, srcFmt> src, PixelFormat dstFmt) noexcept {
  * @param src Pointer to the source pixel data.
  * @param srcFmt The source pixel format.
  */
-template <PixelFormat dstFmt, typename T>
-void cvtPixelFrom(Pixel<T, dstFmt>& dst, const T* src, PixelFormat srcFmt) noexcept {
-    DO_PIX_FMT(srcFmt, dst = cvtPixel<dstFmt, T, FMT>(*reinterpret_cast<const Pixel<T, FMT>*>(src)); break;)
+template <PixelFormat dstFmt, PixelType typ, typename T = PixelTypeOf<typ>>
+void cvtPixelFrom(Pixel<typ, dstFmt>& dst, const T* src, PixelFormat srcFmt) noexcept {
+    DO_PIX_FMT(srcFmt, dst = cvtPixel<dstFmt>(*reinterpret_cast<const Pixel<typ, FMT>*>(src)); break;)
 }
 
 } // namespace Brisk

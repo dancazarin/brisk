@@ -52,13 +52,16 @@ static png_uint_32 toPNGFormat(PixelFormat fmt) {
 }
 
 bytes pngEncode(RC<Image> image) {
+    if (image->pixelType() != PixelType::U8Gamma) {
+        throwException(EImageError("PNG codec doesn't support encoding {} format", image->format()));
+    }
     // All png pixel formats are supported except PNG_FORMAT_AG
     png_image pngimage;
     memset(&pngimage, 0, sizeof(pngimage));
     pngimage.version = PNG_IMAGE_VERSION;
     pngimage.width   = image->width();
     pngimage.height  = image->height();
-    pngimage.format  = toPNGFormat(image->format());
+    pngimage.format  = toPNGFormat(image->pixelFormat());
     bytes b(PNG_IMAGE_PNG_SIZE_MAX(pngimage), 0);
     png_alloc_size_t pngbytes = b.size();
 
@@ -75,23 +78,28 @@ bytes pngEncode(RC<Image> image) {
     }
 }
 
-expected<RC<Image>, ImageIOError> pngDecode(bytes_view bytes, PixelFormat format) {
+expected<RC<Image>, ImageIOError> pngDecode(bytes_view bytes, ImageFormat format) {
+    if (toPixelType(format) != PixelType::U8Gamma && toPixelType(format) != PixelType::Unknown) {
+        throwException(EImageError("PNG codec doesn't support decoding to {} format", format));
+    }
+    PixelFormat pixelFormat = toPixelFormat(format);
     png_image pngimage;
     memset(&pngimage, 0, sizeof(pngimage));
     pngimage.version = PNG_IMAGE_VERSION;
     if (!png_image_begin_read_from_memory(&pngimage, bytes.data(), bytes.size())) {
         return unexpected(ImageIOError::CodecError);
     }
-    if (format != PixelFormat::Unknown) {
-        pngimage.format = toPNGFormat(format);
+    if (pixelFormat != PixelFormat::Unknown) {
+        pngimage.format = toPNGFormat(pixelFormat);
     } else {
-        format = fromPNGFormat(pngimage.format);
-        if (format == PixelFormat::Unknown) {
+        pixelFormat = fromPNGFormat(pngimage.format);
+        if (pixelFormat == PixelFormat::Unknown) {
             return unexpected(ImageIOError::InvalidFormat);
         }
     }
-    RC<Image> image = createImage(Size(pngimage.width, pngimage.height), format);
-    auto w          = image->mapWrite();
+    RC<Image> image =
+        rcnew Image(Size(pngimage.width, pngimage.height), imageFormat(PixelType::U8Gamma, pixelFormat));
+    auto w = image->mapWrite();
     if (!png_image_finish_read(&pngimage, nullptr, w.data(), w.byteStride(), nullptr)) {
         return unexpected(ImageIOError::CodecError);
     }

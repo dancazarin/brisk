@@ -125,9 +125,6 @@ struct ColorOf {
                       std::is_same_v<T, int16_t>,
                   "Incorrect type");
 
-    // Deleted constructor to prevent default initialization with an integer.
-    constexpr ColorOf(int) = delete;
-
     /**
      * @brief Constructs a grayscale color with an optional alpha value.
      *
@@ -708,41 +705,95 @@ constexpr Color operator""_rgb(unsigned long long rgb) {
     return rgbToColor(rgb);
 }
 
+namespace Internal {
+template <typename T, ColorGamma Gamma>
+constexpr PixelType pixelTypeFor() {
+    if constexpr (std::is_same_v<T, uint8_t>) {
+        if constexpr (Gamma == ColorGamma::sRGB)
+            return PixelType::U8Gamma;
+        else
+            return PixelType::U8;
+    } else if constexpr (std::is_same_v<T, uint16_t>) {
+        return PixelType::U16;
+    } else if constexpr (std::is_same_v<T, float>) {
+        return PixelType::F32;
+    } else {
+        static_assert(sizeof(T) == 0, "Invalid type passed to pixelTypeFor");
+    }
+}
+} // namespace Internal
+
 /**
  * @brief Converts a pixel to a color representation based on its type and format.
  *
- * This function takes a pixel and converts it into a `ColorOf` instance based on the pixel's type
- * and format, ensuring the appropriate gamma correction is applied.
+ * This function takes a pixel of the specified type and format, converts it into an intermediate RGBA
+ * pixel format, and then returns a `ColorOf` instance with the appropriate color space.
  *
- * @tparam Type The pixel type.
- * @tparam T The data type used for color components.
- * @tparam fmt The pixel format.
- * @param pixel The pixel to convert.
- * @return A `ColorOf<T, pixelTypeToGamma(Type)>` object representing the color.
+ * @tparam typ The pixel type (e.g., integer, float).
+ * @tparam fmt The pixel format (e.g., RGB, RGBA).
+ * @param pixel The input pixel to convert.
+ * @return A `ColorOf<PixelTypeOf<typ>, pixelTypeToGamma(typ)>` object representing the color.
  */
-template <PixelType Type, typename T, PixelFormat fmt>
-BRISK_INLINE ColorOf<T, pixelTypeToGamma(Type)> pixelToColor(Pixel<T, fmt> pixel) noexcept {
-    Pixel<T, PixelFormat::RGBA> rgbaPixel = cvtPixel<PixelFormat::RGBA, T, fmt>(pixel);
-    return ColorOf<T, pixelTypeToGamma(Type)>{ rgbaPixel.r, rgbaPixel.g, rgbaPixel.b, rgbaPixel.a };
+template <PixelType typ, PixelFormat fmt>
+BRISK_INLINE ColorOf<PixelTypeOf<typ>, pixelTypeToGamma(typ)> pixelToColor(Pixel<typ, fmt> pixel) noexcept {
+    Pixel<typ, PixelFormat::RGBA> rgbaPixel = cvtPixel<PixelFormat::RGBA>(pixel);
+    return ColorOf<PixelTypeOf<typ>, pixelTypeToGamma(typ)>{ rgbaPixel.r, rgbaPixel.g, rgbaPixel.b,
+                                                             rgbaPixel.a };
 }
 
 /**
- * @brief Converts a color to a pixel representation based on its gamma and format.
+ * @brief Converts a pixel to a color and stores the result in a pre-existing `ColorOf` object.
  *
- * This function takes a `ColorOf` instance and converts it to a pixel format, ensuring the appropriate
- * gamma correction is applied based on the destination format.
+ * This overload allows for in-place conversion, storing the result in the provided `result` parameter.
  *
- * @tparam Type The pixel type.
+ * @tparam T The data type for color components.
+ * @tparam gamma The gamma space of the resulting color.
+ * @tparam typ The pixel type.
  * @tparam fmt The pixel format.
+ * @param result Reference to a `ColorOf<T, gamma>` where the converted color will be stored.
+ * @param pixel The input pixel to convert.
+ */
+template <typename T, ColorGamma gamma, PixelType typ, PixelFormat fmt>
+BRISK_INLINE void pixelToColor(ColorOf<T, gamma>& result, Pixel<typ, fmt> pixel) noexcept {
+    result = pixelToColor(pixel);
+}
+
+/**
+ * @brief Converts a color to a pixel representation based on its data type and gamma.
+ *
+ * This function converts a `ColorOf` instance into a pixel with the specified format and gamma correction.
+ * The result is always in the RGBA pixel format, suitable for further conversion to other formats.
+ *
  * @tparam T The data type used for color components.
  * @tparam Gamma The gamma space of the color.
  * @param color The color to convert.
- * @return A `Pixel<T, fmt>` object representing the pixel.
+ * @return A `Pixel<Internal::pixelTypeFor<T, Gamma>(), PixelFormat::RGBA>` representing the color as a pixel.
  */
-template <PixelType Type, PixelFormat fmt, typename T, ColorGamma Gamma>
-BRISK_INLINE Pixel<T, fmt> colorToPixel(ColorOf<T, Gamma> color) noexcept {
-    Pixel<T, PixelFormat::RGBA> rgbaPixel{ color.r, color.g, color.b, color.a };
-    return cvtPixel<fmt, T, PixelFormat::RGBA>(rgbaPixel);
+template <typename T, ColorGamma Gamma>
+BRISK_INLINE Pixel<Internal::pixelTypeFor<T, Gamma>(), PixelFormat::RGBA> colorToPixel(
+    ColorOf<T, Gamma> color) noexcept {
+    return Pixel<Internal::pixelTypeFor<T, Gamma>(), PixelFormat::RGBA>{ color.r, color.g, color.b, color.a };
+}
+
+/**
+ * @brief Converts a color to a pixel and stores the result in a pre-existing `Pixel` object.
+ *
+ * This overload allows for in-place conversion, storing the result in the provided `result` parameter.
+ * The input color is first converted to the intermediate RGBA format before being converted to the final
+ * pixel format.
+ *
+ * @tparam typ The pixel type.
+ * @tparam fmt The pixel format.
+ * @tparam T The data type used for color components.
+ * @tparam Gamma The gamma space of the color.
+ * @param result Reference to a `Pixel<typ, fmt>` where the converted pixel will be stored.
+ * @param color The color to convert.
+ */
+template <PixelType typ, PixelFormat fmt, typename T, ColorGamma Gamma>
+BRISK_INLINE void colorToPixel(Pixel<typ, fmt>& result, ColorOf<T, Gamma> color) noexcept {
+    ColorOf<PixelTypeOf<typ>, pixelTypeToGamma(typ)> tmpColor = color;
+    Pixel<typ, PixelFormat::RGBA> rgbaPixel{ tmpColor.r, tmpColor.g, tmpColor.b, tmpColor.a };
+    result = cvtPixel<fmt>(rgbaPixel);
 }
 
 /**

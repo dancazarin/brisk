@@ -29,7 +29,7 @@ public:
      * @brief Renders the offscreen image and returns the resulting image.
      * @return A reference-counted pointer to the rendered image in RGBA format.
      */
-    [[nodiscard]] RC<ImageRGBA> render();
+    [[nodiscard]] RC<Image> render();
 
     /**
      * @brief Gets the rectangle representing the size of the rendering target.

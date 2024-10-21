@@ -38,7 +38,7 @@ ImageRenderTargetD3D11::ImageRenderTargetD3D11(RC<RenderDeviceD3D11> device, Siz
 ImageRenderTargetD3D11::~ImageRenderTargetD3D11() = default;
 
 bool ImageRenderTargetD3D11::updateImage() {
-    m_image                    = createImage(m_frameSize, m_type, format);
+    m_image                    = rcnew Image(m_frameSize, imageFormat(m_type, format));
     ImageBackendD3D11* backend = getOrCreateBackend(m_device, m_image, false, true);
     m_backBuffer.colorBuffer   = backend->m_texture;
     if (!m_device->updateBackBuffer(m_backBuffer, m_type, m_depthStencilType, m_samples)) {
@@ -58,7 +58,7 @@ void ImageRenderTargetD3D11::setSize(Size newSize) {
     }
 }
 
-RC<ImageAny> ImageRenderTargetD3D11::image() const {
+RC<Image> ImageRenderTargetD3D11::image() const {
     return m_image;
 }
 } // namespace Brisk

@@ -43,22 +43,26 @@ static int toJPGFormat(PixelFormat fmt) {
 }
 
 bytes jpegEncode(RC<Image> image, optional<int> quality, optional<ColorSubsampling> ss) {
+    if (image->pixelType() != PixelType::U8Gamma) {
+        throwException(EImageError("JPEG codec doesn't support encoding {} format", image->format()));
+    }
     // All jpeg pixel formats are supported
     tjhandle jpeg = tjInitCompress();
     SCOPE_EXIT {
         tjDestroy(jpeg);
     };
 
-    Image::AccessR r = image->mapRead();
+    auto r = image->mapRead<ImageFormat::Unknown_U8Gamma>();
 
     bytes result(tjBufSize(r.width(), r.height(), toJPGSS(ss.value_or(defaultColorSubsampling))));
     uint8_t* resultData      = result.data();
     unsigned long resultSize = result.size();
 
-    if (tjCompress2(jpeg, r.data(), r.width(), r.byteStride(), r.height(), toJPGFormat(image->format()),
+    if (tjCompress2(jpeg, r.data(), r.width(), r.byteStride(), r.height(), toJPGFormat(image->pixelFormat()),
                     &resultData, &resultSize,
-                    image->format() == PixelFormat::Greyscale ? TJSAMP_GRAY
-                                                              : toJPGSS(ss.value_or(defaultColorSubsampling)),
+                    image->pixelFormat() == PixelFormat::Greyscale
+                        ? TJSAMP_GRAY
+                        : toJPGSS(ss.value_or(defaultColorSubsampling)),
                     quality.value_or(defaultImageQuality),
                     TJFLAG_FASTDCT | TJFLAG_NOREALLOC | TJFLAG_PROGRESSIVE) != 0) {
         return {};
@@ -67,11 +71,15 @@ bytes jpegEncode(RC<Image> image, optional<int> quality, optional<ColorSubsampli
     return result;
 }
 
-expected<RC<Image>, ImageIOError> jpegDecode(bytes_view bytes, PixelFormat format) {
+expected<RC<Image>, ImageIOError> jpegDecode(bytes_view bytes, ImageFormat format) {
+    if (toPixelType(format) != PixelType::U8Gamma && toPixelType(format) != PixelType::Unknown) {
+        throwException(EImageError("JPEG codec doesn't support decoding to {} format", format));
+    }
     tjhandle jpeg = tjInitDecompress();
     SCOPE_EXIT {
         tjDestroy(jpeg);
     };
+    PixelFormat pixelFormat = toPixelFormat(format);
 
     Size size;
     int jpegSS;
@@ -80,16 +88,16 @@ expected<RC<Image>, ImageIOError> jpegDecode(bytes_view bytes, PixelFormat forma
                             &jpegSS) != 0) {
         return unexpected(ImageIOError::CodecError);
     }
-    if (format == PixelFormat::Unknown) {
-        format = jpegSS == TJSAMP_GRAY ? PixelFormat::Greyscale : PixelFormat::RGB;
+    if (pixelFormat == PixelFormat::Unknown) {
+        pixelFormat = jpegSS == TJSAMP_GRAY ? PixelFormat::Greyscale : PixelFormat::RGB;
     }
 
-    RC<Image> image  = createImage(size, format);
+    RC<Image> image = rcnew Image(size, imageFormat(PixelType::U8Gamma, pixelFormat));
 
-    Image::AccessW w = image->mapWrite();
+    auto w          = image->mapWrite<ImageFormat::Unknown_U8Gamma>();
 
     if (tjDecompress2(jpeg, const_cast<uint8_t*>(bytes.data()), bytes.size(), w.data(), w.width(),
-                      w.byteStride(), w.height(), toJPGFormat(format), TJFLAG_ACCURATEDCT) != 0) {
+                      w.byteStride(), w.height(), toJPGFormat(pixelFormat), TJFLAG_ACCURATEDCT) != 0) {
         return unexpected(ImageIOError::CodecError);
     }
 

@@ -49,8 +49,8 @@ template <PixelFormat Format>
 static void testImageSample(std::string sample, Size size) {
     auto raw = readBytes(fs::path(PROJECT_SOURCE_DIR) / "src" / "graphics" / "testdata" / (sample + ".raw"));
     REQUIRE(!!raw);
-    InplacePtr<ImageTyped<PixelType::U8Gamma, Format>> reference(raw->data(), size,
-                                                                 size.width * pixelComponents(Format));
+    InplacePtr<Image> reference(raw->data(), size, size.width * pixelComponents(Format),
+                                imageFormat(PixelType::U8Gamma, Format));
 
     // SECTION("bmp") {
     //     testImageCodec(sample, reference, ImageCodec::BMP, "bmp");

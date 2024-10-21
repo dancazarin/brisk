@@ -319,12 +319,12 @@ void RenderDeviceD3D11::decrementWindowTargets() {
         m_dxgiDevice1->SetMaximumFrameLatency(m_windowTargets);
 }
 
-void RenderDeviceD3D11::createImageBackend(RC<ImageAny> image) {
+void RenderDeviceD3D11::createImageBackend(RC<Image> image) {
     BRISK_ASSERT(image);
-    if (dxFormat(image->type(), image->format()) == DXGI_FORMAT_UNKNOWN) {
+    if (dxFormat(image->pixelType(), image->pixelFormat()) == DXGI_FORMAT_UNKNOWN) {
         throwException(EImageError("Direct3D11 backend does not support the image type or format: {}, {}. "
                                    "Consider converting the image before sending it to the GPU.",
-                                   image->type(), image->format()));
+                                   image->pixelType(), image->pixelFormat()));
     }
     std::ignore = getOrCreateBackend(shared_from_this(), std::move(image), true, false);
 }

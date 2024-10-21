@@ -116,54 +116,54 @@ inline ColorSubsampling defaultColorSubsampling = ColorSubsampling::S420;
  * @brief Decodes a PNG image from the provided byte data.
  *
  * @param bytes A view of the byte data representing a PNG image.
- * @param format Optional pixel format to use for decoding (default is PixelFormat::Unknown).
+ * @param format Optional image format to use for decoding (returns original format if not specified).
  * @return An expected result containing a reference-counted pointer to the decoded image or an ImageIOError.
  */
 [[nodiscard]] expected<RC<Image>, ImageIOError> pngDecode(bytes_view bytes,
-                                                          PixelFormat format = PixelFormat::Unknown);
+                                                          ImageFormat format = ImageFormat::Unknown);
 
 /**
  * @brief Decodes a BMP image from the provided byte data.
  *
  * @param bytes A view of the byte data representing a BMP image.
- * @param format Optional pixel format to use for decoding (default is PixelFormat::Unknown).
+ * @param format Optional image format to use for decoding (returns original format if not specified).
  * @return An expected result containing a reference-counted pointer to the decoded image or an ImageIOError.
  */
 [[nodiscard]] expected<RC<Image>, ImageIOError> bmpDecode(bytes_view bytes,
-                                                          PixelFormat format = PixelFormat::Unknown);
+                                                          ImageFormat format = ImageFormat::Unknown);
 
 /**
  * @brief Decodes a JPEG image from the provided byte data.
  *
  * @param bytes A view of the byte data representing a JPEG image.
- * @param format Optional pixel format to use for decoding (default is PixelFormat::Unknown).
+ * @param format Optional image format to use for decoding (returns original format if not specified).
  * @return An expected result containing a reference-counted pointer to the decoded image or an ImageIOError.
  */
 [[nodiscard]] expected<RC<Image>, ImageIOError> jpegDecode(bytes_view bytes,
-                                                           PixelFormat format = PixelFormat::Unknown);
+                                                           ImageFormat format = ImageFormat::Unknown);
 
 /**
  * @brief Decodes a WEBP image from the provided byte data.
  *
  * @param bytes A view of the byte data representing a WEBP image.
- * @param format Optional pixel format to use for decoding (default is PixelFormat::Unknown).
+ * @param format Optional image format to use for decoding (returns original format if not specified).
  * @return An expected result containing a reference-counted pointer to the decoded image or an ImageIOError.
  */
 [[nodiscard]] expected<RC<Image>, ImageIOError> webpDecode(bytes_view bytes,
-                                                           PixelFormat format = PixelFormat::Unknown);
+                                                           ImageFormat format = ImageFormat::Unknown);
 
 /**
  * @brief Decodes an image from the provided byte data using the specified codec.
  *
  * @param codec The image codec to use for decoding.
  * @param bytes A view of the byte data representing the image.
- * @param format Optional pixel format to use for decoding (default is PixelFormat::Unknown).
+ * @param format Optional image format to use for decoding (returns original format if not specified).
  * @return An expected result containing a reference-counted pointer to the decoded image or an ImageIOError.
  */
 [[nodiscard]] expected<RC<Image>, ImageIOError> imageDecode(ImageCodec codec, bytes_view bytes,
-                                                            PixelFormat format = PixelFormat::Unknown);
+                                                            ImageFormat format = ImageFormat::Unknown);
 
 [[nodiscard]] expected<RC<Image>, ImageIOError> imageDecode(bytes_view bytes,
-                                                            PixelFormat format = PixelFormat::Unknown);
+                                                            ImageFormat format = ImageFormat::Unknown);
 
 } // namespace Brisk

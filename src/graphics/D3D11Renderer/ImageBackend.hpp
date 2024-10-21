@@ -29,7 +29,7 @@ class RenderEncoderD3D11;
 
 class ImageBackendD3D11 final : public Internal::ImageBackend {
 public:
-    explicit ImageBackendD3D11(RC<RenderDeviceD3D11> device, ImageAny* image, bool uploadImage);
+    explicit ImageBackendD3D11(RC<RenderDeviceD3D11> device, Image* image, bool uploadImage);
     ~ImageBackendD3D11() final = default;
     void begin(AccessMode mode, Rectangle rect) final;
     void end(AccessMode mode, Rectangle rect) final;
@@ -46,11 +46,11 @@ private:
     ComPtr<ID3D11Texture2D> m_texture;
     ComPtr<ID3D11ShaderResourceView> m_srv;
 
-    ImageAny* m_image;
+    Image* m_image;
     bool m_invalidated = false;
     DXGI_FORMAT m_dxformat;
 };
 
-ImageBackendD3D11* getOrCreateBackend(RC<RenderDeviceD3D11> device, RC<ImageAny> image, bool uploadImage,
+ImageBackendD3D11* getOrCreateBackend(RC<RenderDeviceD3D11> device, RC<Image> image, bool uploadImage,
                                       bool renderTarget);
 } // namespace Brisk

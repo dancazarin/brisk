@@ -54,7 +54,7 @@ public:
 
     RenderLimits limits() const final;
 
-    void createImageBackend(RC<ImageAny> image) final;
+    void createImageBackend(RC<Image> image) final;
 
     RenderDeviceD3D11(RendererDeviceSelection deviceSelection);
     ~RenderDeviceD3D11();

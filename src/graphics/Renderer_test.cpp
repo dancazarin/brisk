@@ -87,13 +87,13 @@ static void renderTest(const std::string& referenceImageName, Size size, Fn&& fn
 
         visualTest(
             referenceImageName, size,
-            [&](RC<ImageRGBA> image) {
+            [&](RC<Image> image) {
                 {
                     RenderPipeline pipeline(encoder, target, backColor);
                     fn(static_cast<RenderContext&>(pipeline));
                 }
                 encoder->wait();
-                auto out = target->imageAs<PixelType::U8Gamma>();
+                RC<Image> out = target->image();
                 image->copyFrom(out);
             },
             minimumPSNR);
@@ -410,12 +410,12 @@ TEST_CASE("Gradients", "[gpu]") {
 TEST_CASE("TextureFill", "[gpu]") {
     constexpr Size canvasSize{ 400, 400 };
     blendingTest("texturefill", canvasSize, [&](RenderContext& context) {
-        RC<ImageRGBA> checkerboard = rcnew ImageRGBA({ 20, 20 });
+        RC<Image> checkerboard = rcnew Image({ 20, 20 }, ImageFormat::RGBA);
         {
-            auto wr = checkerboard->mapWrite();
+            auto wr = checkerboard->mapWrite<ImageFormat::RGBA>();
             wr.forPixels([](int32_t x, int32_t y, PixelRGBA8& pix) {
                 Color c = x < 10 != y < 10 ? 0x592d07_rgb : 0xf0bf7f_rgb;
-                pix     = colorToPixel<PixelType::U8Gamma, PixelFormat::RGBA>(c);
+                colorToPixel(pix, c);
             });
         }
 
@@ -432,7 +432,7 @@ TEST_CASE("Canvas::drawImage", "[gpu]") {
         Canvas canvas(context);
         auto bytes = readBytes(fs::path(PROJECT_SOURCE_DIR) / "src/graphics/testdata/16616460-rgba.png");
         REQUIRE(bytes.has_value());
-        auto image = pngDecode(*bytes, PixelFormat::RGBA);
+        auto image = pngDecode(*bytes, ImageFormat::RGBA);
         REQUIRE(image.has_value());
         canvas.drawImage({ 100, 100, 200, 200 }, *image, Matrix2D{}.rotate(15, 150.f, 150.f));
     });
@@ -440,7 +440,7 @@ TEST_CASE("Canvas::drawImage", "[gpu]") {
         Canvas canvas(context);
         auto bytes = readBytes(fs::path(PROJECT_SOURCE_DIR) / "src/graphics/testdata/16616460-rgba.png");
         REQUIRE(bytes.has_value());
-        auto image = pngDecode(*bytes, PixelFormat::RGBA);
+        auto image = pngDecode(*bytes, ImageFormat::RGBA);
         REQUIRE(image.has_value());
         canvas.setTransform(Matrix2D{}.rotate(15, 150.f, 150.f));
         canvas.drawImage({ 100, 100, 200, 200 }, *image);
@@ -449,7 +449,7 @@ TEST_CASE("Canvas::drawImage", "[gpu]") {
         Canvas canvas(context);
         auto bytes = readBytes(fs::path(PROJECT_SOURCE_DIR) / "src/graphics/testdata/16616460-rgba.png");
         REQUIRE(bytes.has_value());
-        auto image = pngDecode(*bytes, PixelFormat::RGBA);
+        auto image = pngDecode(*bytes, ImageFormat::RGBA);
         REQUIRE(image.has_value());
         canvas.setTransform(Matrix2D{}.rotate(15, 150.f, 150.f));
         canvas.setFillColor(Palette::Standard::green);

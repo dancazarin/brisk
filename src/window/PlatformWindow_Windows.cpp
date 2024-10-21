@@ -786,7 +786,8 @@ bool PlatformWindow::cursorInContentArea() const {
 
 namespace Internal {
 
-static HICON createIcon(const ImageRGBA::AccessR& image, int xhot, int yhot, bool icon) {
+static HICON createIcon(const ImageAccess<ImageFormat::RGBA, AccessMode::R>& image, int xhot, int yhot,
+                        bool icon) {
     int i;
     HDC dc;
     HICON handle;
@@ -856,8 +857,8 @@ static HICON createIcon(const ImageRGBA::AccessR& image, int xhot, int yhot, boo
     return handle;
 }
 
-RC<SystemCursor> PlatformCursors::cursorFromImage(const RC<ImageRGBA>& image, Point point, float scale) {
-    return rcnew SystemCursor{ createIcon(image->mapRead(), point.x, point.y, true) };
+RC<SystemCursor> PlatformCursors::cursorFromImage(const RC<Image>& image, Point point, float scale) {
+    return rcnew SystemCursor{ createIcon(image->mapRead<ImageFormat::RGBA>(), point.x, point.y, true) };
 }
 
 RC<SystemCursor> PlatformCursors::getSystemCursor(Cursor shape) {

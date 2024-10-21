@@ -900,11 +900,11 @@ ShapedRuns FontManager::shape(const Font& font, const TextWithOptions& text) con
     return doShapeCached(font, text);
 }
 
-void FontManager::testRender(RC<ImageGreyscale> image, const PrerenderedText& prerendered, Point origin,
+void FontManager::testRender(RC<Image> image, const PrerenderedText& prerendered, Point origin,
                              TestRenderFlags flags, std::initializer_list<int> xlines,
                              std::initializer_list<int> ylines) const {
     lock_quard_cond lk(m_lock);
-    auto w = image->mapWrite();
+    auto w = image->mapWrite<ImageFormat::Greyscale_U8Gamma>();
     if (flags && TestRenderFlags::TextBounds) {
         RectangleF rect;
         rect = prerendered.bounds();

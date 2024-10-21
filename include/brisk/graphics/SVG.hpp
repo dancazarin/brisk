@@ -41,9 +41,9 @@ public:
      * @param size The desired size of the output image.
      * @param background The background color to use (default is transparent).
      *
-     * @return A smart pointer to an ImageRGBA object representing the rendered image.
+     * @return A smart pointer to an Image object representing the rendered image.
      */
-    RC<ImageRGBA> render(Size size, ColorF background = ColorF(0.f, 0.f)) const;
+    RC<Image> render(Size size, ColorF background = ColorF(0.f, 0.f)) const;
 
 private:
     RC<Internal::SVGImpl> m_impl; ///< Pointer to the internal SVG implementation.

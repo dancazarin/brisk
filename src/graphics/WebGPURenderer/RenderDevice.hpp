@@ -78,7 +78,7 @@ public:
 
     RenderLimits limits() const final;
 
-    void createImageBackend(RC<ImageAny> image) final;
+    void createImageBackend(RC<Image> image) final;
 
     RenderDeviceWebGPU(RendererDeviceSelection deviceSelection);
     ~RenderDeviceWebGPU();

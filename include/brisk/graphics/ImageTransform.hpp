@@ -24,8 +24,7 @@ enum class ResizingFilter {
  * @param source The image to be resized. Must be a valid image.
  * @param filter The resizing filter to use. Defaults to ResizingFilter::Default.
  */
-void imageResizeTo(RC<ImageAny> destination, RC<ImageAny> source,
-                   ResizingFilter filter = ResizingFilter::Default);
+void imageResizeTo(RC<Image> destination, RC<Image> source, ResizingFilter filter = ResizingFilter::Default);
 
 /**
  * @brief Resizes an image to the specified new size and returns a new image.
@@ -37,23 +36,5 @@ void imageResizeTo(RC<ImageAny> destination, RC<ImageAny> source,
  */
 [[nodiscard]] RC<Image> imageResize(RC<Image> image, Size newSize,
                                     ResizingFilter filter = ResizingFilter::Default);
-
-/**
- * @brief Resizes an image to the specified new size and returns a new image.
- *
- * @tparam Type The pixel type of the image.
- * @tparam Format The pixel format of the image.
- * @param image The image to be resized. Must be a valid image.
- * @param newSize The new size for the resized image.
- * @param filter The resizing filter to use. Defaults to ResizingFilter::Default.
- * @return A smart pointer to the newly resized image.
- */
-template <PixelType Type, PixelFormat Format>
-RC<ImageTyped<Type, Format>> imageResize(RC<ImageTyped<Type, Format>> image, Size newSize,
-                                         ResizingFilter filter = ResizingFilter::Default) {
-    RC<ImageTyped<Type, Format>> result = createImageLike(image);
-    imageResizeTo(result, image, filter);
-    return result;
-}
 
 } // namespace Brisk

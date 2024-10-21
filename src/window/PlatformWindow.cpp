@@ -59,8 +59,8 @@ RC<SystemCursor> PlatformCursors::getCursor(Cursor cursor, float scale_) {
         return it->second;
     }
     if (auto it = m_svgCursors.find(cursor); it != m_svgCursors.end()) {
-        RC<ImageRGBA> bmp = SVGImage(it->second.svg).render(SizeF(SVGCursor::size) * scale);
-        auto svgCursor    = cursorFromImage(
+        RC<Image> bmp  = SVGImage(it->second.svg).render(SizeF(SVGCursor::size) * scale);
+        auto svgCursor = cursorFromImage(
             bmp, Point(std::lround(it->second.hotspot.x * scale), std::lround(it->second.hotspot.y * scale)),
             scale);
         m_svgCursorCache.insert_or_assign(key, svgCursor);

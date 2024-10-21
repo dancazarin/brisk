@@ -159,4 +159,4 @@ public:
 protected:
     RC<Widget> build() override;
 };
-}
+} // namespace Brisk

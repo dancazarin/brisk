@@ -21,7 +21,7 @@
 #include <brisk/gui/GUIApplication.hpp>
 
 namespace Brisk {
-    
+
 GUIApplication* guiApplication;
 
 int GUIApplication::run(RC<Component> mainComponent) {

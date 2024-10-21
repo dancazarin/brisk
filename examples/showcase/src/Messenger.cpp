@@ -13,7 +13,7 @@ void ShowcaseMessenger::messagesBuilder(Widget* target) {
                        [&](std::string textContent) {
                            content = rcnew Paragraph{ std::move(textContent) };
                        },
-                       [&](RC<ImageAny> imageContent) {
+                       [&](RC<Image> imageContent) {
                            float imageAspect =
                                static_cast<float>(imageContent->width()) / imageContent->height();
                            content = rcnew ImageView{
@@ -118,7 +118,7 @@ ShowcaseMessenger::ShowcaseMessenger() {
         Message{
             Status::Read,
             date - std::chrono::minutes(71),
-            imageDecode(hot_air_balloons(), PixelFormat::RGBA).value(),
+            imageDecode(hot_air_balloons(), ImageFormat::RGBA).value(),
             ICON_heart,
         },
         Message{

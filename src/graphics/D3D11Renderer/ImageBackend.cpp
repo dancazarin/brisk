@@ -23,7 +23,7 @@
 
 namespace Brisk {
 
-ImageBackendD3D11* getOrCreateBackend(RC<RenderDeviceD3D11> device, RC<ImageAny> image, bool uploadImage,
+ImageBackendD3D11* getOrCreateBackend(RC<RenderDeviceD3D11> device, RC<Image> image, bool uploadImage,
                                       bool renderTarget) {
     if (!image)
         return nullptr;
@@ -35,10 +35,10 @@ ImageBackendD3D11* getOrCreateBackend(RC<RenderDeviceD3D11> device, RC<ImageAny>
     return newBackend;
 }
 
-ImageBackendD3D11::ImageBackendD3D11(RC<RenderDeviceD3D11> device, ImageAny* image, bool uploadImage)
+ImageBackendD3D11::ImageBackendD3D11(RC<RenderDeviceD3D11> device, Image* image, bool uploadImage)
     : m_device(std::move(device)), m_image(image) {
     D3D11_TEXTURE2D_DESC tex =
-        texDesc(dxFormatTypeless(m_image->type(), m_image->format()), image->size(), 1);
+        texDesc(dxFormatTypeless(m_image->pixelType(), m_image->pixelFormat()), image->size(), 1);
     HRESULT hr = m_device->m_device->CreateTexture2D(&tex, nullptr, m_texture.ReleaseAndGetAddressOf());
     CHECK_HRESULT(hr, return);
 
@@ -47,8 +47,8 @@ ImageBackendD3D11::ImageBackendD3D11(RC<RenderDeviceD3D11> device, ImageAny* ima
     }
 
     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{}; // zero-initialize
-    PixelType pixType           = Internal::fixPixelType(m_image->type());
-    srvDesc.Format              = dxFormat(pixType, m_image->format());
+    PixelType pixType           = Internal::fixPixelType(m_image->pixelType());
+    srvDesc.Format              = dxFormat(pixType, m_image->pixelFormat());
     srvDesc.ViewDimension       = D3D11_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Texture2D.MipLevels = 1;
 

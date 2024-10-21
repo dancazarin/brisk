@@ -48,9 +48,12 @@ static void stbi_write(void* context, void* data, int size) {
 }
 
 bytes bmpEncode(RC<Image> image) {
+    if (image->pixelType() != PixelType::U8Gamma) {
+        throwException(EImageError("BMP codec doesn't support encoding {} format", image->format()));
+    }
     // All pixel formats are supported
     auto r   = image->mapRead();
-    int comp = pixelComponents(image->format());
+    int comp = pixelComponents(image->pixelFormat());
     MemoryStream strm;
     if (r.byteStride() == r.width() * comp) {
         stbi_write_bmp_to_func(&stbi_write, &strm, image->width(), image->height(), comp, r.data());
@@ -68,27 +71,31 @@ struct stbi_delete {
     }
 };
 
-static expected<RC<Image>, ImageIOError> stbiDecode(bytes_view bytes, PixelFormat format) {
+static expected<RC<Image>, ImageIOError> stbiDecode(bytes_view bytes, ImageFormat format) {
+    if (toPixelType(format) != PixelType::U8Gamma && toPixelType(format) != PixelType::Unknown) {
+        throwException(EImageError("BMP codec doesn't support decoding to {} format", format));
+    }
+    PixelFormat pixelFormat = toPixelFormat(format);
     int width, height, comp;
     std::unique_ptr<stbi_uc, stbi_delete> mem(
         stbi_load_from_memory(bytes.data(), bytes.size(), &width, &height, &comp,
-                              format == PixelFormat::Unknown ? 0 : pixelComponents(format)));
+                              pixelFormat == PixelFormat::Unknown ? 0 : pixelComponents(pixelFormat)));
     if (!mem)
         return unexpected(ImageIOError::CodecError);
 
     // comp contains the original pixel format
-    if (format != PixelFormat::Unknown)
-        comp = pixelComponents(format);
+    if (pixelFormat != PixelFormat::Unknown)
+        comp = pixelComponents(pixelFormat);
     PixelFormat fmt = componentsToFormat(comp);
     if (fmt == PixelFormat::Unknown)
         return unexpected(ImageIOError::InvalidFormat);
-    RC<Image> image = createImage({ width, height }, fmt);
+    RC<Image> image = rcnew Image(Size{ width, height }, imageFormat(PixelType::U8Gamma, fmt));
     auto w          = image->mapWrite();
     w.readFrom(bytes_view{ mem.get(), size_t(width * height * comp) });
     return image;
 }
 
-expected<RC<Image>, ImageIOError> bmpDecode(bytes_view bytes, PixelFormat format) {
+expected<RC<Image>, ImageIOError> bmpDecode(bytes_view bytes, ImageFormat format) {
     return stbiDecode(bytes, format);
 }
 

@@ -29,7 +29,7 @@ class RenderEncoderWebGPU;
 
 class ImageBackendWebGPU final : public Internal::ImageBackend {
 public:
-    explicit ImageBackendWebGPU(RC<RenderDeviceWebGPU> device, ImageAny* image, bool uploadImage,
+    explicit ImageBackendWebGPU(RC<RenderDeviceWebGPU> device, Image* image, bool uploadImage,
                                 bool renderTarget);
     ~ImageBackendWebGPU() final = default;
     void begin(AccessMode mode, Rectangle rect) final;
@@ -47,11 +47,11 @@ private:
     wgpu::Texture m_texture;
     wgpu::TextureView m_textureView;
 
-    ImageAny* m_image;
+    Image* m_image;
     bool m_invalidated = false;
     wgpu::TextureFormat m_wgformat;
 };
 
-ImageBackendWebGPU* getOrCreateBackend(RC<RenderDeviceWebGPU> device, RC<ImageAny> image, bool uploadImage,
+ImageBackendWebGPU* getOrCreateBackend(RC<RenderDeviceWebGPU> device, RC<Image> image, bool uploadImage,
                                        bool renderTarget);
 } // namespace Brisk

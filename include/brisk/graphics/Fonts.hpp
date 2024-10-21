@@ -518,7 +518,7 @@ public:
     using FontKey = std::tuple<FontFamily, FontStyle, FontWeight>;
 
     FontKey faceToKey(Internal::FontFace* face) const;
-    void testRender(RC<ImageGreyscale> image, const PrerenderedText& run, Point origin,
+    void testRender(RC<Image> image, const PrerenderedText& run, Point origin,
                     TestRenderFlags flags = TestRenderFlags::None, std::initializer_list<int> xlines = {},
                     std::initializer_list<int> ylines = {}) const;
 

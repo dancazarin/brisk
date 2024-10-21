@@ -2390,7 +2390,7 @@ bool PlatformWindow::cursorInContentArea() const {
 
 namespace Internal {
 
-RC<SystemCursor> PlatformCursors::cursorFromImage(const RC<ImageRGBA>& image, Point point, float scale) {
+RC<SystemCursor> PlatformCursors::cursorFromImage(const RC<Image>& image, Point point, float scale) {
     // TODO
     return {};
 }

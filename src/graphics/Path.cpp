@@ -252,17 +252,20 @@ BRISK_INLINE static void blendRow(PixelGreyscale8* dst, uint8_t src, uint32_t le
     }
 }
 
-static RC<ImageGreyscale> rleToMask(VRle rle, VRect bounds) {
+static RC<Image> rleToMask(VRle rle, VRect bounds) {
     if (rle.empty())
         return nullptr;
-    RC<ImageGreyscale> bitmap = rcnew ImageGreyscale(w(bounds.size()), PixelGreyscale8{});
-    ImageGreyscale::AccessW w = bitmap->mapWrite();
+    RC<Image> bitmap = rcnew Image(w(bounds.size()), ImageFormat::Greyscale_U8Gamma);
+    auto w           = bitmap->mapWrite<ImageFormat::Greyscale_U8Gamma>();
+    w.forPixels([](int32_t, int32_t, auto& pix) {
+        pix = { 0 };
+    });
     rle.intersect(
         VRect(0, 0, bounds.width(), bounds.height()),
         [](size_t count, const VRle::Span* spans, void* userData) {
-            ImageGreyscale::AccessW& w = *static_cast<ImageGreyscale::AccessW*>(userData);
-            int16_t yy                 = INT16_MIN;
-            PixelGreyscale8* line      = nullptr;
+            auto& w    = *static_cast<ImageAccess<ImageFormat::Greyscale_U8Gamma, AccessMode::W>*>(userData);
+            int16_t yy = INT16_MIN;
+            PixelGreyscale8* line = nullptr;
             for (size_t i = 0; i < count; ++i) {
                 if (spans[i].y != yy) [[unlikely]] {
                     line = w.line(spans[i].y);
@@ -276,8 +279,8 @@ static RC<ImageGreyscale> rleToMask(VRle rle, VRect bounds) {
     return bitmap;
 }
 
-static std::tuple<RC<ImageGreyscale>, Rectangle> rasterizeToImage(Path path, const FillOrStrokeParams& params,
-                                                                  Rectangle clip) {
+static std::tuple<RC<Image>, Rectangle> rasterizeToImage(Path path, const FillOrStrokeParams& params,
+                                                         Rectangle clip) {
     VRasterizer rasterizer;
     if (const FillParams* fill = get_if<FillParams>(&params)) {
         rasterizer.rasterize(*v(&path), v(fill->fillRule), clip == noClipRect ? VRect{} : v(clip));
@@ -292,7 +295,7 @@ static std::tuple<RC<ImageGreyscale>, Rectangle> rasterizeToImage(Path path, con
 }
 
 RasterizedPath Internal::rasterizePath(Path path, const FillOrStrokeParams& params, Rectangle clipRect) {
-    std::tuple<RC<ImageGreyscale>, Rectangle> imageAndRect = rasterizeToImage(path, params, clipRect);
+    std::tuple<RC<Image>, Rectangle> imageAndRect = rasterizeToImage(path, params, clipRect);
     if (!std::get<0>(imageAndRect)) {
         return RasterizedPath{ nullptr, {} };
     }

@@ -28,8 +28,8 @@
 namespace Brisk {
 
 [[maybe_unused]] static float imagePSNR(RC<Image> img, RC<Image> ref) {
-    Image::AccessR rimg = img->mapRead();
-    Image::AccessR rref = ref->mapRead();
+    auto rimg = img->mapRead<ImageFormat::Unknown_U8Gamma>();
+    auto rref = ref->mapRead<ImageFormat::Unknown_U8Gamma>();
     REQUIRE(rimg.components() == rref.components());
     REQUIRE(rimg.width() == rref.width());
     REQUIRE(rimg.height() == rref.height());
@@ -48,9 +48,8 @@ namespace Brisk {
 template <PixelFormat Format = PixelFormat::RGBA, typename Fn>
 static void visualTest(const std::string& referenceImageName, Size size, Fn&& fn, float minimumPSNR = 40.f) {
     INFO(referenceImageName);
-    Pixel<uint8_t, Format> clearValue = colorToPixel<PixelType::U8Gamma, Format>(Color(255, 255, 255, 255));
-    RC<ImageTyped<PixelType::U8Gamma, Format>> testImage =
-        rcnew ImageTyped<PixelType::U8Gamma, Format>(size, clearValue);
+    RC<Image> testImage =
+        rcnew Image(size, imageFormat(PixelType::U8Gamma, Format), Color(255, 255, 255, 255));
     bool testOk = false;
     SCOPE_EXIT {
         if (!testOk) {
@@ -71,10 +70,9 @@ static void visualTest(const std::string& referenceImageName, Size size, Fn&& fn
         expected<RC<Image>, ImageIOError> decodedRefImg = pngDecode(*refImgBytes);
         REQUIRE(decodedRefImg.has_value());
         REQUIRE((*decodedRefImg)->size() == size);
-        REQUIRE((*decodedRefImg)->format() == Format);
-        RC<ImageTyped<PixelType::U8Gamma, Format>> decodedRefImgT =
-            (*decodedRefImg)->as<PixelType::U8Gamma, Format>();
-        float testPSNR = imagePSNR(testImage, decodedRefImgT);
+        REQUIRE((*decodedRefImg)->pixelFormat() == Format);
+        RC<Image> decodedRefImgT = (*decodedRefImg);
+        float testPSNR           = imagePSNR(testImage, decodedRefImgT);
         CHECK(testPSNR > minimumPSNR);
         testOk = testPSNR > minimumPSNR;
     }

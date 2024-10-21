@@ -250,14 +250,14 @@ constexpr inline Argument<Tag::SamplerMode> samplerMode{};
 
 } // namespace Arg
 
-constexpr float defaultGamma        = 2.2f;
+constexpr float defaultGamma             = 2.2f;
 
-constexpr int multigradientColorMix = -10;
+constexpr int multigradientColorMix      = -10;
 
 using TextureId                          = uint32_t;
 constexpr inline TextureId textureIdNone = static_cast<TextureId>(-1);
 
-using ImageHandle                        = RC<ImageAny>;
+using ImageHandle                        = RC<Image>;
 
 struct RenderBuffer;
 

@@ -142,7 +142,8 @@ struct SystemCursor {
     ~SystemCursor() {}
 };
 
-static NSCursor* createCursor(const ImageRGBA::AccessR& image, int xhot, int yhot, float scale) {
+static NSCursor* createCursor(const ImageAccess<ImageFormat::RGBA, AccessMode::R>& image, int xhot, int yhot,
+                              float scale) {
     @autoreleasepool {
         NSBitmapImageRep* rep =
             [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL
@@ -174,8 +175,8 @@ static NSCursor* createCursor(const ImageRGBA::AccessR& image, int xhot, int yho
     } // autoreleasepool
 }
 
-RC<SystemCursor> PlatformCursors::cursorFromImage(const RC<ImageRGBA>& image, Point point, float scale) {
-    return rcnew SystemCursor{ createCursor(image->mapRead(), point.x, point.y, scale) };
+RC<SystemCursor> PlatformCursors::cursorFromImage(const RC<Image>& image, Point point, float scale) {
+    return rcnew SystemCursor{ createCursor(image->mapRead<ImageFormat::RGBA>(), point.x, point.y, scale) };
 }
 
 RC<SystemCursor> PlatformCursors::getSystemCursor(Cursor shape) {
