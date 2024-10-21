@@ -69,19 +69,10 @@
             "name": "libuv"
         },
         {
-            "name": "zstd",
-            "features": [
-                "tools"
-            ]
-        },
-        {
             "name": "libwebp"
         },
         {
             "name": "libpng"
-        },
-        {
-            "name": "function2"
         }
     ],
     "builtin-baseline": "898b728edc5e0d12b50015f9cd18247c4257a3eb",
