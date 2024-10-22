@@ -641,8 +641,8 @@ constexpr BRISK_INLINE Color rgbToColor(uint32_t x) {
  * @return The interpolated `ColorOf` object.
  */
 template <typename T, ColorGamma G>
-BRISK_INLINE ColorOf<T, G> mix(float t, const ColorOf<T, G>& a, const ColorOf<T, G>& b,
-                               AlphaMode mode = AlphaMode::Straight) {
+inline ColorOf<T, G> mix(float t, const ColorOf<T, G>& a, const ColorOf<T, G>& b,
+                         AlphaMode mode = AlphaMode::Straight) {
     if (mode == AlphaMode::Straight)
         return mix(t, a.premultiply(), b.premultiply(), AlphaMode::Premultiplied).unpremultiply();
     else

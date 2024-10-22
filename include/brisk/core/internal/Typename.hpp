@@ -57,7 +57,8 @@ constexpr size_t valuename_postfix = sizeof(">(void) noexcept") - 1;
 #else // GCC
 constexpr size_t typename_prefix  = sizeof("constexpr auto Brisk::Internal::typeNameFixed() [with T = ") - 1;
 constexpr size_t typename_postfix = sizeof("]") - 1;
-constexpr size_t valuename_prefix = sizeof("constexpr auto Brisk::Internal::valueNameFixed() [with V = ") - 1;
+constexpr size_t valuename_prefix =
+    sizeof("constexpr auto Brisk::Internal::valueNameFixed() [with auto V = ") - 1;
 constexpr size_t valuename_postfix = sizeof("]") - 1;
 #endif
 

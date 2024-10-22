@@ -226,6 +226,8 @@ inline Number binary(Number x, AdditiveOperator op, Number y) {
         return x + y;
     case AdditiveOperator::Subtract:
         return x - y;
+    default:
+        BRISK_UNREACHABLE();
     }
 }
 
@@ -235,6 +237,8 @@ inline Number binary(Number x, MultiplicativeOperator op, Number y) {
         return x * y;
     case MultiplicativeOperator::Divide:
         return x / y;
+    default:
+        BRISK_UNREACHABLE();
     }
 }
 
@@ -242,6 +246,8 @@ inline Number binary(Number x, ExponentiationOperator op, Number y) {
     switch (op) {
     case ExponentiationOperator::Power:
         return x ^ y;
+    default:
+        BRISK_UNREACHABLE();
     }
 }
 
@@ -255,6 +261,8 @@ inline Number unary(UnaryOperator op, Number x) {
         return Number(1) / x;
     case UnaryOperator::Square:
         return x * x;
+    default:
+        BRISK_UNREACHABLE();
     }
 }
 

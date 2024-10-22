@@ -231,8 +231,8 @@ using WStringView   = std::wstring_view;
  */
 template <typename T>
 constexpr inline bool simpleMemoryRepresentation =
-    (std::has_unique_object_representations_v<T> || std::is_floating_point_v<T> ||
-     std::is_same_v<T, bool>)&&(alignof(T) <= sizeof(T));
+    (std::has_unique_object_representations_v<T> || std::is_floating_point_v<T> || std::is_same_v<T, bool>) &&
+    (alignof(T) <= sizeof(T));
 
 /**
  * @brief Converts an object of type `T` to a non-modifiable view of bytes.
@@ -681,7 +681,7 @@ struct Range {
     constexpr TYPE operator+(TYPE x, TYPE y) noexcept {                                                      \
         return static_cast<TYPE>(+x + +y);                                                                   \
     }                                                                                                        \
-    constexpr TYPE& operator+=(TYPE x, TYPE y) noexcept {                                                    \
+    constexpr TYPE& operator+=(TYPE& x, TYPE y) noexcept {                                                   \
         return x = static_cast<TYPE>(+x + +y);                                                               \
     }                                                                                                        \
     constexpr void toggle(TYPE& x, TYPE y, bool flag) noexcept {                                             \

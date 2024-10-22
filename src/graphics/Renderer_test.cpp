@@ -357,7 +357,8 @@ TEST_CASE("Blending", "[gpu]") {
     constexpr int rowHeight = 100;
     blendingTest("blending1", canvasSize, [&](RenderContext& context) {
         RawCanvas canvas(context);
-        auto bands = [&canvas](int index, int count, Color background, Color foreground) {
+        auto bands = [&canvas BRISK_IF_GCC(, canvasSize)](int index, int count, Color background,
+                                                          Color foreground) {
             canvas.drawRectangle(RectangleF(Point(0, index * rowHeight), Size(canvasSize.width, rowHeight)),
                                  0.f, 0.f, fillColor = background, strokeWidth = 0);
             for (int i = 0; i <= count; ++i) {
@@ -368,7 +369,8 @@ TEST_CASE("Blending", "[gpu]") {
                     strokeWidth = 0);
             }
         };
-        auto gradient = [&canvas](int index, Color background, Color start, Color end) {
+        auto gradient = [&canvas BRISK_IF_GCC(, canvasSize)](int index, Color background, Color start,
+                                                             Color end) {
             canvas.drawRectangle(RectangleF(Point(0, index * rowHeight), Size(canvasSize.width, rowHeight)),
                                  0.f, 0.f, fillColor = background, strokeWidth = 0);
             canvas.drawRectangle(RectangleF(Point(0, index * rowHeight), Size(canvasSize.width, rowHeight)),

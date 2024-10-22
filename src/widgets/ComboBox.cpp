@@ -51,7 +51,7 @@ void ComboBox::onChildAdded(Widget* w) {
         };
         menu->visible          = false;
         menu->absolutePosition = { 0, 100_perc };
-        menu->anchor           = { 0, 0 };
+        menu->anchor           = { 0_px, 0_px };
         menu->tabGroup         = true;
     }
     if (Item* selectedItem = dynamic_cast<Item*>(w)) {

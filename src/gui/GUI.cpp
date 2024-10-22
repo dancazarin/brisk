@@ -695,8 +695,7 @@ float resolveValue(Length value, float defaultValue, float referenceValue, const
         return value.value() * params.viewportSize.longestSide() * 0.01f;
 #endif
 
-    case Undefined:
-    case Auto:
+    default:
         return defaultValue;
     }
 }
@@ -1531,12 +1530,12 @@ float Widget::resolveFontHeight() const {
 }
 
 template <typename T>
-BRISK_INLINE static T getFallback(Widget* widget, T Widget::*field, std::type_identity_t<T> fallback) {
+BRISK_INLINE static T getFallback(Widget* widget, T Widget::* field, std::type_identity_t<T> fallback) {
     return widget ? widget->*field : fallback;
 }
 
 template <typename T>
-BRISK_INLINE static T getFallback(Widget* widget, Internal::Transition<T> Widget::*field,
+BRISK_INLINE static T getFallback(Widget* widget, Internal::Transition<T> Widget::* field,
                                   std::type_identity_t<T> fallback) {
     return widget ? (widget->*field).stopValue : fallback;
 }
@@ -2114,7 +2113,7 @@ BRISK_INLINE static const T& getterConvert(const Internal::Transition<T>& value)
 } // namespace Internal
 
 template <typename T>
-float Widget::*Widget::transitionField(Internal::Transition<T> Widget::*field) const noexcept {
+float Widget::* Widget::transitionField(Internal::Transition<T> Widget::* field) const noexcept {
     if (field == &Widget::m_backgroundColor)
         return &Widget::m_backgroundColorTransition;
     else if (field == &Widget::m_borderColor)
@@ -2307,12 +2306,12 @@ inline void GUIProperty<index_, T, flags_, fields_...>::set(Inherit inherit)
     this_pointer->setter<T, index, flags_, fields_...>(inherit);
 }
 
-template <size_t index_, typename Type_, auto Widget::*field, typename... Properties>
+template <size_t index_, typename Type_, auto Widget::* field, typename... Properties>
 inline OptConstRef<Type_> GUIPropertyCompound<index_, Type_, field, Properties...>::get() const noexcept {
     return Internal::getterConvert(this_pointer->*field);
 }
 
-template <size_t index_, typename Type_, auto Widget::*field, typename... Properties>
+template <size_t index_, typename Type_, auto Widget::* field, typename... Properties>
 inline OptConstRef<ResolvedType<Type_>> GUIPropertyCompound<index_, Type_, field, Properties...>::resolved()
     const noexcept
     requires(((Properties::flags | ...) & PropFlags::Resolvable) == PropFlags::Resolvable)
@@ -2320,19 +2319,19 @@ inline OptConstRef<ResolvedType<Type_>> GUIPropertyCompound<index_, Type_, field
     return (this_pointer->*field).resolved;
 }
 
-template <size_t index_, typename Type_, auto Widget::*field, typename... Properties>
+template <size_t index_, typename Type_, auto Widget::* field, typename... Properties>
 inline void GUIPropertyCompound<index_, Type_, field, Properties...>::set(Type value) {
     (Properties{ this_pointer }.set(Properties::sub(value)), ...);
 }
 
-template <size_t index_, typename Type_, auto Widget::*field, typename... Properties>
+template <size_t index_, typename Type_, auto Widget::* field, typename... Properties>
 inline void GUIPropertyCompound<index_, Type_, field, Properties...>::set(Inherit value)
     requires(((Properties::flags | ...) & PropFlags::Inheritable) == PropFlags::Inheritable)
 {
     (Properties{ this_pointer }.set(inherit), ...);
 }
 
-template <size_t index_, typename Type_, auto Widget::*field, typename... Properties>
+template <size_t index_, typename Type_, auto Widget::* field, typename... Properties>
 BindingAddress GUIPropertyCompound<index_, Type_, field, Properties...>::address() const noexcept {
     return toBindingAddress(&(this_pointer->*field));
 }

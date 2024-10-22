@@ -1421,7 +1421,7 @@ inline void operator>>=(Prop& prop, Arg&& arg)
 
 template <PropertyLike Prop, typename Type = typename Prop::Type, typename Arg>
 inline void operator&=(Prop& prop, Arg&& arg)
-    requires requires(Type v, Arg a) { v& a; }
+    requires requires(Type v, Arg a) { v & a; }
 {
     prop.set(prop.get() & std::forward<Arg>(arg));
 }
@@ -1440,7 +1440,7 @@ inline void operator^=(Prop& prop, Arg&& arg)
     prop.set(prop.get() ^ std::forward<Arg>(arg));
 }
 
-template <typename Class, typename T, auto Class::*field,
+template <typename Class, typename T, auto std::type_identity_t<Class>::* field,
           std::remove_const_t<T> (Class::*getter)() const = nullptr,
           void (Class::*setter)(std::remove_const_t<T>) = nullptr, auto changed = nullptr, bool notify = true>
 struct Property {
@@ -1565,15 +1565,15 @@ public:
     static void* operator new(size_t sz) {
         void* ptr = alignedAlloc(sz, cacheAlignment);
         RC<Scheduler> sched;
-        BRISK_GNU_ATTR_PRAGMA(GCC diagnostic push)
-        BRISK_GNU_ATTR_PRAGMA(GCC diagnostic ignored "-Wpointer-bool-conversion")
+        BRISK_CLANG_PRAGMA(GCC diagnostic push)
+        BRISK_CLANG_PRAGMA(GCC diagnostic ignored "-Wpointer-bool-conversion")
         if constexpr (scheduler) {
             sched = *scheduler;
         }
         bindings->registerRegion(
             BindingAddress{ reinterpret_cast<uint8_t*>(ptr), reinterpret_cast<uint8_t*>(ptr) + sz },
             std::move(sched));
-        BRISK_GNU_ATTR_PRAGMA(GCC diagnostic pop)
+        BRISK_CLANG_PRAGMA(GCC diagnostic pop)
         return ptr;
     }
 

@@ -444,42 +444,42 @@ TEST_CASE("intersections") {
             uint8_t first;  // First byte of the union
             uint8_t second; // Second byte of the union
         };
-    };
+    } x;
 
     int firstCounter = 0, secondCounter = 0, bothCounter = 0; // Counters to track listener calls
 
-    BindingRegistration both_r{ &both, nullptr }; // Register a binding for the 'both' value
+    BindingRegistration both_r{ &x.both, nullptr }; // Register a binding for the 'both' value
 
     // Listen for changes to 'first' and increment its counter
-    bindings->listen(Value{ &first }, [&]() {
+    bindings->listen(Value{ &x.first }, [&]() {
         ++firstCounter;
     });
 
     // Listen for changes to 'second' and increment its counter
-    bindings->listen(Value{ &second }, [&]() {
+    bindings->listen(Value{ &x.second }, [&]() {
         ++secondCounter;
     });
 
     // Listen for changes to 'both' and increment its counter
-    bindings->listen(Value{ &both }, [&]() {
+    bindings->listen(Value{ &x.both }, [&]() {
         ++bothCounter;
     });
 
-    bindings->notify(&first);  // Notify listeners of changes to 'first'
-    CHECK(firstCounter == 1);  // Verify 'first' listener was called once
-    CHECK(secondCounter == 0); // Ensure 'second' listener was not called
-    CHECK(bothCounter == 1);   // Check that 'both' listener was called once
+    bindings->notify(&x.first); // Notify listeners of changes to 'first'
+    CHECK(firstCounter == 1);   // Verify 'first' listener was called once
+    CHECK(secondCounter == 0);  // Ensure 'second' listener was not called
+    CHECK(bothCounter == 1);    // Check that 'both' listener was called once
 
     // Reset counters for the next notification
     firstCounter = 0, secondCounter = 0, bothCounter = 0;
-    bindings->notify(&second); // Notify listeners of changes to 'second'
-    CHECK(firstCounter == 0);  // Ensure 'first' listener was not called
-    CHECK(secondCounter == 1); // Verify 'second' listener was called once
-    CHECK(bothCounter == 1);   // Check that 'both' listener was called once
+    bindings->notify(&x.second); // Notify listeners of changes to 'second'
+    CHECK(firstCounter == 0);    // Ensure 'first' listener was not called
+    CHECK(secondCounter == 1);   // Verify 'second' listener was called once
+    CHECK(bothCounter == 1);     // Check that 'both' listener was called once
 
     // Reset counters for the next notification
     firstCounter = 0, secondCounter = 0, bothCounter = 0;
-    bindings->notify(&both);   // Notify listeners of changes to 'both'
+    bindings->notify(&x.both); // Notify listeners of changes to 'both'
     CHECK(firstCounter == 1);  // Verify 'first' listener was called once
     CHECK(secondCounter == 1); // Verify 'second' listener was called once
     CHECK(bothCounter == 1);   // Check that 'both' listener was called once
