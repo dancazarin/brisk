@@ -117,9 +117,13 @@ struct Builder {
 
 namespace Tag {
 struct Depends {
-    using Type                        = Value<Trigger<>>;
-    constexpr static const char* name = "depends";
-    constexpr static PropFlags flags  = PropFlags ::None;
+    using Type = Value<Trigger<>>;
+
+    static std::string_view name() noexcept {
+        return "depends";
+    }
+
+    constexpr static PropFlags flags = PropFlags ::None;
 };
 
 } // namespace Tag
@@ -318,16 +322,18 @@ constexpr inline size_t numProperties = 100;
 extern const std::string_view propNames[numProperties];
 } // namespace Internal
 
-template <size_t index_, typename Type_, auto Widget::*field, typename... Properties>
+template <size_t index_, typename Type_, auto Widget::* field, typename... Properties>
 struct GUIPropertyCompound {
     using Type      = Type_;
     using ValueType = Type;
 
     static_assert(index_ == static_cast<size_t>(-1) || index_ < Internal::numProperties);
 
-    constexpr static PropFlags flags    = (Properties::flags | ...) | PropFlags::Compound;
+    constexpr static PropFlags flags = (Properties::flags | ...) | PropFlags::Compound;
 
-    inline static std::string_view name = Internal::propNames[index_];
+    static std::string_view name() noexcept {
+        return Internal::propNames[index_];
+    }
 
     void operator=(Type value) {
         this->set(std::move(value));
@@ -384,8 +390,11 @@ public:
         return Internal::subImpl<fields_...>(std::forward<U>(value));
     }
 
-    inline static std::string_view name = Internal::propNames[index_];
-    constexpr static size_t index       = index_;
+    static std::string_view name() noexcept {
+        return Internal::propNames[index_];
+    }
+
+    constexpr static size_t index = index_;
 
     constexpr static std::tuple fields{ fields_... };
 
@@ -481,9 +490,11 @@ struct PropArg : PropertyTag {
 
 template <size_t index, typename T, PropFlags flags, auto... fields>
 struct PropArg<GUIProperty<index, T, flags, fields...>> : PropertyTag {
-    using Type                          = T;
+    using Type = T;
 
-    inline static std::string_view name = GUIProperty<index, T, flags, fields...>::name;
+    static std::string_view name() noexcept {
+        return GUIProperty<index, T, flags, fields...>::name();
+    }
 
     using ExtraTypes =
         std::conditional_t<flags && PropFlags::Inheritable,
@@ -496,14 +507,16 @@ struct PropArg<GUIProperty<index, Trigger<Args...>, flags, fields...>> : Propert
     using Type = Value<Trigger<Args...>>;
 };
 
-template <size_t index_, typename Type_, auto Widget::*field, typename... Properties>
+template <size_t index_, typename Type_, auto Widget::* field, typename... Properties>
 struct PropArg<GUIPropertyCompound<index_, Type_, field, Properties...>> : PropertyTag {
 
-    inline static std::string_view name = GUIPropertyCompound<index_, Type_, field, Properties...>::name;
+    static std::string_view name() noexcept {
+        return GUIPropertyCompound<index_, Type_, field, Properties...>::name();
+    }
 
-    using Type                          = Type_;
+    using Type       = Type_;
 
-    using ExtraTypes                    = std::variant<function<Type()>, function<Type(Widget*)>>;
+    using ExtraTypes = std::variant<function<Type()>, function<Type(Widget*)>>;
 };
 
 } // namespace Tag
@@ -1139,7 +1152,7 @@ protected:
     OptConstRef<T> getterCurrent() const noexcept;
 
     template <typename T>
-    float Widget::*transitionField(Internal::Transition<T> Widget::*field) const noexcept;
+    float Widget::* transitionField(Internal::Transition<T> Widget::* field) const noexcept;
 
     void requestUpdates(PropFlags flags);
 

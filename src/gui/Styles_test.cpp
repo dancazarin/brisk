@@ -36,11 +36,11 @@ TEST_CASE("Rules") {
         fmt::print("sizeof(Rule) = {}\n", sizeof(Rule));
     }
 
-    CHECK(decltype(Widget::borderColor)::name == "borderColor"sv);
-    CHECK(decltype(Widget::shadowSize)::name == "shadowSize"sv);
-    CHECK(decltype(Widget::opacity)::name == "opacity"sv);
-    CHECK(decltype(Widget::layout)::name == "layout"sv);
-    CHECK(decltype(Widget::tabSize)::name == "tabSize"sv);
+    CHECK(decltype(Widget::borderColor)::name() == "borderColor"sv);
+    CHECK(decltype(Widget::shadowSize)::name() == "shadowSize"sv);
+    CHECK(decltype(Widget::opacity)::name() == "opacity"sv);
+    CHECK(decltype(Widget::layout)::name() == "layout"sv);
+    CHECK(decltype(Widget::tabSize)::name() == "tabSize"sv);
 
     CHECK(Rule(borderColor = 0xFFFFFF_rgb).name() == "borderColor"sv);
     CHECK(Rule(shadowSize = 2).toString() == "shadowSize: 2px"sv);

@@ -100,7 +100,7 @@ struct StyleProperty {
         requires PropertyTag<Tag> || StyleVarTag<Tag>
     {
         using Type = typename Tag::Type;
-        name       = Tag::name;
+        name       = Tag::name();
         apply      = [](RuleOp op, const StyleValuePtr& rule, Widget* widget, WidgetState state) {
             if ((widget->state() & state) == state) {
                 if constexpr (PropertyTag<Tag>) {
@@ -625,9 +625,12 @@ private:
 
 template <typename T, int index>
 struct StyleVariableTag : Tag::StyleVarTag {
-    using Type                             = T;
-    constexpr static int id                = index;
-    constexpr static std::string_view name = "styleVar";
+    using Type              = T;
+    constexpr static int id = index;
+
+    static std::string_view name() noexcept {
+        return "styleVar";
+    }
 };
 
 constexpr inline Argument<StyleVariableTag<ColorF, 0>> windowColor{};
