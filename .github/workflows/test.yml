@@ -162,7 +162,7 @@ jobs:
         ctest --test-dir build --output-on-failure
 
   macos-ninja-clang-x86_64:
-    runs-on: macos-latest
+    runs-on: macos-13
     env:
       VCPKG_DEFAULT_TRIPLET: x64-osx
       VCPKG_DEFAULT_HOST_TRIPLET: x64-osx
