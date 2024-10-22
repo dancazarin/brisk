@@ -18,14 +18,23 @@
  * If you do not wish to be bound by the GPL-2.0+ license, you must purchase a commercial
  * license. For commercial licensing options, please visit: https://brisklib.com
  */
+#include <brisk/core/System.hpp>
+#include <brisk/core/Version.hpp>
+#include <brisk/core/Log.hpp>
+#include <brisk/core/Text.hpp>
 #include <brisk/core/internal/Initialization.hpp>
 
 #define CATCH_CONFIG_RUNNER
 #include <catch2/catch_all.hpp>
 
 int main(int argc, char* argv[]) {
+    using namespace Brisk;
+
     // global setup...
-    Brisk::CommonInitializer init(Brisk::InitializationFlags::Threading);
+    CommonInitializer init(InitializationFlags::Threading);
+
+    fmt::println("Brisk {} running on {}", version, osName());
+    fmt::println("Brisk build info {}", replaceAll(buildInfo, ";", "\n"));
 
     int result = Catch::Session().run(argc, argv);
 
