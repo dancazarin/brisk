@@ -184,7 +184,7 @@ using ValueArgument = typename Internal::ValueArgumentImpl<T>::Type;
  */
 template <typename T>
 concept PropertyLike = requires(T t, const T ct, typename T::Type v) {
-    std::copy_constructible<typename T::Type>;
+    requires std::copy_constructible<typename T::Type>;
     { ct.get() } -> std::convertible_to<typename T::Type>;
     t.set(v);
     { ct.address() } -> std::convertible_to<BindingAddress>;
