@@ -215,7 +215,8 @@ struct Trichromatic {
 
     template <ColorSpace SrcSpace>
     Trichromatic(Trichromatic<T, SrcSpace> color) {
-        *this = convertColorSpace<Space>(color);
+        Trichromatic<T, SrcSpace> color_copy = color; // An extra copy is needed to work around a bug in VS2022
+        array = convertColorSpace<Space>(color_copy).array;
     }
 
     decltype(auto) operator[](size_t index) const {
@@ -284,40 +285,36 @@ inline void convertColorSpace(Trichromatic<T, Space>& dest, Trichromatic<T, Spac
 template <typename T>
 void convertColorSpace(Trichromatic<T, ColorSpace::sRGBLinear>& rgb,
                        Trichromatic<T, ColorSpace::CIEXYZ> xyz) {
-    xyz.value *= T(0.01);
-    rgb.value = xyz[0] * SIMD<T, 3>{ T(3.2406), T(-0.9689), T(0.0557) } +
-                xyz[1] * SIMD<T, 3>{ T(-1.5372), T(1.8758), T(-0.2040) } +
-                xyz[2] * SIMD<T, 3>{ T(-0.4986), T(0.0415), T(1.0570) };
+    rgb.value = xyz[0] * SIMD<T, 3>{ T(+0.032406), T(-0.009689), T(+0.000557) } +
+                xyz[1] * SIMD<T, 3>{ T(-0.015372), T(+0.018758), T(-0.002040) } +
+                xyz[2] * SIMD<T, 3>{ T(-0.004986), T(+0.000415), T(+0.010570) };
 }
 
 // rgb_to_xyz
 template <typename T>
 void convertColorSpace(Trichromatic<T, ColorSpace::CIEXYZ>& xyz,
                        Trichromatic<T, ColorSpace::sRGBLinear> rgb) {
-    xyz.value = (rgb[0] * SIMD<T, 3>{ T(0.4124), T(0.2126), T(0.0193) } +
-                 rgb[1] * SIMD<T, 3>{ T(0.3576), T(0.7152), T(0.1192) } +
-                 rgb[2] * SIMD<T, 3>{ T(0.1805), T(0.0722), T(0.9505) });
-    xyz.value *= T(100);
+    xyz.value = (rgb[0] * SIMD<T, 3>{ T(41.24), T(21.26), T(01.93) } +
+                 rgb[1] * SIMD<T, 3>{ T(35.76), T(71.52), T(11.92) } +
+                 rgb[2] * SIMD<T, 3>{ T(18.05), T(07.22), T(95.05) });
 }
 
 // xyz_to_p3
 template <typename T>
 void convertColorSpace(Trichromatic<T, ColorSpace::DisplayP3Linear>& p3,
                        Trichromatic<T, ColorSpace::CIEXYZ> xyz) {
-    xyz.value *= T(0.01);
-    p3.value = xyz[0] * SIMD<T, 3>{ 2.493498, -0.82949, 0.035846 } +
-               xyz[1] * SIMD<T, 3>{ -0.931385, 1.762664, -0.076172 } +
-               xyz[2] * SIMD<T, 3>{ -0.40271, 0.023625, 0.956885 };
+    p3.value = xyz[0] * SIMD<T, 3>{ 0.02493498, -0.0082949, 0.00035846 } +
+               xyz[1] * SIMD<T, 3>{ -0.00931385, 0.01762664, -0.00076172 } +
+               xyz[2] * SIMD<T, 3>{ -0.0040271, 0.00023625, 0.00956885 };
 }
 
 // p3_to_xyz
 template <typename T>
 void convertColorSpace(Trichromatic<T, ColorSpace::CIEXYZ>& xyz,
                        Trichromatic<T, ColorSpace::DisplayP3Linear> p3) {
-    xyz.value =
-        (p3[0] * SIMD<T, 3>{ 0.486571, 0.228975, -0. } + p3[1] * SIMD<T, 3>{ 0.265668, 0.691739, 0.045113 } +
-         p3[2] * SIMD<T, 3>{ 0.198217, 0.079287, 1.043944 });
-    xyz.value *= T(100);
+    xyz.value = p3[0] * SIMD<T, 3>{ 48.6571, 22.8975, 0.0000 } +
+                p3[1] * SIMD<T, 3>{ 26.5668, 69.1739, 4.5113 } +
+                p3[2] * SIMD<T, 3>{ 19.8217, 7.9287, 104.3944 };
 }
 
 // xyz_to_lab
@@ -334,17 +331,13 @@ void convertColorSpace(Trichromatic<T, ColorSpace::CIELAB>& lab, Trichromatic<T,
 // lab_to_xyz
 template <typename T>
 void convertColorSpace(Trichromatic<T, ColorSpace::CIEXYZ>& xyz, Trichromatic<T, ColorSpace::CIELAB> lab) {
-    const float y         = (lab[0] + T(16)) / T(116);
-    const float x         = lab[1] / T(500) + y;
-    const float z         = y - lab[2] / T(200);
-
-    const SIMD<T, 3> w    = { x, y, z };
+    const T y             = (lab[0] + T(16)) / T(116);
+    const SIMD<T, 3> w    = { lab[1] / T(500) + y, y, y - lab[2] / T(200) };
 
     const SIMD<T, 3> cube = w * w * w;
-    xyz.value             = SIMD<T, 3>{ T(0.95047), T(1.00000), T(1.08883) } *
-                (select(gt(cube, SIMD<T, 3>(T(216)) / T(24389)), cube,
-                        (w - T(16) / T(116)) / (T(24389) / T(27) / T(116))));
-    xyz.value *= T(100);
+    xyz.value =
+        select(gt(cube, SIMD<T, 3>(T(216.0 / 24389))), cube, (w - T(16.0 / 116)) / (T(24389.0 / 27 / 116))) *
+        SIMD<T, 3>(illuminants<T>[+Illuminant::D65]);
 }
 
 template <typename T>
@@ -379,38 +372,34 @@ void convertColorSpace(Trichromatic<T, ColorSpace::CIELAB>& lab,
 // xyz_to_lms
 template <typename T>
 void convertColorSpace(Trichromatic<T, ColorSpace::LMS>& lms, Trichromatic<T, ColorSpace::CIEXYZ> xyz) {
-    xyz.value *= T(0.01);
-    lms.value = xyz[0] * SIMD<T, 3>{ T(+0.8189330101), T(+0.0329845436), T(+0.0482003018) } +
-                xyz[1] * SIMD<T, 3>{ T(+0.3618667424), T(+0.9293118715), T(+0.2643662691) } +
-                xyz[2] * SIMD<T, 3>{ T(-0.1288597137), T(+0.0361456387), T(+0.6338517070) };
+    lms.value = xyz[0] * SIMD<T, 3>{ T(+0.008189330101), T(+0.000329845436), T(+0.000482003018) } +
+                xyz[1] * SIMD<T, 3>{ T(+0.003618667424), T(+0.009293118715), T(+0.002643662691) } +
+                xyz[2] * SIMD<T, 3>{ T(-0.001288597137), T(+0.000361456387), T(+0.006338517070) };
 }
 
 // lms_to_xyz
 template <typename T>
 void convertColorSpace(Trichromatic<T, ColorSpace::CIEXYZ>& xyz, Trichromatic<T, ColorSpace::LMS> lms) {
-    xyz.value = (lms[0] * SIMD<T, 3>{ T(1.2270138511), T(-0.0405801784), T(-0.0763812845) } +
-                 lms[1] * SIMD<T, 3>{ T(-0.5577999806), T(1.1122568696), T(-0.4214819784) } +
-                 lms[2] * SIMD<T, 3>{ T(0.2812561490), T(-0.0716766787), T(1.5861632204) });
-    xyz.value *= T(100);
+    xyz.value = lms[0] * SIMD<T, 3>{ T(+122.70138511), T(-4.05801784), T(-7.63812845) } +
+                lms[1] * SIMD<T, 3>{ T(-55.77999806), T(+111.22568696), T(-42.14819784) } +
+                lms[2] * SIMD<T, 3>{ T(+28.12561490), T(-7.16766787), T(+158.61632204) };
 }
 
 // lms_to_oklab
 template <typename T>
 void convertColorSpace(Trichromatic<T, ColorSpace::OKLAB>& oklab, Trichromatic<T, ColorSpace::LMS> lms) {
     lms.value   = copysign(pow(abs(lms.value), SIMD<T, 3>(T(0.33333333))), lms.value);
-    oklab.value = (lms[0] * SIMD<T, 3>{ T(0.2104542553), T(1.9779984951), T(0.0259040371) } +
-                   lms[1] * SIMD<T, 3>{ T(0.7936177850), T(-2.4285922050), T(0.7827717662) } +
-                   lms[2] * SIMD<T, 3>{ T(-0.0040720468), T(0.4505937099), T(-0.8086757660) });
-    oklab.value *= T(100);
+    oklab.value = (lms[0] * SIMD<T, 3>{ T(21.04542553), T(197.79984951), T(2.59040371) } +
+                   lms[1] * SIMD<T, 3>{ T(79.36177850), T(-242.85922050), T(78.27717662) } +
+                   lms[2] * SIMD<T, 3>{ T(-0.40720468), T(45.05937099), T(-80.86757660) });
 }
 
 // oklab_to_lms
 template <typename T>
 void convertColorSpace(Trichromatic<T, ColorSpace::LMS>& lms, Trichromatic<T, ColorSpace::OKLAB> oklab) {
-    oklab.value *= T(0.01);
-    lms.value = (oklab[0] + //
-                 oklab[1] * SIMD<T, 3>{ T(0.3963377774), T(-0.1055613458), T(-0.0894841775) } +
-                 oklab[2] * SIMD<T, 3>{ T(0.2158037573), T(-0.0638541728), T(-1.2914855480) });
+    lms.value = oklab[0] * T(0.01) +
+                oklab[1] * SIMD<T, 3>{ T(0.003963377774), T(-0.001055613458), T(-0.000894841775) } +
+                oklab[2] * SIMD<T, 3>{ T(0.002158037573), T(-0.000638541728), T(-0.012914855480) };
     lms.value = pow(lms.value, SIMD<T, 3>(3));
 }
 
