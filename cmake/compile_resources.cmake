@@ -24,6 +24,8 @@ set(_RESOURCES_DATA_DIR
     ${CMAKE_BINARY_DIR}/resources-data
     CACHE PATH "")
 
+file(MAKE_DIRECTORY ${_RESOURCES_DIR}/resources ${_RESOURCES_DATA_DIR})
+
 function (brisk_target_link_resource TARGET MODE NAME)
     cmake_parse_arguments("EMBED" "BROTLI;GZIP;LZ4" "INPUT" "" ${ARGN})
 
