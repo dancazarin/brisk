@@ -44,16 +44,6 @@
 
 namespace Brisk {
 
-namespace Internal {
-/**
- * @brief Function to remove move semantics from an object.
- */
-template <typename T>
-constexpr T& unmove(T&& t) {
-    return static_cast<T&>(t);
-}
-} // namespace Internal
-
 namespace SimdInternal {} // namespace SimdInternal
 
 /**
@@ -65,7 +55,7 @@ namespace SimdInternal {} // namespace SimdInternal
  * @tparam T Type to be checked.
  */
 template <typename T>
-concept SIMDCompatible = (std::is_floating_point_v<T> || std::is_integral_v<T>)&&!std::is_same_v<T, bool>;
+concept SIMDCompatible = (std::is_floating_point_v<T> || std::is_integral_v<T>) && !std::is_same_v<T, bool>;
 
 /**
  * @brief A template class that represents a SIMD (Single Instruction Multiple Data) type.
@@ -317,7 +307,8 @@ constexpr SIMD<T, N>& operator+=(SIMD<T, N>& lhs, const SIMD<T, N>& rhs) noexcep
  */
 template <typename T, size_t N>
 constexpr SIMD<T, N> operator+(const SIMD<T, N>& lhs, const SIMD<T, N>& rhs) noexcept {
-    return Internal::unmove(SIMD<T, N>(lhs)) += rhs;
+    SIMD<T, N> result(lhs);
+    return result += rhs;
 }
 
 /**
@@ -390,7 +381,8 @@ constexpr SIMD<T, N>& operator-=(SIMD<T, N>& lhs, const SIMD<T, N>& rhs) noexcep
  */
 template <typename T, size_t N>
 constexpr SIMD<T, N> operator-(const SIMD<T, N>& lhs, const SIMD<T, N>& rhs) noexcept {
-    return Internal::unmove(SIMD<T, N>(lhs)) -= rhs;
+    SIMD<T, N> result(lhs);
+    return result -= rhs;
 }
 
 /**
@@ -463,7 +455,8 @@ constexpr SIMD<T, N>& operator*=(SIMD<T, N>& lhs, const SIMD<T, N>& rhs) noexcep
  */
 template <typename T, size_t N>
 constexpr SIMD<T, N> operator*(const SIMD<T, N>& lhs, const SIMD<T, N>& rhs) noexcept {
-    return Internal::unmove(SIMD<T, N>(lhs)) *= rhs;
+    SIMD<T, N> result(lhs);
+    return result *= rhs;
 }
 
 /**
@@ -536,7 +529,8 @@ constexpr SIMD<T, N>& operator/=(SIMD<T, N>& lhs, const SIMD<T, N>& rhs) noexcep
  */
 template <typename T, size_t N>
 constexpr SIMD<T, N> operator/(const SIMD<T, N>& lhs, const SIMD<T, N>& rhs) noexcept {
-    return Internal::unmove(SIMD<T, N>(lhs)) /= rhs;
+    SIMD<T, N> result(lhs);
+    return result /= rhs;
 }
 
 /**
