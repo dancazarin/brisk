@@ -31,7 +31,7 @@ jobs:
         vcpkg install --x-install-root vcpkg_installed --x-feature=icu
     - name: Configure
       run: |
-        cmake -GNinja -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=clang++-19 -DCMAKE_C_COMPILER=clang-19
+        cmake -GNinja -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=clang++-19 -DCMAKE_C_COMPILER=clang-19
     - name: Build
       run: |
         cmake --build build
@@ -55,7 +55,7 @@ jobs:
         vcpkg install --x-install-root vcpkg_installed --x-feature=icu
     - name: Configure
       run: |
-        cmake -G"Unix Makefiles" -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_C_COMPILER=gcc-14
+        cmake -G"Unix Makefiles" -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_C_COMPILER=gcc-14
     - name: Build
       run: |
         cmake --build build
@@ -81,7 +81,7 @@ jobs:
       shell: cmd
       run: |
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-        cmake -GNinja -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_TARGET_TRIPLET=%VCPKG_DEFAULT_TRIPLET% -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER="C:/Program Files/LLVM/bin/clang-cl.exe" -DCMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang-cl.exe" -DCMAKE_LINKER="C:/Program Files/LLVM/bin/lld-link.exe"
+        cmake -GNinja -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_TARGET_TRIPLET=%VCPKG_DEFAULT_TRIPLET% -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER="C:/Program Files/LLVM/bin/clang-cl.exe" -DCMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang-cl.exe" -DCMAKE_LINKER="C:/Program Files/LLVM/bin/lld-link.exe"
     - name: Build
       run: |
         cmake --build build
@@ -103,7 +103,7 @@ jobs:
     - name: Configure
       shell: cmd
       run: |
-        cmake -G"Visual Studio 17 2022" -A Win32 -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_TARGET_TRIPLET=%VCPKG_DEFAULT_TRIPLET% -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake
+        cmake -G"Visual Studio 17 2022" -A Win32 -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_TARGET_TRIPLET=%VCPKG_DEFAULT_TRIPLET% -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON
     - name: Build
       run: |
         cmake --build build --config RelWithDebInfo
@@ -125,7 +125,7 @@ jobs:
     - name: Configure
       shell: cmd
       run: |
-        cmake -G"Visual Studio 17 2022" -A x64 -T ClangCL -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_TARGET_TRIPLET=%VCPKG_DEFAULT_TRIPLET% -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake
+        cmake -G"Visual Studio 17 2022" -A x64 -T ClangCL -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_TARGET_TRIPLET=%VCPKG_DEFAULT_TRIPLET% -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON
     - name: Build
       run: |
         cmake --build build --config RelWithDebInfo
@@ -153,7 +153,7 @@ jobs:
     - name: Configure
       run: |
         export VCPKG_ROOT="$HOME/vcpkg"
-        cmake -GNinja -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DCMAKE_OSX_ARCHITECTURES=arm64 -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        cmake -GNinja -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DCMAKE_OSX_ARCHITECTURES=arm64 -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
     - name: Build
       run: |
         cmake --build build
@@ -181,7 +181,7 @@ jobs:
     - name: Configure
       run: |
         export VCPKG_ROOT="$HOME/vcpkg"
-        cmake -GNinja -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DCMAKE_OSX_ARCHITECTURES=x86_64 -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        cmake -GNinja -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DCMAKE_OSX_ARCHITECTURES=x86_64 -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
     - name: Build
       run: |
         cmake --build build
