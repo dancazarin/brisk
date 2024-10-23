@@ -40,6 +40,11 @@ add_library(
 target_link_libraries(brisk-window PUBLIC brisk-graphics)
 
 if (WIN32)
+    add_executable(icowriter ${PROJECT_SOURCE_DIR}/src/window/IcoWriter.cpp)
+    target_link_libraries(icowriter PUBLIC brisk-graphics)
+endif ()
+
+if (WIN32)
     target_link_libraries(brisk-window PUBLIC dwmapi Shlwapi Comctl32 Shcore)
 elseif (APPLE)
     target_link_libraries(brisk-window PUBLIC "-framework Cocoa" "-framework UniformTypeIdentifiers")

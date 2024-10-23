@@ -17,7 +17,6 @@
 # If you do not wish to be bound by the GPL-2.0+ license, you must purchase a commercial license. For commercial
 # licensing options, please visit: https://brisklib.com
 #
-include(${CMAKE_CURRENT_LIST_DIR}/icon.cmake)
 
 function (setup_executable_platform TARGET)
 
@@ -40,8 +39,7 @@ function (setup_executable_platform TARGET)
 
         add_custom_command(
             OUTPUT ${OUT_ICON}
-            COMMAND ${MAGICK_EXECUTABLE} convert -background none ${APP_ICON} -define
-                    icon:auto-resize=256,128,64,48,32,24,16 ${OUT_ICON}
+            COMMAND icowriter ${APP_ICON} ${OUT_ICON}
             DEPENDS ${APP_ICON}
             VERBATIM)
 
