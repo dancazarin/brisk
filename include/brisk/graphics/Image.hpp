@@ -444,7 +444,7 @@ struct ImageAccess {
         return m_data.line(y);
     }
 
-    void writeTo(bytes_mutable_view data) const {
+    void writeTo(bytes_mutable_view data, bool flipY = false) const {
 #ifndef NDEBUG
         if (data.size() != sizeof(StorageType) * m_data.memorySize())
             throwRangeError(fmt::format("writeTo(): invalid size {} (required={})", data.size(),
@@ -453,11 +453,17 @@ struct ImageAccess {
         LineIterator l   = lineIterator();
         StorageType* dst = reinterpret_cast<StorageType*>(data.data());
         int32_t w        = m_data.memoryWidth();
-        for (int32_t y = 0; y < height(); ++y, ++l, dst += w)
-            memcpy(dst, l.data, w * sizeof(StorageType));
+        int32_t dstStep  = w;
+        if (flipY) {
+            dst += w * (height() - 1);
+            dstStep = -dstStep;
+        }
+        w *= sizeof(StorageType);
+        for (int32_t y = 0; y < height(); ++y, ++l, dst += dstStep)
+            memcpy(dst, l.data, w);
     }
 
-    void readFrom(bytes_view data) const
+    void readFrom(bytes_view data, bool flipY = false) const
         requires(Mode != AccessMode::R)
     {
 #ifndef NDEBUG
@@ -468,8 +474,14 @@ struct ImageAccess {
         LineIterator l         = lineIterator();
         const StorageType* src = reinterpret_cast<const StorageType*>(data.data());
         int32_t w              = m_data.memoryWidth();
-        for (int32_t y = 0; y < height(); ++y, ++l, src += w)
-            memcpy(l.data, src, w * sizeof(StorageType));
+        int32_t srcStep        = w;
+        if (flipY) {
+            src += w * (height() - 1);
+            srcStep = -srcStep;
+        }
+        w *= sizeof(StorageType);
+        for (int32_t y = 0; y < height(); ++y, ++l, src += srcStep)
+            memcpy(l.data, src, w);
     }
 
     bool isContiguous() const {
