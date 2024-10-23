@@ -34,7 +34,11 @@ void imageResizeTo(RC<Image> destination, RC<Image> source, ResizingFilter filte
  * @param filter The resizing filter to use. Defaults to ResizingFilter::Default.
  * @return A smart pointer to the newly resized image.
  */
-[[nodiscard]] RC<Image> imageResize(RC<Image> image, Size newSize,
-                                    ResizingFilter filter = ResizingFilter::Default);
+[[nodiscard]] inline RC<Image> imageResize(RC<Image> image, Size newSize,
+                                           ResizingFilter filter = ResizingFilter::Default) {
+    RC<Image> result = rcnew Image(newSize, image->format());
+    imageResizeTo(result, std::move(image), filter);
+    return result;
+}
 
 } // namespace Brisk
