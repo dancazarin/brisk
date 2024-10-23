@@ -10,9 +10,9 @@ Brisk is a modern, cross-platform C++ GUI toolkit focused on building responsive
 
 ![C++](https://img.shields.io/badge/C%2B%2B-20-blue.svg?style=flat-square)
 ![Clang 16+](https://img.shields.io/badge/Clang-16%2B-green.svg?style=flat-square)
-![GCC 10+](https://img.shields.io/badge/GCC-10%2B-green.svg?style=flat-square)
+![GCC 12+](https://img.shields.io/badge/GCC-12%2B-green.svg?style=flat-square)
 ![MSVC 2022](https://img.shields.io/badge/MSVC-2022%2B-green.svg?style=flat-square)
-![Xcode 14+](https://img.shields.io/badge/Xcode-14%2B-green.svg?style=flat-square)
+![Xcode 14.3+](https://img.shields.io/badge/Xcode-14.3%2B-green.svg?style=flat-square)
 
 ### Key Features 🌟
 - **Stateful & Stateless Widgets**: Supports both modes with flexible binding for efficient state management.
