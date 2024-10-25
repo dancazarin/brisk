@@ -76,6 +76,7 @@ jobs:
         choco install ninja --no-progress -y
     - name: Vcpkg
       run: |
+        set LLVM_DIR=C:/Program Files/LLVM
         vcpkg install --x-install-root vcpkg_installed --x-feature=icu
     - name: Configure
       shell: cmd
