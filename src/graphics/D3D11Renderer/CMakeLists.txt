@@ -18,7 +18,7 @@
 # licensing options, please visit: https://brisklib.com
 #
 add_library(
-    brisk-renderer-d3d11
+    brisk-renderer-d3d11 STATIC
     D3D11Renderer.hpp
     RenderDevice.hpp
     RenderEncoder.hpp

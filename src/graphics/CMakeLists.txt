@@ -19,26 +19,6 @@
 #
 
 add_library(
-    brisk-graphics-vector STATIC
-    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vbezier.cpp
-    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vdasher.cpp
-    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vmatrix.cpp
-    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vpath.cpp
-    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vpathmesure.cpp
-    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vraster.cpp
-    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vrect.cpp
-    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vrle.cpp
-    ${PROJECT_SOURCE_DIR}/src/graphics/vector/freetype/v_ft_math.cpp
-    ${PROJECT_SOURCE_DIR}/src/graphics/vector/freetype/v_ft_raster.cpp
-    ${PROJECT_SOURCE_DIR}/src/graphics/vector/freetype/v_ft_stroker.cpp)
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    target_compile_options(brisk-graphics-vector PRIVATE -Wno-deprecated-volatile)
-endif ()
-target_compile_definitions(brisk-graphics-vector PRIVATE V_NAMESPACE=Brisk)
-target_include_directories(brisk-graphics-vector PUBLIC ${PROJECT_SOURCE_DIR}/src/graphics/vector)
-target_include_directories(brisk-graphics-vector PRIVATE ${PROJECT_SOURCE_DIR}/src/graphics/vector/freetype)
-
-add_library(
     brisk-graphics STATIC
     ${PROJECT_SOURCE_DIR}/include/brisk/graphics/Renderer.hpp
     ${PROJECT_SOURCE_DIR}/include/brisk/graphics/ImageFormats.hpp
@@ -73,21 +53,33 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/graphics/Image.cpp
     ${PROJECT_SOURCE_DIR}/src/graphics/Path.cpp
     ${PROJECT_SOURCE_DIR}/src/graphics/Renderer.cpp
-    ${PROJECT_SOURCE_DIR}/src/graphics/Offscreen.cpp)
+    ${PROJECT_SOURCE_DIR}/src/graphics/Offscreen.cpp
+    #
+    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vbezier.cpp
+    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vdasher.cpp
+    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vmatrix.cpp
+    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vpath.cpp
+    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vpathmesure.cpp
+    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vraster.cpp
+    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vrect.cpp
+    ${PROJECT_SOURCE_DIR}/src/graphics/vector/vrle.cpp
+    ${PROJECT_SOURCE_DIR}/src/graphics/vector/freetype/v_ft_math.cpp
+    ${PROJECT_SOURCE_DIR}/src/graphics/vector/freetype/v_ft_raster.cpp
+    ${PROJECT_SOURCE_DIR}/src/graphics/vector/freetype/v_ft_stroker.cpp)
+
+target_link_libraries(brisk-graphics PUBLIC brisk-core)
+
+target_include_directories(brisk-graphics PRIVATE ${PROJECT_SOURCE_DIR}/src/graphics/vector)
+target_include_directories(brisk-graphics PRIVATE ${PROJECT_SOURCE_DIR}/src/graphics/vector/freetype)
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(brisk-graphics PRIVATE -Wno-deprecated-volatile)
+endif ()
+target_compile_definitions(brisk-graphics PRIVATE V_NAMESPACE=Brisk)
 
 if (WIN32)
     add_subdirectory(D3D11Renderer)
     target_link_libraries(brisk-graphics PRIVATE brisk-renderer-d3d11)
-endif ()
-
-if (BRISK_WEBGPU)
-    add_subdirectory(WebGPURenderer)
-    if (TARGET brisk-renderer-webgpu)
-        target_link_libraries(brisk-graphics PRIVATE brisk-renderer-webgpu)
-        target_compile_definitions(brisk-graphics PUBLIC BRISK_WEBGPU=1)
-    else ()
-        message(FATAL_ERROR "BRISK_WEBGPU is ON but brisk-renderer-webgpu target is missing")
-    endif ()
 endif ()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -100,59 +92,25 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif ()
 
 target_compile_definitions(brisk-graphics PRIVATE V_NAMESPACE=Brisk)
-target_link_libraries(brisk-graphics PRIVATE brisk-graphics-vector)
 
-target_include_directories(brisk-graphics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
-target_link_libraries(brisk-graphics PUBLIC brisk-core)
-
-# >PNG
-find_package(PNG REQUIRED)
-target_link_libraries(brisk-graphics PRIVATE PNG::PNG)
-# /PNG
-
-# >WebP
-find_package(WebP CONFIG REQUIRED)
-target_link_libraries(brisk-graphics PRIVATE WebP::webp WebP::webpdecoder)
-# /WebP
-
-# >libjpeg-turbo
-find_package(libjpeg-turbo CONFIG REQUIRED)
-target_link_libraries(
-    brisk-graphics
-    PRIVATE $<IF:$<TARGET_EXISTS:libjpeg-turbo::turbojpeg>,libjpeg-turbo::turbojpeg,libjpeg-turbo::turbojpeg-static>)
-# /libjpeg-turbo
-
-# >lunasvg
-find_package(unofficial-lunasvg CONFIG REQUIRED)
-target_link_libraries(brisk-graphics PRIVATE unofficial::lunasvg::lunasvg)
-# /lunasvg
-
-# >harfbuzz
-find_package(harfbuzz CONFIG REQUIRED)
-target_link_libraries(brisk-graphics PRIVATE harfbuzz)
-# /harfbuzz
-
-# >freetype
-find_package(freetype CONFIG REQUIRED)
-target_link_libraries(brisk-graphics PRIVATE freetype)
-# /freetype
-
-# >icu
-find_package(ICU COMPONENTS uc)
-if (TARGET ICU::uc)
-
-    file(SIZE "${PROJECT_SOURCE_DIR}/resources/icu/icudt74l.dat" ICUDT_SIZE)
-    brisk_target_link_resource(
-        brisk-graphics PRIVATE icudt
-        INPUT "${PROJECT_SOURCE_DIR}/resources/icu/icudt74l.dat"
-        BROTLI)
-    set_source_files_properties(${PROJECT_SOURCE_DIR}/src/graphics/ICU.cpp PROPERTIES COMPILE_DEFINITIONS
-                                                                                      ICUDT_SIZE=${ICUDT_SIZE})
-
-    target_link_libraries(brisk-graphics PRIVATE ICU::uc)
+if (BRISK_WEBGPU)
+    add_subdirectory(WebGPURenderer)
 endif ()
-# /icu
+
+set(_DEP_PUBLIC PUBLIC)
+set(_DEP_PRIVATE PRIVATE)
+
+include(Deps.cmake)
+
+unset(_DEP_PUBLIC)
+unset(_DEP_PRIVATE)
+
+if (TARGET Dawn)
+    target_link_libraries(brisk-graphics PRIVATE brisk-renderer-webgpu)
+    target_compile_definitions(brisk-graphics PRIVATE BRISK_WEBGPU=1)
+else ()
+    message(FATAL_ERROR "BRISK_WEBGPU is ON but Dawn target is missing")
+endif ()
 
 set_target_properties(brisk-graphics PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_ARGS}")
 

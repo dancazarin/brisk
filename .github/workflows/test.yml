@@ -31,13 +31,18 @@ jobs:
         vcpkg install --x-install-root vcpkg_installed --x-feature=icu
     - name: Configure
       run: |
-        cmake -GNinja -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=clang++-19 -DCMAKE_C_COMPILER=clang-19
+        cmake -GNinja -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=clang++-19 -DCMAKE_C_COMPILER=clang-19
     - name: Build
       run: |
-        cmake --build build
+        cmake --build build --target install
     - name: Test
       run: |
         WGPU_LONG_TIMEOUT=1 ctest --test-dir build --output-on-failure -E "window_autotests"
+    - name: Binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.job }}
+        path: ${{ github.workspace }}/dist
 
   ubuntu-make-gcc-x86_64:
     runs-on: ubuntu-24.04
@@ -55,13 +60,18 @@ jobs:
         vcpkg install --x-install-root vcpkg_installed --x-feature=icu
     - name: Configure
       run: |
-        cmake -G"Unix Makefiles" -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_C_COMPILER=gcc-14
+        cmake -G"Unix Makefiles" -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_C_COMPILER=gcc-14
     - name: Build
       run: |
-        cmake --build build
+        cmake --build build --target install
     - name: Test
       run: |
         WGPU_LONG_TIMEOUT=1 ctest --test-dir build --output-on-failure -E "window_autotests"
+    - name: Binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.job }}
+        path: ${{ github.workspace }}/dist
 
   windows-ninja-clang-x86-64:
     runs-on: windows-latest
@@ -82,13 +92,18 @@ jobs:
       shell: cmd
       run: |
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-        cmake -GNinja -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_TARGET_TRIPLET=%VCPKG_DEFAULT_TRIPLET% -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER="C:/Program Files/LLVM/bin/clang-cl.exe" -DCMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang-cl.exe" -DCMAKE_LINKER="C:/Program Files/LLVM/bin/lld-link.exe"
+        cmake -GNinja -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_TARGET_TRIPLET=%VCPKG_DEFAULT_TRIPLET% -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER="C:/Program Files/LLVM/bin/clang-cl.exe" -DCMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang-cl.exe" -DCMAKE_LINKER="C:/Program Files/LLVM/bin/lld-link.exe"
     - name: Build
       run: |
-        cmake --build build
+        cmake --build build --target install
     - name: Test
       run: |
         ctest --test-dir build --output-on-failure
+    - name: Binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.job }}
+        path: ${{ github.workspace }}/dist
 
   windows-vs-x86:
     runs-on: windows-latest
@@ -104,13 +119,18 @@ jobs:
     - name: Configure
       shell: cmd
       run: |
-        cmake -G"Visual Studio 17 2022" -A Win32 -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_TARGET_TRIPLET=%VCPKG_DEFAULT_TRIPLET% -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON
+        cmake -G"Visual Studio 17 2022" -A Win32 -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_TARGET_TRIPLET=%VCPKG_DEFAULT_TRIPLET% -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON
     - name: Build
       run: |
-        cmake --build build --config RelWithDebInfo
+        cmake --build build --config RelWithDebInfo --target install
     - name: Test
       run: |
         ctest --test-dir build --build-config RelWithDebInfo --output-on-failure
+    - name: Binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.job }}
+        path: ${{ github.workspace }}/dist
 
   windows-vs-clangcl-x86_64:
     runs-on: windows-latest
@@ -126,13 +146,18 @@ jobs:
     - name: Configure
       shell: cmd
       run: |
-        cmake -G"Visual Studio 17 2022" -A x64 -T ClangCL -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_TARGET_TRIPLET=%VCPKG_DEFAULT_TRIPLET% -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON
+        cmake -G"Visual Studio 17 2022" -A x64 -T ClangCL -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_TARGET_TRIPLET=%VCPKG_DEFAULT_TRIPLET% -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON
     - name: Build
       run: |
-        cmake --build build --config RelWithDebInfo
+        cmake --build build --config RelWithDebInfo --target install
     - name: Test
       run: |
         ctest --test-dir build --build-config RelWithDebInfo --output-on-failure
+    - name: Binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.job }}
+        path: ${{ github.workspace }}/dist
 
   macos-ninja-clang-arm64:
     runs-on: macos-latest
@@ -154,13 +179,18 @@ jobs:
     - name: Configure
       run: |
         export VCPKG_ROOT="$HOME/vcpkg"
-        cmake -GNinja -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DCMAKE_OSX_ARCHITECTURES=arm64 -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        cmake -GNinja -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DCMAKE_OSX_ARCHITECTURES=arm64 -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
     - name: Build
       run: |
-        cmake --build build
+        cmake --build build --target install
     - name: Test
       run: |
         ctest --test-dir build --output-on-failure
+    - name: Binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.job }}
+        path: ${{ github.workspace }}/dist
 
   macos-ninja-clang-x86_64:
     runs-on: macos-13
@@ -182,10 +212,15 @@ jobs:
     - name: Configure
       run: |
         export VCPKG_ROOT="$HOME/vcpkg"
-        cmake -GNinja -S . -B build -DVCPKG_MANIFEST_MODE=OFF -DCMAKE_OSX_ARCHITECTURES=x86_64 -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        cmake -GNinja -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DCMAKE_OSX_ARCHITECTURES=x86_64 -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
     - name: Build
       run: |
-        cmake --build build
+        cmake --build build --target install
     - name: Test
       run: |
         ctest --test-dir build --output-on-failure
+    - name: Binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.job }}
+        path: ${{ github.workspace }}/dist

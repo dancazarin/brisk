@@ -8,15 +8,14 @@
 #
 # This file is part of the Brisk library.
 #
-# Brisk is dual-licensed under the GNU General Public License, version 2 (GPL-2.0+),
-# and a commercial license. You may use, modify, and distribute this software under
-# the terms of the GPL-2.0+ license if you comply with its conditions.
+# Brisk is dual-licensed under the GNU General Public License, version 2 (GPL-2.0+), and a commercial license. You may
+# use, modify, and distribute this software under the terms of the GPL-2.0+ license if you comply with its conditions.
 #
-# You should have received a copy of the GNU General Public License along with this program.
-# If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License along with this program. If not, see
+# <http://www.gnu.org/licenses/>.
 #
-# If you do not wish to be bound by the GPL-2.0+ license, you must purchase a commercial
-# license. For commercial licensing options, please visit: https://brisklib.com
+# If you do not wish to be bound by the GPL-2.0+ license, you must purchase a commercial license. For commercial
+# licensing options, please visit: https://brisklib.com
 #
 
 cmake_minimum_required(VERSION 3.16)
@@ -29,7 +28,23 @@ endif ()
 
 include(cmake/init.cmake)
 
-project(brisk CXX C)
+file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/include/brisk/core/Version.hpp BRISK_VERSION
+     REGEX "#define BRISK_VERSION_(MINOR|MAJOR|PATCH)")
+string(REGEX MATCHALL "[0-9]+" BRISK_VERSION_MATCH ${BRISK_VERSION})
+string(REPLACE ";" "." BRISK_VERSION "${BRISK_VERSION_MATCH}")
+
+project(
+    brisk
+    VERSION ${BRISK_VERSION}
+    LANGUAGES CXX C)
+
+if (DEBUG_CMAKE)
+    get_cmake_property(VARS VARIABLES)
+    list(SORT VARS)
+    foreach (VAR ${VARS})
+        message(STATUS "${VAR}=${${VAR}}")
+    endforeach ()
+endif ()
 
 option(BRISK_LTO ON "Use Link Time Optimization in Release builds")
 option(BRISK_BROTLI "Enable Brotli compression" ON)
@@ -80,16 +95,18 @@ endif ()
 
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/licenses.txt" "")
 
+set(_BRISK_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+include(GNUInstallDirs)
+
 include(cmake/add_autotests.cmake)
-include(cmake/compile_resources.cmake)
-include(cmake/setup_executable.cmake)
-include(cmake/metadata.cmake)
+include(cmake/scripts/compile_resources.cmake)
+include(cmake/scripts/setup_executable.cmake)
+include(cmake/scripts/metadata.cmake)
 
 if (BRISK_LOG_TO_STDERR)
     add_compile_definitions(BRISK_LOG_TO_STDERR=1)
 endif ()
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 include(cmake/add_license.cmake)
 
@@ -105,26 +122,35 @@ set(RESOURCES_DIR ${PROJECT_SOURCE_DIR}/resources)
 set(FONTS_DIR ${RESOURCES_DIR}/fonts)
 set(IMAGES_DIR ${RESOURCES_DIR}/images)
 
+if (NOT BRISK_DBG_SUFFIX)
+    set(BRISK_DBG_SUFFIX
+        "/debug"
+        CACHE STRING "")
+endif ()
+
 add_subdirectory(src)
 
 add_library(brisk-executable INTERFACE)
 if (WIN32)
-    target_sources(brisk-executable INTERFACE src/window/default.manifest)
-endif ()
-
-set(TESTS_GRAPHICS_LIBS)
-set(TESTS_GRAPHICS_DEFS)
-
-find_package(glfw3 CONFIG)
-if (glfw3_FOUND)
-    message(STATUS "GLFW3 is found. It will be used for interactive tests")
-    list(APPEND TESTS_GRAPHICS_LIBS glfw)
-    list(APPEND TESTS_GRAPHICS_DEFS HAVE_GLFW3)
-else ()
-    message(STATUS "GLFW3 is not found, skipping interactive tests")
+    target_sources(
+        brisk-executable
+        INTERFACE
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>$<INSTALL_INTERFACE:$<INSTALL_PREFIX>>/include/brisk/window/internal/Windows.manifest
+    )
 endif ()
 
 if (BRISK_TESTS)
+
+    set(TESTS_GRAPHICS_LIBS)
+    set(TESTS_GRAPHICS_DEFS)
+    find_package(glfw3 CONFIG)
+    if (glfw3_FOUND)
+        message(STATUS "GLFW3 is found. It will be used for interactive tests")
+        list(APPEND TESTS_GRAPHICS_LIBS glfw)
+        list(APPEND TESTS_GRAPHICS_DEFS HAVE_GLFW3)
+    else ()
+        message(STATUS "GLFW3 is not found, skipping interactive tests")
+    endif ()
 
     file(GLOB TESTS_CORE ${CMAKE_CURRENT_SOURCE_DIR}/src/core/*_test.cpp)
     file(GLOB TESTS_NETWORK ${CMAKE_CURRENT_SOURCE_DIR}/src/network/*_test.cpp)
@@ -157,3 +183,75 @@ if (BRISK_EXAMPLES)
     add_subdirectory(examples)
 
 endif ()
+
+install(DIRECTORY include/brisk DESTINATION include)
+
+include(CMakePackageConfigHelpers)
+
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/BriskConfigVersion.cmake
+    VERSION ${BRISK_VERSION}
+    COMPATIBILITY SameMinorVersion)
+
+set(BRISK_INSTALL_CMAKEDIR
+    "${CMAKE_INSTALL_LIBDIR}/cmake/brisk"
+    CACHE STRING "Path to Brisk CMake files")
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/BriskConfigVersion.cmake DESTINATION ${BRISK_INSTALL_CMAKEDIR})
+
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.cmake.in
+                              ${CMAKE_CURRENT_BINARY_DIR}/BriskConfig.cmake INSTALL_DESTINATION "lib/cmake/brisk")
+
+set(EXTRA_INSTALL_TARGETS)
+
+if (TARGET brisk-renderer-d3d11)
+    list(APPEND EXTRA_INSTALL_TARGETS brisk-renderer-d3d11)
+endif ()
+if (TARGET brisk-renderer-webgpu)
+    list(APPEND EXTRA_INSTALL_TARGETS brisk-renderer-webgpu)
+endif ()
+if (TARGET icowriter)
+    list(APPEND EXTRA_INSTALL_TARGETS icowriter)
+endif ()
+
+install(
+    TARGETS
+        brisk-core
+        brisk-graphics
+        brisk-network
+        brisk-window
+        brisk-gui
+        brisk-widgets
+        brisk-executable
+        bin2c
+        ${EXTRA_INSTALL_TARGETS}
+    EXPORT BriskTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}$<$<CONFIG:Debug>:${BRISK_DBG_SUFFIX}>
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}$<$<CONFIG:Debug>:${BRISK_DBG_SUFFIX}>
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}$<$<CONFIG:Debug>:${BRISK_DBG_SUFFIX}>)
+
+install(DIRECTORY cmake/scripts/ DESTINATION "${BRISK_INSTALL_CMAKEDIR}/scripts")
+
+install(
+    FILES src/core/Deps.cmake
+    RENAME Core.cmake
+    DESTINATION "${BRISK_INSTALL_CMAKEDIR}/deps")
+install(
+    FILES src/graphics/Deps.cmake
+    RENAME Graphics.cmake
+    DESTINATION "${BRISK_INSTALL_CMAKEDIR}/deps")
+install(
+    FILES src/network/Deps.cmake
+    RENAME Network.cmake
+    DESTINATION "${BRISK_INSTALL_CMAKEDIR}/deps")
+install(
+    FILES src/window/Deps.cmake
+    RENAME Window.cmake
+    DESTINATION "${BRISK_INSTALL_CMAKEDIR}/deps")
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/BriskConfig.cmake DESTINATION "${BRISK_INSTALL_CMAKEDIR}")
+
+install(
+    EXPORT BriskTargets
+    DESTINATION "${BRISK_INSTALL_CMAKEDIR}"
+    CONFIGURATIONS Debug Release)

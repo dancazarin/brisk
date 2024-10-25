@@ -53,6 +53,6 @@ function (brisk_target_link_resource TARGET MODE NAME)
     set_source_files_properties(${DATA} ${HDR} PROPERTIES GENERATED TRUE)
 
     target_sources(${TARGET} PRIVATE ${DATA} ${HDR})
-    target_include_directories(${TARGET} ${MODE} ${_RESOURCES_DIR})
+    target_include_directories(${TARGET} ${MODE}  $<BUILD_INTERFACE:${_RESOURCES_DIR}>)
     target_compile_definitions(${TARGET} PRIVATE BRISK_RESOURCE_${CNAME}=1)
 endfunction ()

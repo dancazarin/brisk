@@ -42,15 +42,21 @@ target_link_libraries(brisk-window PUBLIC brisk-graphics)
 if (WIN32)
     add_executable(icowriter ${PROJECT_SOURCE_DIR}/src/window/IcoWriter.cpp)
     target_link_libraries(icowriter PUBLIC brisk-graphics)
+    set_target_properties(icowriter PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 endif ()
+
+set(_DEP_PUBLIC PUBLIC)
+set(_DEP_PRIVATE PRIVATE)
+
+include(Deps.cmake)
+
+unset(_DEP_PUBLIC)
+unset(_DEP_PRIVATE)
 
 if (WIN32)
     target_link_libraries(brisk-window PUBLIC dwmapi Shlwapi Comctl32 Shcore)
 elseif (APPLE)
     target_link_libraries(brisk-window PUBLIC "-framework Cocoa" "-framework UniformTypeIdentifiers")
-else ()
-    find_package(X11 REQUIRED)
-    target_link_libraries(brisk-window PUBLIC X11::X11 X11::Xrandr X11::Xinerama)
 endif ()
 
 set_target_properties(brisk-window PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_ARGS}")

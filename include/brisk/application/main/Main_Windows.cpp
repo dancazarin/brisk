@@ -20,6 +20,7 @@
  *
  * For commercial licensing, please visit: https://brisklib.com/
  */
+#define NOMINMAX 1
 #include <windows.h>
 #include <vector>
 #include <string>

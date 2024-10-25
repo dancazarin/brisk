@@ -22,6 +22,8 @@ add_license("Lato fonts" ${FONTS_DIR}/Lato-OFL.txt)
 add_license("SourceCodePro" ${FONTS_DIR}/SourceCodePro-LICENSE.txt)
 add_license("Lucide Icons" ${FONTS_DIR}/Lucide-Icons-LICENSE.txt)
 
+include(yoga/list.cmake)
+
 add_library(
     brisk-gui STATIC
     ${PROJECT_SOURCE_DIR}/include/brisk/gui/GUIWindow.hpp
@@ -43,9 +45,12 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/gui/SingleHeaderTest.cpp
     ${PROJECT_SOURCE_DIR}/src/gui/Layout.cpp
     ${PROJECT_SOURCE_DIR}/src/gui/Component.cpp
-    ${PROJECT_SOURCE_DIR}/src/gui/GUIApplication.cpp)
+    ${PROJECT_SOURCE_DIR}/src/gui/GUIApplication.cpp
+    ${yogacore_SRC})
 
-add_subdirectory(yoga)
+target_link_libraries(brisk-gui PUBLIC brisk-window)
+
+target_include_directories(brisk-gui PRIVATE ${CMAKE_CURRENT_LIST_DIR}/yoga)
 
 brisk_target_link_resource(
     brisk-gui PRIVATE Lato-Black
@@ -78,7 +83,5 @@ brisk_target_link_resource(
     brisk-gui PRIVATE Lucide
     INPUT "${FONTS_DIR}/Lucide.ttf"
     BROTLI)
-
-target_link_libraries(brisk-gui PUBLIC brisk-window yogacore)
 
 set_target_properties(brisk-gui PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_ARGS}")

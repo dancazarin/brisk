@@ -25,9 +25,12 @@ add_library(
 
 target_link_libraries(brisk-network PUBLIC brisk-core)
 
-# >CURL
-find_package(CURL REQUIRED)
-target_link_libraries(brisk-network PUBLIC CURL::libcurl)
-# /CURL
+set(_DEP_PUBLIC PUBLIC)
+set(_DEP_PRIVATE PRIVATE)
+
+include(Deps.cmake)
+
+unset(_DEP_PUBLIC)
+unset(_DEP_PRIVATE)
 
 set_target_properties(brisk-network PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_ARGS}")

@@ -17,40 +17,35 @@
 # If you do not wish to be bound by the GPL-2.0+ license, you must purchase a commercial license. For commercial
 # licensing options, please visit: https://brisklib.com
 #
-find_package(Dawn CONFIG)
-if (TARGET Dawn)
-    add_library(
-        brisk-renderer-webgpu
-        WebGPURenderer.hpp
-        RenderDevice.hpp
-        RenderEncoder.hpp
-        ImageRenderTarget.hpp
-        WindowRenderTarget.hpp
-        ImageBackend.hpp
-        Common.hpp
-        WebGPURenderer.cpp
-        RenderDevice.cpp
-        RenderEncoder.cpp
-        ImageRenderTarget.cpp
-        WindowRenderTarget.cpp
-        ImageBackend.cpp
-        Common.cpp
-        RenderDevice${PLATFORM_SPECIFIC_CPP}
-        WindowRenderTarget${PLATFORM_SPECIFIC_CPP})
+add_library(
+    brisk-renderer-webgpu STATIC
+    WebGPURenderer.hpp
+    RenderDevice.hpp
+    RenderEncoder.hpp
+    ImageRenderTarget.hpp
+    WindowRenderTarget.hpp
+    ImageBackend.hpp
+    Common.hpp
+    WebGPURenderer.cpp
+    RenderDevice.cpp
+    RenderEncoder.cpp
+    ImageRenderTarget.cpp
+    WindowRenderTarget.cpp
+    ImageBackend.cpp
+    Common.cpp
+    RenderDevice${PLATFORM_SPECIFIC_CPP}
+    WindowRenderTarget${PLATFORM_SPECIFIC_CPP})
 
-    target_link_libraries(brisk-renderer-webgpu PUBLIC Dawn)
+target_link_libraries(brisk-renderer-webgpu PUBLIC brisk-core)
 
-    target_link_libraries(brisk-renderer-webgpu PUBLIC brisk-core)
+brisk_target_link_resource(
+    brisk-renderer-webgpu PUBLIC wgslshader
+    INPUT ${CMAKE_CURRENT_LIST_DIR}/shader.wgsl
+    BROTLI)
 
-    brisk_target_link_resource(
-        brisk-renderer-webgpu PUBLIC wgslshader
-        INPUT ${CMAKE_CURRENT_LIST_DIR}/shader.wgsl
-        BROTLI)
-
-    if (WIN32)
-        target_link_libraries(brisk-renderer-webgpu PUBLIC d3d11 dxgi)
-    endif ()
-    if (APPLE)
-        target_link_libraries(brisk-renderer-webgpu PUBLIC "-framework IOSurface")
-    endif ()
+if (WIN32)
+    target_link_libraries(brisk-renderer-webgpu PUBLIC d3d11 dxgi)
+endif ()
+if (APPLE)
+    target_link_libraries(brisk-renderer-webgpu PUBLIC "-framework IOSurface")
 endif ()

@@ -1,0 +1,31 @@
+@PACKAGE_INIT@
+
+include(${CMAKE_CURRENT_LIST_DIR}/BriskTargets.cmake)
+
+include(${CMAKE_CURRENT_LIST_DIR}/BriskConfigVersion.cmake)
+
+get_filename_component(_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+get_filename_component(_BRISK_INCLUDE_DIR "${_DIR}/../../../include" ABSOLUTE)
+
+file(GLOB SCRIPT_FILES "${_DIR}/scripts/*.cmake")
+foreach (f ${SCRIPT_FILES})
+    include(${f})
+endforeach ()
+
+include(CMakeFindDependencyMacro)
+
+set(BRISK_BROTLI @BRISK_BROTLI@)
+set(BRISK_WEBGPU @BRISK_WEBGPU@)
+
+set(_DEP_PUBLIC INTERFACE)
+set(_DEP_PRIVATE INTERFACE)
+set(_FIND_PACKAGE find_dependency)
+
+include(${_DIR}/deps/Core.cmake)
+include(${_DIR}/deps/Graphics.cmake)
+include(${_DIR}/deps/Network.cmake)
+include(${_DIR}/deps/Window.cmake)
+
+unset(_DEP_PUBLIC)
+unset(_DEP_PRIVATE)
+unset(_FIND_PACKAGE)

@@ -87,128 +87,54 @@ if (APPLE)
     target_sources(brisk-core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/AutoreleasePool.mm)
 endif ()
 
-target_include_directories(brisk-core PUBLIC ${PROJECT_SOURCE_DIR}/include)
-
-target_include_directories(brisk-core PUBLIC ${DEPS_DIR}/include/Common)
+target_include_directories(brisk-core PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+                                             $<INSTALL_INTERFACE:include>)
 
 if (WIN32)
-    target_compile_definitions(brisk-core PUBLIC _CRT_SECURE_NO_WARNINGS=1)
-    target_compile_definitions(brisk-core PUBLIC _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS=1)
-    target_compile_definitions(brisk-core PUBLIC _ENABLE_EXTENDED_ALIGNED_STORAGE=1)
-    target_compile_definitions(brisk-core PUBLIC -DUNICODE)
-    target_compile_definitions(brisk-core PUBLIC -DWINVER=0x0A00)
-    target_compile_definitions(brisk-core PUBLIC -DWIN32=1)
-    target_compile_definitions(brisk-core PUBLIC -D_WIN32_WINNT=0xA00)
-    target_compile_definitions(brisk-core PUBLIC -DNOMINMAX)
+    target_compile_definitions(brisk-core PUBLIC $<BUILD_INTERFACE:_CRT_SECURE_NO_WARNINGS=1>)
+    target_compile_definitions(brisk-core PUBLIC $<BUILD_INTERFACE:UNICODE>)
+    target_compile_definitions(brisk-core PUBLIC $<BUILD_INTERFACE:WINVER=0x0A00>)
+    target_compile_definitions(brisk-core PUBLIC $<BUILD_INTERFACE:WIN32=1>)
+    target_compile_definitions(brisk-core PUBLIC $<BUILD_INTERFACE:_WIN32_WINNT=0xA00>)
+    target_compile_definitions(brisk-core PUBLIC $<BUILD_INTERFACE:NOMINMAX>)
 endif ()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
-    target_compile_options(brisk-core PUBLIC -Werror=unused-result)
-    target_compile_options(brisk-core PUBLIC -Werror=return-type)
+    target_compile_options(brisk-core PUBLIC $<BUILD_INTERFACE:-Werror=unused-result>)
+    target_compile_options(brisk-core PUBLIC $<BUILD_INTERFACE:-Werror=return-type>)
 endif ()
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    target_compile_options(brisk-core PUBLIC -Wno-attributes)
+    target_compile_options(brisk-core PUBLIC $<BUILD_INTERFACE:-Wno-attributes>)
 endif ()
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_compile_options(brisk-core PUBLIC -Werror=microsoft-template)
-    target_compile_options(brisk-core PUBLIC -fdiagnostics-absolute-paths)
-    target_compile_options(brisk-core PUBLIC -Werror=infinite-recursion)
-    target_compile_options(brisk-core PUBLIC -fdiagnostics-absolute-paths)
-    target_compile_options(brisk-core PUBLIC -Werror=infinite-recursion)
-    target_compile_options(brisk-core PUBLIC -Werror=literal-conversion)
+    target_compile_options(brisk-core PUBLIC $<BUILD_INTERFACE:-Werror=microsoft-template>)
+    target_compile_options(brisk-core PUBLIC $<BUILD_INTERFACE:-Werror=infinite-recursion>)
+    target_compile_options(brisk-core PUBLIC $<BUILD_INTERFACE:-Werror=literal-conversion>)
+    target_compile_options(brisk-core PUBLIC $<BUILD_INTERFACE:-fdiagnostics-absolute-paths>)
 endif ()
 
-# >libuv
-find_package(libuv CONFIG REQUIRED)
-target_link_libraries(brisk-core PRIVATE $<IF:$<TARGET_EXISTS:libuv::uv_a>,libuv::uv_a,libuv::uv>)
-# /libuv
+set(_DEP_PUBLIC PUBLIC)
+set(_DEP_PRIVATE PRIVATE)
 
-# >readerwriterqueue
-find_path(READERWRITERQUEUE_INCLUDE_DIRS "readerwriterqueue/atomicops.h")
-target_include_directories(brisk-core PRIVATE ${READERWRITERQUEUE_INCLUDE_DIRS})
-# /readerwriterqueue
+include(Deps.cmake)
 
-# >concurrentqueue
-find_package(unofficial-concurrentqueue CONFIG REQUIRED)
-target_link_libraries(brisk-core PRIVATE unofficial::concurrentqueue::concurrentqueue)
-# /concurrentqueue
-
-# >stb
-find_package(Stb REQUIRED)
-target_include_directories(brisk-core PRIVATE ${Stb_INCLUDE_DIR})
-# /stb
-
-# >fmt
-find_package(fmt CONFIG REQUIRED)
-target_link_libraries(brisk-core PUBLIC fmt::fmt)
-# /fmt
-
-# >spdlog
-find_package(spdlog CONFIG REQUIRED)
-target_link_libraries(brisk-core PUBLIC spdlog::spdlog)
-# /spdlog
-
-if (BRISK_BROTLI)
-    # >brotli
-    find_package(unofficial-brotli CONFIG REQUIRED)
-    target_link_libraries(brisk-core PRIVATE unofficial::brotli::brotlidec unofficial::brotli::brotlienc)
-    # /brotli
-
-    target_compile_definitions(brisk-core PUBLIC BRISK_HAVE_BROTLI=1)
-endif ()
-
-# >libtomcrypt
-find_package(LibTomCrypt REQUIRED)
-target_link_libraries(brisk-core PUBLIC ${LibTomCrypt_LIBRARIES})
-target_include_directories(brisk-core PRIVATE ${LibTomCrypt_INCLUDE_DIR})
-# /libtomcrypt
-
-# >libtommath
-find_package(LibTomMath REQUIRED)
-target_link_libraries(brisk-core PUBLIC ${LibTomMath_LIBRARIES})
-target_include_directories(brisk-core PRIVATE ${LibTomMath_INCLUDE_DIR})
-target_compile_definitions(brisk-core PUBLIC -DLTM_DESC -DUSE_LTM)
-# /libtommath
-
-# >rapidjson
-find_package(RapidJSON CONFIG REQUIRED)
-target_link_libraries(brisk-core PRIVATE rapidjson)
-# /rapidjson
-
-# >lz4
-find_package(lz4 CONFIG REQUIRED)
-target_link_libraries(brisk-core PRIVATE lz4::lz4)
-# /lz4
-
-# >msgpack-cxx
-find_package(msgpack-cxx CONFIG REQUIRED)
-target_link_libraries(brisk-core PRIVATE msgpack-cxx)
-# /msgpack-cxx
-
-# >utf8proc
-find_package(unofficial-utf8proc CONFIG REQUIRED)
-target_link_libraries(brisk-core PRIVATE utf8proc)
-# /utf8proc
-
-# >zlib
-find_package(ZLIB REQUIRED)
-target_link_libraries(brisk-core PRIVATE ZLIB::ZLIB)
-# /zlib
-
-# >tl-expected
-find_package(tl-expected CONFIG REQUIRED)
-target_link_libraries(brisk-core PRIVATE tl::expected)
-# /tl-expected
+unset(_DEP_PUBLIC)
+unset(_DEP_PRIVATE)
 
 if (WIN32)
-    target_link_options(brisk-core PUBLIC /NATVIS:${CMAKE_CURRENT_SOURCE_DIR}/types.natvis)
+    target_link_options(
+        brisk-core PUBLIC $<BUILD_INTERFACE:-NATVIS:${CMAKE_CURRENT_SOURCE_DIR}/types.natvis>
+        $<INSTALL_INTERFACE:-NATVIS:$<INSTALL_PREFIX>/${CMAKE_INSTALL_LIBDIR}${BRISK_DEBUG_INSTALL_SUFFIX}/types.natvis>
+    )
+
+    install(FILES types.natvis DESTINATION ${CMAKE_INSTALL_LIBDIR}$<$<CONFIG:Debug>:${BRISK_DBG_SUFFIX}>)
 endif ()
 
 target_compile_definitions(brisk-core PUBLIC BRISK_CFG_$<CONFIG>=1)
 
 add_executable(bin2c bin2c.cpp)
 target_link_libraries(bin2c PRIVATE brisk-core)
-set_target_properties(bin2c PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set_target_properties(bin2c PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 
 # System libraries and frameworks
 if (WIN32)
@@ -217,11 +143,11 @@ endif ()
 
 if (APPLE)
     target_link_libraries(brisk-core PUBLIC "-framework Foundation")
-    target_compile_options(brisk-core PUBLIC -fobjc-arc)
+    target_compile_options(brisk-core PUBLIC $<BUILD_INTERFACE:-fobjc-arc>)
 endif ()
 
 set_target_properties(brisk-core PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_ARGS}")
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(brisk-core PUBLIC -wd4003)
+    target_compile_options(brisk-core PRIVATE -wd4003)
 endif ()

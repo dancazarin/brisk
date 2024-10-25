@@ -34,8 +34,9 @@ function (brisk_setup_executable TARGET)
         set(APP_VERSION_PATCH 0)
     endif ()
 
-    configure_file(${brisk_SOURCE_DIR}/include/brisk/application/main/Metadata.Defines.hpp.in
-                   ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_meta/Metadata.Defines.hpp @ONLY)
+    set(APP_METADATA_FILE ${_BRISK_INCLUDE_DIR}/brisk/application/main/Metadata.Defines.hpp.in)
+
+    configure_file(${APP_METADATA_FILE} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_meta/Metadata.Defines.hpp @ONLY)
     target_include_directories(${TARGET} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_meta)
 
     set_target_properties(

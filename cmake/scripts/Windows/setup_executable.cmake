@@ -27,7 +27,7 @@ function (setup_executable_platform TARGET)
         set(HAS_ICON 0)
     endif ()
 
-    configure_file(${brisk_SOURCE_DIR}/include/brisk/application/main/app.rc.in
+    configure_file(${_BRISK_INCLUDE_DIR}/brisk/application/main/app.rc.in
                    ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.app.rc @ONLY)
     if (NOT BRISK_FORCE_CONSOLE)
         set_target_properties(${TARGET} PROPERTIES WIN32_EXECUTABLE TRUE)
@@ -47,5 +47,5 @@ function (setup_executable_platform TARGET)
     endif ()
 
     target_sources(${TARGET} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.app.rc)
-    target_sources(${TARGET} PRIVATE ${brisk_SOURCE_DIR}/include/brisk/application/main/Main_Windows.cpp)
+    target_sources(${TARGET} PRIVATE ${_BRISK_INCLUDE_DIR}/brisk/application/main/Main_Windows.cpp)
 endfunction ()
