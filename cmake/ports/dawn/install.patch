@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 9e2909323a..6cdf0c900c 100644
+index 9e2909323a..e2a43a64b7 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -94,11 +94,11 @@ function (install_if_enabled target)
@@ -19,7 +19,22 @@ index 9e2909323a..6cdf0c900c 100644
  
      get_target_property(targetHeaders ${target} INTERFACE_SOURCES)
      if (NOT targetHeaders)
-@@ -596,3 +596,72 @@ if (DAWN_EMIT_COVERAGE)
+@@ -406,6 +406,14 @@ function(common_compile_options TARGET)
+     endif()
+   endif(COMPILER_IS_LIKE_GNU)
+ 
++  if (COMPILER_IS_CLANG_CL)
++    target_compile_options(${TARGET} PRIVATE
++      -Wno-deprecated-builtins
++      -Wno-unknown-warning-option
++      -Wno-switch-default
++    )
++  endif ()
++
+   if(MSVC)
+       target_compile_options(${TARGET} PUBLIC /utf-8)
+   endif()
+@@ -596,3 +604,72 @@ if (DAWN_EMIT_COVERAGE)
      COMMENT "Generating tint coverage data"
      VERBATIM)
  endif()
