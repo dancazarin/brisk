@@ -57,7 +57,7 @@ static int curlProgress(function<void(intmax_t, intmax_t)>* progress, curl_off_t
                                      RC<Stream> responseBody) {
     CURL* curl = curl_easy_init();
     if (!curl) {
-        return HTTPResponse{};
+        return HTTPResponse{ FetchErrorCode::failedInit };
     }
     SCOPE_EXIT {
         curl_easy_cleanup(curl);
@@ -144,8 +144,9 @@ static int curlProgress(function<void(intmax_t, intmax_t)>* progress, curl_off_t
     }
 
     HTTPResponse response;
+    response.error = FetchErrorCode::ok;
 
-    CURLcode res = curl_easy_perform(curl);
+    CURLcode res   = curl_easy_perform(curl);
     if (res != CURLcode::CURLE_OK) {
         response.error = static_cast<FetchErrorCode>(res);
     }
@@ -164,6 +165,11 @@ static int curlProgress(function<void(intmax_t, intmax_t)>* progress, curl_off_t
 
     if (!headers.empty()) {
         response.headers = toStrings(split(headers, "\r\n"));
+        response.headers.erase(std::remove_if(response.headers.begin(), response.headers.end(),
+                                              [](std::string_view s) -> bool {
+                                                  return s.empty();
+                                              }),
+                               response.headers.end());
     }
 
     return response;
