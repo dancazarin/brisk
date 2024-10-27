@@ -39,6 +39,7 @@ BRISK_CLANG_PRAGMA(clang diagnostic ignored "-Wc++2a-extensions")
 #include <brisk/graphics/Canvas.hpp>
 #include <brisk/graphics/Color.hpp>
 #include <set>
+#include <fmt/ranges.h>
 #include <spdlog/spdlog.h>
 #include <typeindex>
 #include <typeinfo>

@@ -27,11 +27,71 @@
 
 BRISK_GNU_ATTR_PRAGMA(GCC diagnostic push)
 BRISK_GNU_ATTR_PRAGMA(GCC diagnostic ignored "-Wunused-function")
+#if __has_include(<stb_image_resize2.h>)
+#include <stb_image_resize2.h>
+#define STB_RESIZE_NEW_API 1
+#else
 #include <stb_image_resize.h>
+#endif
 BRISK_GNU_ATTR_PRAGMA(GCC diagnostic pop)
 
 namespace Brisk {
 
+#ifdef STB_RESIZE_NEW_API
+static stbir_pixel_layout pixelLayout(PixelFormat fmt) {
+    return staticMap(fmt, PixelFormat::Greyscale, STBIR_1CHANNEL, //
+                     PixelFormat::Alpha, STBIR_1CHANNEL,          //
+                     PixelFormat::GreyscaleAlpha, STBIR_RA,       //
+                     PixelFormat::RGB, STBIR_RGB,                 //
+                     PixelFormat::BGR, STBIR_BGR,                 //
+                     PixelFormat::RGBA, STBIR_RGBA_PM,            //
+                     PixelFormat::BGRA, STBIR_BGRA_PM,            //
+                     PixelFormat::ARGB, STBIR_ARGB_PM,            //
+                     PixelFormat::ABGR, STBIR_ABGR_PM,            //
+                     STBIR_1CHANNEL);
+}
+
+void imageResizeTo(RC<Image> destination, RC<Image> source, ResizingFilter filter) {
+    if (source->format() != destination->format())
+        throwException(EArgument("imageResizeTo: incompatible type or format: destination={} source={}",
+                                 destination->format(), source->format()));
+    auto r = source->mapRead();
+    auto w = destination->mapWrite();
+
+    switch (source->pixelType()) {
+    case PixelType::U8Gamma:
+        // Ignore the return value because all preconditions have been checked
+        std::ignore = stbir_resize(reinterpret_cast<const void*>(r.data()), r.width(), r.height(),
+                                   r.byteStride(), reinterpret_cast<void*>(w.data()), w.width(), w.height(),
+                                   w.byteStride(), pixelLayout(source->pixelFormat()), STBIR_TYPE_UINT8_SRGB,
+                                   STBIR_EDGE_CLAMP, static_cast<stbir_filter>(filter));
+        break;
+    case PixelType::U8:
+        // Ignore the return value because all preconditions have been checked
+        std::ignore = stbir_resize(reinterpret_cast<const void*>(r.data()), r.width(), r.height(),
+                                   r.byteStride(), reinterpret_cast<void*>(w.data()), w.width(), w.height(),
+                                   w.byteStride(), pixelLayout(source->pixelFormat()), STBIR_TYPE_UINT8,
+                                   STBIR_EDGE_CLAMP, static_cast<stbir_filter>(filter));
+        break;
+    case PixelType::U16:
+        // Ignore the return value because all preconditions have been checked
+        std::ignore = stbir_resize(reinterpret_cast<const void*>(r.data()), r.width(), r.height(),
+                                   r.byteStride(), reinterpret_cast<void*>(w.data()), w.width(), w.height(),
+                                   w.byteStride(), pixelLayout(source->pixelFormat()), STBIR_TYPE_UINT16,
+                                   STBIR_EDGE_CLAMP, static_cast<stbir_filter>(filter));
+        break;
+    case PixelType::F32:
+        // Ignore the return value because all preconditions have been checked
+        std::ignore = stbir_resize(reinterpret_cast<const void*>(r.data()), r.width(), r.height(),
+                                   r.byteStride(), reinterpret_cast<void*>(w.data()), w.width(), w.height(),
+                                   w.byteStride(), pixelLayout(source->pixelFormat()), STBIR_TYPE_FLOAT,
+                                   STBIR_EDGE_CLAMP, static_cast<stbir_filter>(filter));
+        break;
+    default:
+        BRISK_UNREACHABLE();
+    }
+}
+#else
 static int alphaChannelIndex(PixelFormat fmt) {
     return staticMap(fmt, PixelFormat::RGBA, 3, PixelFormat::BGRA, 3, PixelFormat::ARGB, 0, PixelFormat::ABGR,
                      0, STBIR_ALPHA_CHANNEL_NONE);
@@ -75,8 +135,9 @@ void imageResizeTo(RC<Image> destination, RC<Image> source, ResizingFilter filte
             STBIR_COLORSPACE_LINEAR, nullptr);
         break;
     default:
-        return;
+        BRISK_UNREACHABLE();
     }
 }
+#endif
 
 } // namespace Brisk

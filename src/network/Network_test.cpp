@@ -1,3 +1,4 @@
+#include <fmt/ranges.h>
 #include <catch2/catch_all.hpp>
 #include "../core/Catch2Utils.hpp"
 #include <brisk/network/Fetch.hpp>
