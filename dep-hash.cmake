@@ -7,12 +7,17 @@ file(GLOB_RECURSE FILES "${CMAKE_CURRENT_LIST_DIR}/cmake/ports/*" "${CMAKE_CURRE
 
 set(HASHES)
 
+message("-- Hashing files")
+
 foreach (FILE IN LISTS FILES)
     file(READ ${FILE} CONTENT)
     string(SHA256 HASH "${CONTENT}")
-    message("${FILE} -> ${HASH}")
+    file(RELATIVE_PATH REL_FILE ${CMAKE_CURRENT_LIST_DIR} ${FILE})
+    message("        ${REL_FILE} -> ${HASH}")
     list(APPEND HASHES "${HASH}")
 endforeach ()
 
-string(SHA256 GLOB_HASH "${HASHES}")
-message(STATUS ${GLOB_HASH})
+message("-- Combined hash is")
+
+string(SHA256 DEP_HASH "${HASHES}")
+message(STATUS ${DEP_HASH})

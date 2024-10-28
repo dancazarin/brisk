@@ -31,17 +31,7 @@ jobs:
     - name: Vcpkg
       shell: bash
       run: |
-        DEP_HASH=$(cmake -P dep-hash.cmake)
-        DEP_HASH=${DEP_HASH:3}
-        echo Hash is $DEP_HASH
-        if ! aws s3 ls "s3://gh-bin/brisk-deps/${{matrix.triplet}}-$DEP_HASH.7z"; then
-          echo "Archive does not exist on S3, trying to build"
-          vcpkg install --x-feature=icu
-          vcpkg export --7zip --output-dir="${{runner.temp}}" --output="${{matrix.triplet}}-$DEP_HASH"
-          aws s3 cp --acl public-read "${{runner.temp}}/${{matrix.triplet}}-$DEP_HASH.7z" s3://gh-bin/brisk-deps/
-        else
-          echo "Archive does exist on S3, skipping build"
-        fi
+        cmake -P upload-deps.cmake
 
   windows-deps:
     strategy:
@@ -60,19 +50,7 @@ jobs:
       uses: actions/checkout@v4
     - name: Vcpkg
       run: |
-        $DEP_HASH = & { cmake -P dep-hash.cmake }
-        $DEP_HASH = $DEP_HASH.Substring(3)
-        Write-Output "Hash is $DEP_HASH"
-        $S3Path = "s3://gh-bin/brisk-deps/${{matrix.triplet}}-$DEP_HASH.7z"
-        $S3Check = aws s3 ls $S3Path
-        if (-not $S3Check) {
-            Write-Output "Archive does not exist on S3, trying to build"
-            vcpkg install --x-feature=icu
-            vcpkg export --7zip --output-dir="${{runner.temp}}" --output="${{matrix.triplet}}-$DEP_HASH"
-            aws s3 cp --acl public-read "${{runner.temp}}/${{matrix.triplet}}-$DEP_HASH.7z" s3://gh-bin/brisk-deps/
-        } else {
-            Write-Output "Archive does exist on S3, skipping build"
-        }
+        cmake -P upload-deps.cmake
 
   macos-deps:
     strategy:
@@ -97,19 +75,8 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Vcpkg
-      shell: bash
       run: |
-        DEP_HASH=$(cmake -P dep-hash.cmake)
-        DEP_HASH=${DEP_HASH:3}
-        echo Hash is $DEP_HASH
-        if ! aws s3 ls "s3://gh-bin/brisk-deps/${{matrix.triplet}}-$DEP_HASH.7z"; then
-          echo "Archive does not exist on S3, trying to build"
-          vcpkg install --x-feature=icu
-          vcpkg export --7zip --output-dir="${{runner.temp}}" --output="${{matrix.triplet}}-$DEP_HASH"
-          aws s3 cp --acl public-read "${{runner.temp}}/${{matrix.triplet}}-$DEP_HASH.7z" s3://gh-bin/brisk-deps/
-        else
-          echo "Archive does exist on S3, skipping build"
-        fi
+        cmake -P upload-deps.cmake
 
   ubuntu-ninja-clang-x86_64:
     runs-on: ubuntu-latest
@@ -124,9 +91,9 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get install -y ninja-build mesa-vulkan-drivers vulkan-tools wget xorg-dev libgl-dev libgl1-mesa-dev libvulkan-dev autoconf autoconf-archive libxrandr-dev libxinerama-dev libxcursor-dev mesa-common-dev libx11-xcb-dev
         wget -O - https://apt.llvm.org/llvm.sh | sudo bash -s - 19
-    - name: Vcpkg
+    - name: Acquire dependencies
       run: |
-        vcpkg install --x-install-root vcpkg_installed --x-feature=icu
+        cmake -DDEP_BUILD=OFF -P acquire-deps.cmake
     - name: Configure
       run: |
         cmake -GNinja -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=clang++-19 -DCMAKE_C_COMPILER=clang-19
@@ -154,9 +121,9 @@ jobs:
     - name: Install prerequisites
       run: |
         sudo apt-get update && sudo apt-get install -y gcc-14 g++-14 ninja-build mesa-vulkan-drivers vulkan-tools wget xorg-dev libgl-dev libgl1-mesa-dev libvulkan-dev autoconf autoconf-archive libxrandr-dev libxinerama-dev libxcursor-dev mesa-common-dev libx11-xcb-dev
-    - name: Vcpkg
+    - name: Acquire dependencies
       run: |
-        vcpkg install --x-install-root vcpkg_installed --x-feature=icu
+        cmake -DDEP_BUILD=OFF -P acquire-deps.cmake
     - name: Configure
       run: |
         cmake -G"Unix Makefiles" -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_C_COMPILER=gcc-14
@@ -178,16 +145,16 @@ jobs:
     env:
       VCPKG_DEFAULT_TRIPLET: x64-windows-static-md
       VCPKG_DEFAULT_HOST_TRIPLET: x64-windows-static-md
+      LLVM_DIR: C:/Program Files/LLVM
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Install prerequisites
       run: |
         choco install ninja --no-progress -y
-    - name: Vcpkg
+    - name: Acquire dependencies
       run: |
-        set LLVM_DIR=C:/Program Files/LLVM
-        vcpkg install --x-install-root vcpkg_installed --x-feature=icu
+        cmake -DDEP_BUILD=OFF -P acquire-deps.cmake
     - name: Configure
       shell: cmd
       run: |
@@ -214,9 +181,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Vcpkg
+    - name: Acquire dependencies
       run: |
-        vcpkg install --x-install-root vcpkg_installed --x-feature=icu
+        cmake -DDEP_BUILD=OFF -P acquire-deps.cmake
     - name: Configure
       shell: cmd
       run: |
@@ -242,9 +209,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Vcpkg
+    - name: Acquire dependencies
       run: |
-        vcpkg install --x-install-root vcpkg_installed --x-feature=icu
+        cmake -DDEP_BUILD=OFF -P acquire-deps.cmake
     - name: Configure
       shell: cmd
       run: |
@@ -274,14 +241,14 @@ jobs:
       run: |
         brew install ninja autoconf automake autoconf-archive
         git clone https://github.com/microsoft/vcpkg "$HOME/vcpkg"
-    - name: Vcpkg
-      run: |
-        export VCPKG_ROOT="$HOME/vcpkg"
         $HOME/vcpkg/bootstrap-vcpkg.sh -disableMetrics
-        $HOME/vcpkg/vcpkg install --x-install-root vcpkg_installed --x-feature=icu
+        echo "VCPKG_ROOT=$HOME/vcpkg" >> $GITHUB_ENV
+        echo "$HOME/vcpkg" >> "$GITHUB_PATH"
+    - name: Acquire dependencies
+      run: |
+        cmake -DDEP_BUILD=OFF -P acquire-deps.cmake
     - name: Configure
       run: |
-        export VCPKG_ROOT="$HOME/vcpkg"
         cmake -GNinja -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DCMAKE_OSX_ARCHITECTURES=arm64 -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
     - name: Build
       run: |
@@ -307,15 +274,12 @@ jobs:
     - name: Install prerequisites
       run: |
         brew install ninja autoconf automake autoconf-archive
-        git clone https://github.com/microsoft/vcpkg "$HOME/vcpkg"
-    - name: Vcpkg
+        env
+    - name: Acquire dependencies
       run: |
-        export VCPKG_ROOT="$HOME/vcpkg"
-        $HOME/vcpkg/bootstrap-vcpkg.sh -disableMetrics
-        $HOME/vcpkg/vcpkg install --x-install-root vcpkg_installed --x-feature=icu
+        cmake -DDEP_BUILD=OFF -P acquire-deps.cmake
     - name: Configure
       run: |
-        export VCPKG_ROOT="$HOME/vcpkg"
         cmake -GNinja -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DCMAKE_OSX_ARCHITECTURES=x86_64 -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
     - name: Build
       run: |
