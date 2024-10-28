@@ -242,14 +242,14 @@ jobs:
         brew install ninja autoconf automake autoconf-archive
         git clone https://github.com/microsoft/vcpkg "$HOME/vcpkg"
         $HOME/vcpkg/bootstrap-vcpkg.sh -disableMetrics
-        echo "VCPKG_ROOT=$HOME/vcpkg" >> $GITHUB_ENV
+        echo "VCPKG_INSTALLATION_ROOT=$HOME/vcpkg" >> $GITHUB_ENV
         echo "$HOME/vcpkg" >> "$GITHUB_PATH"
     - name: Acquire dependencies
       run: |
         cmake -DDEP_BUILD=OFF -P acquire-deps.cmake
     - name: Configure
       run: |
-        cmake -GNinja -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DCMAKE_OSX_ARCHITECTURES=arm64 -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        cmake -GNinja -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DCMAKE_OSX_ARCHITECTURES=arm64 -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
     - name: Build
       run: |
         cmake --build build --target install
@@ -280,7 +280,7 @@ jobs:
         cmake -DDEP_BUILD=OFF -P acquire-deps.cmake
     - name: Configure
       run: |
-        cmake -GNinja -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DCMAKE_OSX_ARCHITECTURES=x86_64 -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        cmake -GNinja -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DVCPKG_MANIFEST_MODE=OFF -DCMAKE_OSX_ARCHITECTURES=x86_64 -DVCPKG_INSTALLED_DIR=vcpkg_installed -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DBRISK_LOG_TO_STDERR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
     - name: Build
       run: |
         cmake --build build --target install
