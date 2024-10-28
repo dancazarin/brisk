@@ -21,6 +21,80 @@ Brisk is a modern, cross-platform C++ GUI toolkit focused on building responsive
 - **Unicode Support**: Full UTF-8/16/32 support, including RTL text rendering and basic localization.
 - **Modular Architecture**: Core, Graphics, Window, GUI, and Widgets modules for versatile application development.
 
+### Code Example
+
+#### Component example
+
+```c++
+const NameValueOrderedList<TextAlign> textAlignList{ { "Start", TextAlign::Start },
+                                                     { "Center", TextAlign::Center },
+                                                     { "End", TextAlign::End } };
+
+class Example : public Component {
+public:
+    RC<Widget> build() final {
+        // rcnew Widget{...} is equivalent to std::shared_ptr<Widget>(new Widget{...})
+        return rcnew Widget{
+            layout = Layout::Vertical,
+            new Text{
+                "Switch (widgets/Switch.hpp)",
+                classes = { "section-header" }, // Widgets can be styled using stylesheets
+            },
+
+            new HLayout{
+                new Widget{
+                    new Switch{
+                        // Bind the switch value to the m_toggled variable (bidirectional)
+                        value = Value{ &m_toggled },
+                        new Text{ "Switch" },
+                    },
+                },
+                gapColumn = 10_apx, // CSS Flex-like properties
+                new Text{
+                    text = Value{ &m_label }, // Text may be dynamic
+                    visible =
+                        Value{ &m_toggled }, // The Switch widget controls the visibility of this text widget
+                },
+            },
+
+            // Button widget
+            new Button{
+                new Text{ "Click" },
+                // Using m_lifetime ensures that callbacks will be detached once the Component is deleted
+                onClick = m_lifetime |
+                          [this]() {
+                              // Notify bindings about the change
+                              bindings->assign(m_label) = "Updated text";
+                          },
+            },
+
+            // ComboBox widget
+            new ComboBox{
+                Value{ &m_textAlignment },  // Bind ComboBox value to an enumeration
+                notManaged(&textAlignList), // Pass the list of name-value pairs to populate the ComboBox
+            },
+
+            // The Builder creates widgets dynamically whenever needed
+            Builder([this](Widget* target) {
+                for (int i = 0; i < m_number; ++i) {
+                    target->apply(new Widget{
+                        dimensions = { 40_apx, 40_apx },
+                    });
+                }
+            }),
+            depends = Value{ &m_number }, // Instructs to rebuild this if m_number changes
+        };
+    }
+
+private:
+    bool m_toggled            = false;
+    TextAlign m_textAlignment = TextAlign::Start;
+    std::string m_label       = "OK";
+    float m_progress          = 0;
+    int m_number              = 0;
+};
+```
+
 ### Screenshots
 
 <img src="docs/images/Brisk-screenshot1.png" width="400" alt="Brisk screenshot"/> <img src="docs/images/Brisk-screenshot2.png" width="400" alt="Brisk screenshot"/> <img src="docs/images/Brisk-screenshot3.png" width="400" alt="Brisk screenshot"/>
@@ -58,6 +132,7 @@ Brisk is a modern, cross-platform C++ GUI toolkit focused on building responsive
    - **Style Sheets**: Styles your widgets using a stylesheet system that supports property inheritance.
    - **Binding Support**: Data-binding between UI elements and application data. Supports transforming values using a function on-the-fly and compound values (e.g., sums of other values).
    - **Stateful and Stateless Modes**: Choose between stateful widgets for persistent state or stateless widgets for easily rebuilding widget subtrees.
+   - **Drag-and-Drop**: Supports drag-and-drop within the GUI, with the option to attach a C++ object to represent the dragged data.
 
 #### **Widgets**
    - **Widgets**: Includes buttons, lists, comboboxes, toggle switches, radio buttons, progress bars, sliders, scroll boxes, checkboxes, popup buttons, tabs, tables, spin boxes, dialogs, and more. All public properties are styleable and bindable.
@@ -66,7 +141,7 @@ Brisk is a modern, cross-platform C++ GUI toolkit focused on building responsive
 
 ### Requirements ⚙️
 - **C++20 Compiler**: Brisk requires a C++20-compatible compiler such as MSVC 2022, Clang, XCode, or GCC.
-- **Dependency Management**: Uses [vcpkg](https://github.com/microsoft/vcpkg) to manage dependencies across platforms, simplifying the build process.
+- **Dependency Management**: Uses [vcpkg](https://github.com/microsoft/vcpkg) to manage dependencies across platforms, simplifying the build process. Alternatively, you can download prebuilt binaries.
 
 ### Platform Support
 
@@ -86,7 +161,7 @@ Brisk is a modern, cross-platform C++ GUI toolkit focused on building responsive
 | macOS   | macOS 11 Big Sur                |
 | Linux   | n/a                             |
 
-### Graphics Backend Support
+#### Graphics Backend Support
 
 |         | Backends                        |
 |---------|---------------------------------|
@@ -96,14 +171,16 @@ Brisk is a modern, cross-platform C++ GUI toolkit focused on building responsive
 
 ### Example Projects
 
-The `examples` directory contains projects that showcase how to use the Brisk library.  
+The `examples` directory contains projects that showcase how to use the Brisk library. 
+
 For a minimal example, check out the [brisk-helloworld](https://github.com/brisklib/brisk-helloworld) repository.
 
 ### Development 💻
 
 Brisk is in active development, and we welcome contributions and feedback from the community to improve and expand the toolkit.
 
-The `main` branch contains the latest features and generally passes all built-in tests ✅.
+The `main` branch contains the latest features and generally passes all built-in tests ✅. Other branches are reserved for feature development and may be force-pushed.
 
 ### License 📜
+
 Brisk is licensed under the **GPL v2.0** or later. However, for those who wish to use Brisk in proprietary or closed-source applications, a **commercial license** is also available. For more details on commercial licensing, please contact us at [brisk@brisklib.com](mailto:brisk@brisklib.com).
