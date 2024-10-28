@@ -23,6 +23,7 @@
 #include <tuple>
 #include <atomic>
 #include <utility>
+#include <memory>
 #include <vector>
 #include <type_traits>
 #include "Brisk.h"

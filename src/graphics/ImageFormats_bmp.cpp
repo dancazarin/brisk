@@ -33,7 +33,6 @@
 BRISK_GNU_ATTR_PRAGMA(GCC diagnostic push)
 BRISK_GNU_ATTR_PRAGMA(GCC diagnostic ignored "-Wunused-function")
 #include <stb_image.h>
-#include <stb_image_resize.h>
 #include <stb_image_write.h>
 BRISK_GNU_ATTR_PRAGMA(GCC diagnostic pop)
 
