@@ -255,3 +255,13 @@ install(
     EXPORT BriskTargets
     DESTINATION "${BRISK_INSTALL_CMAKEDIR}"
     CONFIGURATIONS Debug Release)
+
+set(DEP_HASH_SILENT ON)
+include(dep-hash.cmake)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Package-README.me.in ${CMAKE_CURRENT_BINARY_DIR}/Package-README.me)
+
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/Package-README.me
+    RENAME README.md
+    DESTINATION .)
