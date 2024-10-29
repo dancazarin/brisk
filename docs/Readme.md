@@ -1,3 +1,1 @@
-# Brisk documentation
-
-* [Getting Started](GettingStarted.md)
+See [Documentation Index](docs/index.md)

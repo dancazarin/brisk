@@ -58,9 +58,9 @@ These directories are relocatable, so you can move them to another directory or 
 
 Brisk is tested with the following triplets:
 
-- **Linux**: `x64-linux`
-- **Windows**: `x64-windows-static-md` and `x86-windows-static-md`
-- **macOS**: `x64-osx` and `arm64-osx`
+- **Linux**: `x64-linux` (x86_64 aka AMD64)
+- **Windows**: `x64-windows-static-md` (x86_64 aka AMD64) and `x86-windows-static-md` (Intel x86)
+- **macOS**: `x64-osx` (Intel 64-bit Macs) and `arm64-osx` (Apple Silicon)
 
 > [!warning]
 > Currently, Brisk only supports static linking; dynamic linking will be available in a future release.

@@ -1,4 +1,4 @@
-# Installing a C++ Compiler
+# Installing Prerequisites
 
 ## Windows
 

@@ -1,0 +1,64 @@
+site_name: Brisk
+theme:
+  name: 'material'
+  features:
+    - navigation.tabs
+    - navigation.top
+  palette: 
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/brightness-7 
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    
+extra:
+  search:
+    language: en
+
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: 'https://github.com/brisklib'
+    - icon: fontawesome/brands/twitter
+      link: 'https://twitter.com/brisklib'
+
+copyright: 'Copyright &copy; 2024 Brisk'
+
+plugins:
+    - search
+
+markdown_extensions:
+  - admonition
+  - footnotes
+  - meta
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.details
+  - pymdownx.magiclink
+  - pymdownx.tabbed:
+      alternate_style: true
+
+repo_url: https://github.com/brisklib/brisk
+repo_name: Brisk
+edit_uri: edit/main/docs/
+
+nav:
+  - Brisk:
+    - index.md
+    - getting_started.md
+    - prerequisites.md
+    - prebuilt_binaries.md
+  - Reference:
+    - auto/refindex.md
+
+  - brisklib.com: https://brisklib.com
