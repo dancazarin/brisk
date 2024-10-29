@@ -1,6 +1,6 @@
 set(ROOT ${CMAKE_CURRENT_LIST_DIR})
 
-set(URL https://gh-bin.fra1.digitaloceanspaces.com/brisk-deps/{TRIPLET}-{DEP_HASH}.7z)
+set(URL https://download.brisklib.com/brisk-deps/{TRIPLET}-{DEP_HASH}.7z)
 
 if (DEFINED ENV{VCPKG_TARGET_TRIPLET})
     set(VCPKG_TARGET_TRIPLET $ENV{VCPKG_TARGET_TRIPLET})
