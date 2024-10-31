@@ -33,6 +33,7 @@ enum class OpenTypeFeature : uint8_t {
     curs,  /**< Cursive Positioning */
     cv01,  /**< Character Variants (1) */
     cv02,  /**< Character Variants (2) */
+#ifndef DOCUMENTATION
     cv03,
     cv04,
     cv05,
@@ -130,6 +131,7 @@ enum class OpenTypeFeature : uint8_t {
     cv97,
     cv98,
     cv99, /**< Character Variants (99) */
+#endif
     c2pc, /**< Petite Capitals From Capitals */
     c2sc, /**< Small Capitals From Capitals */
     dist, /**< Distances */
@@ -211,6 +213,7 @@ enum class OpenTypeFeature : uint8_t {
     ss01, /**< Stylistic Set 1 */
     ss02, /**< Stylistic Set 2 */
     ss03, /**< Stylistic Set 3 */
+#ifndef DOCUMENTATION
     ss04, /**< Stylistic Set 4 */
     ss05, /**< Stylistic Set 5 */
     ss06, /**< Stylistic Set 6 */
@@ -228,6 +231,7 @@ enum class OpenTypeFeature : uint8_t {
     ss18, /**< Stylistic Set 18 */
     ss19, /**< Stylistic Set 19 */
     ss20, /**< Stylistic Set 20 */
+#endif
     ssty, /**< Script Style */
     stch, /**< Stretching Glyph Deformation */
     subs, /**< Subscript */

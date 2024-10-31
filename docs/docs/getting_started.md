@@ -1,6 +1,6 @@
 # Getting Started
 
-This tutorial assumes familiarity with Git, CMake, and C++. Additionally, a modern C++ compiler is required. For setup details, refer to [Installing a C++ Compiler](Compiler.md).
+This tutorial assumes familiarity with Git, CMake, and C++. Additionally, a modern C++ compiler is required. For setup details, refer to [Installing Prerequisites](prerequisites.md).
 
 ## Fetching the Brisk Source Code
 
@@ -28,7 +28,7 @@ In this case, updating requires downloading a new archive and replacing the dire
 ## Building Brisk
 
 > [!note]
-> You can also download prebuilt binaries from our build server (see [Prebuilt Binaries](PrebuiltBinaries.md)). Extract the archive to a directory and skip this section.
+> You can also download prebuilt binaries from our build server (see [Prebuilt Binaries](prebuilt_binaries.md)). Extract the archive to a directory and skip this section.
 
 The recommended way to build the Brisk library is with Ninja:
 ```bash

@@ -51,7 +51,7 @@ struct RCNew {
 };
 
 /** @brief Instance of RCNew used for creating reference-counted pointers.
- *  @see RCNew
+ *  @see @ref RCNew
  */
 constexpr inline RCNew rcNew{};
 

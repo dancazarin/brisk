@@ -181,12 +181,11 @@ inline std::string operator""_tr() noexcept {
  * @tparam s The fixed string for formatting.
  * @return A LocaleFormatString object.
  *
- * @example
- * ```cpp
+ * @code
  * constexpr auto welcomeMessage = "welcome_msg"_trfmt;  // Creates a LocaleFormatString for "welcome_msg".
  * std::string formattedMessage = welcomeMessage("John");  // Formats the message with the name "John".
  * std::cout << formattedMessage;  // Output: "Welcome, John!" if the translation is "Welcome, {0}!".
- * ```
+ * @endcode
  */
 template <Internal::FixedString s>
 constexpr LocaleFormatString<s> operator""_trfmt() noexcept {

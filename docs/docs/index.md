@@ -5,7 +5,7 @@ The Brisk library is in the alpha stage, so there may be breaking changes, and t
 ## Getting started
 
 * [Getting Started](getting_started.md)
-* [Installing Prerequisites](compiler.md)
+* [Installing Prerequisites](prerequisites.md)
 * [Prebuilt Binaries](prebuilt_binaries.md)
 
 ## Function reference

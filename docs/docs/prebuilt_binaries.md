@@ -30,7 +30,7 @@ Alternatively, you can choose to build the Brisk library from source.
 
 This approach is useful if you plan to modify Brisk's source code to suit your needs. Refer to the license text for details on your rights and obligations regarding code modification and redistribution.
 
-To download only the prebuilt dependencies, use the following command. Set the `VCPKG_DEFAULT_TRIPLET` or `VCPKG_TARGET_TRIPLET` environment variable to match your system's architecture (see [List of Available Triplets](GettingStarted.md#vcpkg-triplets)).
+To download only the prebuilt dependencies, use the following command. Set the `VCPKG_DEFAULT_TRIPLET` or `VCPKG_TARGET_TRIPLET` environment variable to match your system's architecture (see [List of Available Triplets](getting_started.md#vcpkg-triplets)).
 
 ```bash
 cd brisk/repository

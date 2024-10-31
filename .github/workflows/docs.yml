@@ -1,0 +1,55 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["docs"]
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: brisk
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: kfrlib/cxxdox
+          path: cxxdox
+      - name: Build CxxDox
+        run: |
+          docker build -t cxxdox:latest cxxdox
+      - name: Build documentation
+        run: |
+          mkdir "$(pwd)/out"
+          mkdir "$(pwd)/data"
+          docker run --rm -v "$(pwd)/brisk:/src" -v "$(pwd)/out":/out -v "$(pwd)/data":/data cxxdox:latest docs
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out/site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

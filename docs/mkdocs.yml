@@ -58,6 +58,14 @@ nav:
     - getting_started.md
     - prerequisites.md
     - prebuilt_binaries.md
+  - Modules:
+    - auto/core.md
+    - auto/graphics.md
+    - auto/window.md
+    - auto/gui.md
+    - auto/widgets.md
+    - auto/network.md
+    - auto/internal.md
   - Reference:
     - auto/refindex.md
 
