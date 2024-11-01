@@ -84,10 +84,10 @@ if (NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg.cmake" AND NOT DEFINED HAS_VCPKG)
         ${CMAKE_SOURCE_DIR}/vcpkg_installed
         CACHE PATH "")
 
-    if (NOT VCPKG_TARGET_TRIPLET)
+    if (NOT DEFINED VCPKG_TARGET_TRIPLET)
         if (WIN32)
-            set(VCPKG_HOST_TRIPLET "x64-windows-static-md")
-            set(VCPKG_TARGET_TRIPLET ${VCPKG_HOST_TRIPLET})
+            set(VCPKG_HOST_TRIPLET "x64-windows-static-md" CACHE STRING "" FORCE)
+            set(VCPKG_TARGET_TRIPLET ${VCPKG_HOST_TRIPLET} CACHE STRING "" FORCE)
         endif ()
     endif ()
 
