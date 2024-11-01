@@ -34,28 +34,39 @@ set(VCPKG_OVERLAY_PORTS
 
 list(APPEND CMAKE_MODULE_PATH ${BRISK_ROOT}/cmake/packages)
 
-if (NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg.cmake")
+if (NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg.cmake" AND NOT DEFINED HAS_VCPKG)
 
     if (CMAKE_TOOLCHAIN_FILE)
         message(
             WARNING
-                "CMAKE_TOOLCHAIN_FILE is set but does not point to a vcpkg toolchain. Make sure that vcpkg is installed and can be used by Brisk"
-        )
-    else ()
-        message(STATUS "Downloading vcpkg to use with Brisk...")
+                "CMAKE_TOOLCHAIN_FILE is set but does not point to a vcpkg toolchain. "
+                "Make sure that vcpkg is installed and can be used by Brisk. "
+                "Define HAS_VCPKG to indicate that Vcpkg toolchain is loaded")
     endif ()
 
     set(VCPKG_ROOT
         ${CMAKE_SOURCE_DIR}/vcpkg
         CACHE PATH "")
 
-    include(FetchContent)
-    FetchContent_Declare(
-        vcpkg
-        GIT_REPOSITORY https://github.com/microsoft/vcpkg/
-        GIT_TAG 2024.07.12
-        SOURCE_DIR ${VCPKG_ROOT})
-    FetchContent_MakeAvailable(vcpkg)
+    find_program(
+        VCPKG_TOOL
+        NAMES vcpkg
+        PATHS ${VCPKG_ROOT}
+        NO_DEFAULT_PATH)
+
+    if (VCPKG_TOOL)
+        message(STATUS "Vcpkg executable found at ${VCPKG_TOOL}")
+    else ()
+        message(STATUS "Downloading vcpkg to use with Brisk...")
+
+        include(FetchContent)
+        FetchContent_Declare(
+            vcpkg
+            GIT_REPOSITORY https://github.com/microsoft/vcpkg/
+            GIT_TAG 2024.07.12
+            SOURCE_DIR ${VCPKG_ROOT})
+        FetchContent_MakeAvailable(vcpkg)
+    endif ()
 
     set(VCPKG_MANIFEST_MODE
         TRUE
@@ -63,6 +74,8 @@ if (NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg.cmake")
     set(VCPKG_MANIFEST_DIR
         ${BRISK_ROOT}
         CACHE PATH "")
+
+    set(ENV{VCPKG_ROOT} ${VCPKG_ROOT})
 
     set(CMAKE_TOOLCHAIN_FILE
         ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
