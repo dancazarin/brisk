@@ -8,6 +8,11 @@ The Brisk library is in the alpha stage, so there may be breaking changes, and t
 * [Installing Prerequisites](prerequisites.md)
 * [Prebuilt Binaries](prebuilt_binaries.md)
 
+## Examples
+
+* [Hello, world example](hello_world.md)
+* [Other examples](other_examples.md)
+
 ## Reference
 
 > [!note] 

@@ -31,10 +31,13 @@ In this case, updating requires downloading a new archive and replacing the dire
 > You can also download prebuilt binaries from our build server (see [Prebuilt Binaries](prebuilt_binaries.md)). Extract the archive to a directory and skip this section.
 
 The recommended way to build the Brisk library is with Ninja:
+
 ```bash
 cd path/to/brisk/repo
-cmake -GNinja -S . -B build -DCMAKE_INSTALL_PREFIX=dist -DCMAKE_BUILD_TYPE=RelWithDebInfo
-cmake --build build --config RelWithDebInfo --target install
+cmake -GNinja -S . -B build-release -DCMAKE_INSTALL_PREFIX=dist -DCMAKE_BUILD_TYPE=Release
+cmake --build build-release --target install
+cmake -GNinja -S . -B build-debug -DCMAKE_INSTALL_PREFIX=dist -DCMAKE_BUILD_TYPE=Debug
+cmake --build build-debug --target install
 ```
 
 `CMAKE_INSTALL_PREFIX` specifies the directory where the static libraries and header files will be placed after building.
