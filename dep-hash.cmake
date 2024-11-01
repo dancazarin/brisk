@@ -3,7 +3,9 @@
 
 # GLOB_RECURSE returns sorted list of files
 file(GLOB_RECURSE FILES "${CMAKE_CURRENT_LIST_DIR}/cmake/ports/*" "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchains/*"
-     "${CMAKE_CURRENT_LIST_DIR}/cmake/triplets/*" "${CMAKE_CURRENT_LIST_DIR}/vcpkg.json")
+     "${CMAKE_CURRENT_LIST_DIR}/cmake/triplets/*")
+
+list(APPEND FILES "${CMAKE_CURRENT_LIST_DIR}/vcpkg.json")
 
 set(HASHES)
 
