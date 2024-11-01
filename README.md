@@ -2,7 +2,7 @@
 
 Brisk is a modern, cross-platform C++ GUI toolkit focused on building responsive, high-performance applications with flexibility and ease.
 
-🚧 The Brisk library is currently under active development and will remain in the Alpha stage for the next few releases. After that, it will transition to Beta. During this period, expect breaking changes and incomplete documentation
+🚧 The Brisk library is currently under active development and will remain in the Alpha stage for the next few releases. After that, it will transition to Beta. During this period, there may be breaking changes, and the documentation may not always be up to date.
 
 ![Build](https://img.shields.io/github/actions/workflow/status/brisklib/brisk/test.yml?style=flat-square&label=Build) 
 ![License](https://img.shields.io/badge/License-GPL2%2FCommercial-blue.svg?style=flat-square)
