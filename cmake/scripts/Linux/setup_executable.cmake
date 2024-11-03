@@ -19,5 +19,5 @@
 #
 function (setup_executable_platform TARGET)
 
-    target_sources(${TARGET} PRIVATE ${brisk_SOURCE_DIR}/include/brisk/application/main/Main_Linux.cpp)
+    target_sources(${TARGET} PRIVATE ${_BRISK_INCLUDE_DIR}/brisk/application/main/Main_Linux.cpp)
 endfunction ()

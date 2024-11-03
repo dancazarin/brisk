@@ -22,7 +22,7 @@ function (setup_executable_platform TARGET)
 
     set_target_properties(${TARGET} PROPERTIES MACOSX_BUNDLE TRUE)
 
-    configure_file(${brisk_SOURCE_DIR}/include/brisk/application/main/MacOSXBundleInfo.plist.in
+    configure_file(${_BRISK_INCLUDE_DIR}/brisk/application/main/MacOSXBundleInfo.plist.in
                    ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.MacOSXBundleInfo.plist @ONLY)
 
     set_target_properties(${TARGET} PROPERTIES MACOSX_BUNDLE_INFO_PLIST
@@ -56,5 +56,5 @@ function (setup_executable_platform TARGET)
     endif ()
 
     target_sources(${TARGET} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.MacOSXBundleInfo.plist)
-    target_sources(${TARGET} PRIVATE ${brisk_SOURCE_DIR}/include/brisk/application/main/Main_Darwin.mm)
+    target_sources(${TARGET} PRIVATE ${_BRISK_INCLUDE_DIR}/brisk/application/main/Main_Darwin.mm)
 endfunction ()
