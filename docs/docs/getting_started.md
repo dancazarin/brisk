@@ -50,6 +50,11 @@ cd path/to/brisk/repo
 vcpkg export --raw --output-dir=. --output=vcpkg_exported
 ```
 
+> [!note]
+> If Vcpkg is not installed globally, Brisk will check out the Vcpkg repository at `path/to/brisk/repo/vcpkg` and use this local copy to build dependencies. In this case, the command above should be modified as follows:
+> - For Linux/macOS: `vcpkg/vcpkg export --raw --output-dir=. --output=vcpkg_exported`
+> - For Windows: `vcpkg\vcpkg export --raw --output-dir=. --output=vcpkg_exported`
+
 After executing the above commands, you’ll get the following directories:
 
 1. `dist` — stores Brisk’s static libraries and headers.
