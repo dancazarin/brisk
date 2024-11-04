@@ -55,35 +55,6 @@ TEST_CASE("Hashing algorithm validations") {
     CHECK(h == SHA256Hash("D7A8FBB307D7809469CA9ABCB0082E4F8D5651E46D3CDB762D02D0BF37C9E592"));
 }
 
-static const AESKey key = sha256("password");
-static const AESIV iv("8B62C732C7F7956914ADACF31E159B18");
-static const bytes encrypted{ 0x86, 0x43, 0x01, 0x0A, 0x5C, 0x22, 0xFF, 0x1D, 0xFC, 0x38, 0x15,
-                              0xA7, 0xC6, 0xEA, 0x71, 0xA1, 0x07, 0xA2, 0x5A, 0x31, 0x67, 0x41,
-                              0x84, 0x7B, 0xB2, 0x88, 0x1C, 0x91, 0xE9, 0x67, 0x1F, 0xFE, 0x74,
-                              0xA7, 0x3B, 0x53, 0x31, 0x88, 0xFF, 0x93, 0x9B, 0x59, 0x8F };
-
-TEST_CASE("AES encryption & decryption") {
-    Bytes bytes = aesCFBEncode(toBytesView(pangram), key, iv);
-    CHECK(bytes.size() == pangram.size());
-    CHECK(bytes == encrypted);
-
-    CHECK(toBytesView(aesCFBDecode(encrypted, key, iv)) == toBytesView(pangram));
-}
-
-TEST_CASE("aesCFBEncoder functionality") {
-    RC<MemoryStream> mem = rcnew MemoryStream();
-    RC<Stream> aes       = aesCFBEncoder(mem, key, iv);
-    REQUIRE(aes->writeAll(toBytesView(pangram)));
-    REQUIRE(mem->size() == pangram.size());
-    CHECK(mem->data() == encrypted);
-}
-
-TEST_CASE("aesCFBDecoder functionality") {
-    RC<Stream> mem = rcnew ByteViewStream(encrypted);
-    RC<Stream> aes = aesCFBDecoder(mem, key, iv);
-    CHECK(aes->readUntilEnd() == toBytes(pangram));
-}
-
 TEST_CASE("Random number generation") {
     fmt::print("{}\n", toHex(cryptoRandom(32)));
 }

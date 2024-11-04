@@ -78,7 +78,14 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/core/Threading${PLATFORM_SPECIFIC_CPP}
     ${PROJECT_SOURCE_DIR}/src/core/System${PLATFORM_SPECIFIC_CPP}
     ${PROJECT_SOURCE_DIR}/src/core/IO${PLATFORM_SPECIFIC_CPP}
-    ${PROJECT_SOURCE_DIR}/src/core/DynamicLibrary${PLATFORM_SPECIFIC_CPP})
+    ${PROJECT_SOURCE_DIR}/src/core/DynamicLibrary${PLATFORM_SPECIFIC_CPP}
+    ${PROJECT_SOURCE_DIR}/src/core/Cryptography${PLATFORM_SPECIFIC_CPP}
+    ${PROJECT_SOURCE_DIR}/src/core/hash/md5.c
+    ${PROJECT_SOURCE_DIR}/src/core/hash/sha1.c
+    ${PROJECT_SOURCE_DIR}/src/core/hash/sha256.c
+    ${PROJECT_SOURCE_DIR}/src/core/hash/sha512.c
+    ${PROJECT_SOURCE_DIR}/src/core/hash/sha3.c
+    )
 
 if (WIN32)
     target_sources(brisk-core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/COMInit.cpp)

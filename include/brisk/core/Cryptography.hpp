@@ -35,71 +35,6 @@ public:
     using Exception<std::runtime_error>::Exception;
 };
 
-namespace Internal {
-void registerAlgorithms();
-}
-
-using AESKey = FixedBits<256>; ///< Alias for AES key (256 bits)
-using AESIV  = FixedBits<128>; ///< Alias for AES initialization vector (128 bits)
-
-/**
- * @brief Encrypts data using AES algorithm in CFB mode.
- *
- * @param plaintext The plaintext data to encode.
- * @param key The AES key (256 bits).
- * @param iv The initialization vector (128 bits).
- * @return The encrypted data as a `bytes` object.
- */
-[[nodiscard]] bytes aesCFBEncode(bytes_view plaintext, const AESKey& key, const AESIV& iv);
-
-/**
- * @brief Encrypts data using AES algorithm in CFB mode (in-place).
- *
- * @param data The data to encode.
- * @param key The AES key (256 bits).
- * @param iv The initialization vector (128 bits).
- */
-void aesCFBEncodeInplace(bytes_mutable_view data, const AESKey& key, const AESIV& iv);
-
-/**
- * @brief Decrypts data using AES algorithm in CFB mode.
- *
- * @param ciphertext The ciphertext data to decode.
- * @param key The AES key (256 bits).
- * @param iv The initialization vector (128 bits).
- * @return The decrypted data as a `bytes` object.
- */
-[[nodiscard]] bytes aesCFBDecode(bytes_view ciphertext, const AESKey& key, const AESIV& iv);
-
-/**
- * @brief Decrypts data using AES algorithm in CFB mode (in-place).
- *
- * @param data The data to decode.
- * @param key The AES key (256 bits).
- * @param iv The initialization vector (128 bits).
- */
-void aesCFBDecodeInplace(bytes_mutable_view data, const AESKey& key, const AESIV& iv);
-
-/**
- * @brief Creates a RC<Stream> for AES CFB decoding.
- *
- * @param reader The input RC<Stream>.
- * @param key The AES key (256 bits).
- * @param iv The initialization vector (128 bits).
- * @return A RC<Stream> for decoding.
- */
-[[nodiscard]] RC<Stream> aesCFBDecoder(RC<Stream> reader, const AESKey& key, const AESIV& iv);
-
-/**
- * @brief Creates a RC<Stream> for AES CFB encoding.
- *
- * @param writer The output RC<Stream>.
- * @param key The AES key (256 bits).
- * @param iv The initialization vector (128 bits).
- * @return A RC<Stream> for encoding.
- */
-[[nodiscard]] RC<Stream> aesCFBEncoder(RC<Stream> writer, const AESKey& key, const AESIV& iv);
-
 /**
  * @brief Retrieves cryptographically secure random bytes.
  *
@@ -157,6 +92,34 @@ enum class HashMethod {
     SHA3_512,       ///< SHA3-512 hashing method
     Last = SHA3_512 ///< Sentinel value for the last hash method
 };
+
+constexpr auto operator+(HashMethod x) noexcept {
+    return static_cast<std::underlying_type_t<decltype(x)>>(x);
+}
+
+/**
+ * @brief Returns the output bit size of the specified hash method.
+ *
+ * @param method The hash method for which to retrieve the bit size.
+ * @return The bit size of the hash output for the given method.
+ *         Returns 0 if the method is unrecognized.
+ */
+constexpr size_t hashBitSize(HashMethod method) {
+    switch (method) {
+    case HashMethod::MD5:
+        return 128;
+    case HashMethod::SHA1:
+        return 160;
+    case HashMethod::SHA256:
+    case HashMethod::SHA3_256:
+        return 256;
+    case HashMethod::SHA512:
+    case HashMethod::SHA3_512:
+        return 512;
+    default:
+        return 0;
+    }
+}
 
 /**
  * @brief Provides names for hash methods.
@@ -337,7 +300,7 @@ struct Hasher {
     HashMethod method;
 
     /** Internal state of the hasher. */
-    FixedBytes<416> state;
+    alignas(8) FixedBytes<416> state;
 };
 
 /**

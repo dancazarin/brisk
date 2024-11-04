@@ -30,12 +30,6 @@
             "name": "libjpeg-turbo"
         },
         {
-            "name": "libtomcrypt"
-        },
-        {
-            "name": "libtommath"
-        },
-        {
             "name": "lunasvg"
         },
         {
