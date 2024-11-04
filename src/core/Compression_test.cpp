@@ -27,7 +27,13 @@
 
 namespace Brisk {
 
-void testCompression(CompressionMethod method, string ext) {
+void testCompression(CompressionMethod method, CompressionLevel level, const string& ext, size_t readSize,
+                     size_t writeSize, size_t batchSize) {
+    INFO("method=" << fmt::to_string(method));
+    INFO("readSize=" << readSize);
+    INFO("writeSize=" << writeSize);
+    INFO("batchSize=" << batchSize);
+    INFO("level=" << static_cast<int>(level));
 
     fs::path loremIpsumText   = tempFilePath("compression????????.txt");
     fs::path loremIpsumComp   = tempFilePath("compression????????." + ext);
@@ -39,15 +45,18 @@ void testCompression(CompressionMethod method, string ext) {
         fs::remove(loremIpsumUncomp, ec);
     };
 
-    CHECK(toStringView(compressionDecode(method, compressionEncode(method, toBytesView(loremIpsum),
-                                                                   CompressionLevel::Normal))) == loremIpsum);
+    Internal::compressionBatchSize = batchSize;
+
+    CHECK(toStringView(compressionDecode(
+              method, compressionEncode(method, toBytesView(loremIpsum), level))) == loremIpsum);
 
     REQUIRE(writeUtf8(loremIpsumText, loremIpsum).has_value());
 
+    // Compression
     if (auto rd = openFileForReading(loremIpsumText)) {
         if (auto wr = openFileForWriting(loremIpsumComp)) {
-            auto gz     = compressionEncoder(method, *wr, CompressionLevel::Highest);
-            std::ignore = writeFromReader(gz, *rd, 8192);
+            auto gz     = compressionEncoder(method, *wr, level);
+            std::ignore = writeFromReader(gz, *rd, writeSize);
         } else {
             FAIL("Cannot open compressed file for writing");
         }
@@ -55,10 +64,14 @@ void testCompression(CompressionMethod method, string ext) {
         FAIL("Cannot open file for reading");
     }
 
+    // Decompression
     if (auto rd = openFileForReading(loremIpsumComp)) {
+        fmt::println("Compression ratio [{:4s}:{}]: {:5.1f}% {} -> {}", ext, static_cast<int>(level),
+                     100.0 * (*rd)->size() / toBytesView(loremIpsum).size_bytes(),
+                     toBytesView(loremIpsum).size_bytes(), (*rd)->size());
         if (auto wr = openFileForWriting(loremIpsumUncomp)) {
             auto gz     = compressionDecoder(method, *rd);
-            std::ignore = writeFromReader(*wr, gz, 8192);
+            std::ignore = writeFromReader(*wr, gz, readSize);
         } else {
             FAIL("Cannot open file for writing");
         }
@@ -67,6 +80,26 @@ void testCompression(CompressionMethod method, string ext) {
     }
 
     CHECK(readUtf8(loremIpsumUncomp) == loremIpsum);
+}
+
+void testCompression(CompressionMethod method, const string& ext) {
+    for (CompressionLevel level : {
+             CompressionLevel::Lowest,
+             CompressionLevel::Normal,
+             CompressionLevel::Highest,
+         }) {
+        testCompression(method, level, ext, 1, 1, 256);
+        testCompression(method, level, ext, 17, 11, 256);
+        testCompression(method, level, ext, 125, 277, 4096);
+        testCompression(method, level, ext, 277, 125, 4096);
+        testCompression(method, level, ext, 1, 125, 4096);
+        testCompression(method, level, ext, 125, 1, 4096);
+        testCompression(method, level, ext, 4096, 2048, 65536);
+        testCompression(method, level, ext, 2048, 4096, 65536);
+        testCompression(method, level, ext, 1, 2048, 65536);
+        testCompression(method, level, ext, 2048, 1, 65536);
+        testCompression(method, level, ext, 65536, 65536, 65536);
+    }
 }
 
 TEST_CASE("gzip") {

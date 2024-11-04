@@ -99,4 +99,6 @@ namespace Brisk {
     }
 }
 
+size_t Internal::compressionBatchSize = 4096;
+
 } // namespace Brisk

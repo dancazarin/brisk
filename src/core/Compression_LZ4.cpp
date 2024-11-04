@@ -1,4 +1,5 @@
 #include <brisk/core/Compression.hpp>
+#include <brisk/core/Log.hpp>
 #include <lz4.h>
 #include <lz4hc.h>
 #include <lz4frame.h>
@@ -6,15 +7,16 @@
 
 namespace Brisk {
 
-constexpr static size_t batchSize = 65536;
+using Internal::compressionBatchSize;
 
 class LZ4Decoder : public SequentialReader {
 public:
     explicit LZ4Decoder(RC<Stream> reader) : reader(std::move(reader)) {
-        buffer.reset(new uint8_t[batchSize]);
-        bufferUsed              = 0;
-        LZ4F_errorCode_t result = LZ4F_createDecompressionContext(&dctx, LZ4F_VERSION);
+        buffer.reset(new uint8_t[compressionBatchSize]);
+        bufferSize = bufferConsumed = 0;
+        LZ4F_errorCode_t result     = LZ4F_createDecompressionContext(&dctx, LZ4F_VERSION);
         if (LZ4F_isError(result)) {
+            LOG_ERROR(lz4, "LZ4F_createDecompressionContext failed: {}", LZ4F_getErrorName(result));
             dctx = nullptr;
         }
     }
@@ -27,42 +29,46 @@ public:
 
         size_t available_out = size;
         uint8_t* next_out    = data;
-        size_t available_in;
+        size_t in_size;
         const uint8_t* next_in;
 
         do {
-            next_in = buffer.get();
-            if (bufferUsed < batchSize) {
-                Transferred sz = reader->read(buffer.get() + bufferUsed, batchSize - bufferUsed);
+            if (bufferSize < compressionBatchSize) {
+                Transferred sz = reader->read(buffer.get() + bufferSize, compressionBatchSize - bufferSize);
                 if (sz.isError()) {
                     return sz;
                 }
-                available_in = bufferUsed + sz.bytes();
-            } else {
-                available_in = bufferUsed;
+                bufferSize += sz.bytes();
             }
 
+            in_size              = bufferSize - bufferConsumed;
+            next_in              = buffer.get() + bufferConsumed;
+
             size_t next_out_size = available_out;
-            size_t result = LZ4F_decompress(dctx, next_out, &next_out_size, next_in, &available_in, nullptr);
+            size_t result = LZ4F_decompress(dctx, next_out, &next_out_size, next_in, &in_size, nullptr);
             if (LZ4F_isError(result)) {
+                LOG_ERROR(lz4, "LZ4F_decompress failed: {}", LZ4F_getErrorName(result));
                 return Transferred::Error;
             }
 
-            if (next_out_size == 0) {
+            if (bufferSize == bufferConsumed && next_out_size == 0) {
                 finished = true;
                 break;
+            }
+
+            bufferConsumed += in_size;
+
+            if (bufferConsumed > 0) {
+                if (bufferSize > bufferConsumed)
+                    memcpy(buffer.get(), buffer.get() + bufferConsumed, bufferSize - bufferConsumed);
+                bufferSize -= bufferConsumed;
+                bufferConsumed = 0;
             }
 
             available_out -= next_out_size;
             next_out += next_out_size;
 
-            bufferUsed = 0;
         } while (available_out > 0);
-
-        if (available_in > 0) {
-            memcpy(buffer.get(), next_in, available_in);
-            bufferUsed = available_in;
-        }
 
         if (size == available_out && finished) {
             return Transferred::Eof;
@@ -81,9 +87,17 @@ private:
     RC<Stream> reader;
     LZ4F_dctx* dctx = nullptr;
     std::unique_ptr<uint8_t[]> buffer;
-    size_t bufferUsed = 0;
-    bool finished     = false;
+    size_t bufferSize     = 0;
+    size_t bufferConsumed = 0;
+    bool finished         = false;
 };
+
+constexpr int lz4Level(CompressionLevel level) noexcept {
+    return (static_cast<int>(level) - 1) * (LZ4HC_CLEVEL_MAX - LZ4HC_CLEVEL_MIN) / 8 + LZ4HC_CLEVEL_MIN;
+}
+
+static_assert(lz4Level(CompressionLevel::Lowest) == LZ4HC_CLEVEL_MIN);
+static_assert(lz4Level(CompressionLevel::Highest) == LZ4HC_CLEVEL_MAX);
 
 class LZ4Encoder final : public SequentialWriter {
 public:
@@ -91,18 +105,23 @@ public:
 
         LZ4F_errorCode_t result = LZ4F_createCompressionContext(&cctx, LZ4F_VERSION);
         if (LZ4F_isError(result)) {
+            LOG_ERROR(lz4, "LZ4F_createCompressionContext failed: {}", LZ4F_getErrorName(result));
             cctx = nullptr;
         }
-        preferences.compressionLevel =
-            LZ4HC_CLEVEL_MIN + (LZ4HC_CLEVEL_MAX - LZ4HC_CLEVEL_MIN) * static_cast<int>(level) / 9;
+        preferences.frameInfo.blockSizeID = LZ4F_max4MB;
+        preferences.compressionLevel      = lz4Level(level);
 
-        bufferSize = LZ4F_compressBound(batchSize, &preferences);
+        bufferSize                        = LZ4F_compressBound(compressionBatchSize, &preferences);
         buffer.reset(new uint8_t[bufferSize]);
     }
 
     bool writeHeader() {
         uint8_t headerData[LZ4F_HEADER_SIZE_MAX];
-        size_t headerSize = LZ4F_compressBegin(cctx, headerData, batchSize, &preferences);
+        size_t headerSize = LZ4F_compressBegin(cctx, headerData, std::size(headerData), &preferences);
+        if (LZ4F_isError(headerSize)) {
+            LOG_ERROR(lz4, "LZ4F_compressBegin failed: {}", LZ4F_getErrorName(headerSize));
+            return false;
+        }
         return this->writer->write(headerData, headerSize) == headerSize;
     }
 
@@ -125,8 +144,9 @@ public:
             uint8_t* next_out    = buffer.get();
 
             size_t result        = LZ4F_compressUpdate(cctx, next_out, available_out, next_in,
-                                                       std::min(available_in, batchSize), nullptr);
+                                                       std::min(available_in, compressionBatchSize), nullptr);
             if (LZ4F_isError(result)) {
+                LOG_ERROR(lz4, "LZ4F_compressUpdate failed: {}", LZ4F_getErrorName(result));
                 return Transferred::Error;
             }
 
@@ -137,7 +157,7 @@ public:
                     return wr;
                 }
             }
-            available_in -= std::min(available_in, batchSize);
+            available_in -= std::min(available_in, compressionBatchSize);
         }
         return size;
     }
@@ -152,11 +172,12 @@ public:
             headerWritten = true;
         }
 
-        size_t available_out = batchSize;
+        size_t available_out = bufferSize;
         uint8_t* next_out    = buffer.get();
 
         size_t result        = LZ4F_compressEnd(cctx, next_out, available_out, nullptr);
         if (LZ4F_isError(result)) {
+            LOG_ERROR(lz4, "LZ4F_compressEnd failed: {}", LZ4F_getErrorName(result));
             return false;
         }
 
@@ -202,6 +223,7 @@ bytes lz4Encode(bytes_view data, CompressionLevel level) {
     size_t compressed_size =
         LZ4F_compressFrame(result.data(), max_compressed_size, data.data(), data.size(), nullptr);
     if (LZ4F_isError(compressed_size)) {
+        LOG_ERROR(lz4, "LZ4F_compressFrame failed: {}", LZ4F_getErrorName(compressed_size));
         return {};
     }
 
@@ -222,6 +244,7 @@ bytes lz4Decode(bytes_view data) {
     size_t result_size =
         LZ4F_decompress(dctx, result.data(), &decoded_size, data.data(), &consumed_size, nullptr);
     if (LZ4F_isError(result_size)) {
+        LOG_ERROR(lz4, "LZ4F_decompress failed: {}", LZ4F_getErrorName(result_size));
         LZ4F_freeDecompressionContext(dctx);
         return {};
     }

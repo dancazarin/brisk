@@ -208,4 +208,8 @@ inline constexpr std::initializer_list<NameValuePair<CompressionMethod>> default
  */
 [[nodiscard]] bytes compressionDecode(CompressionMethod method, bytes_view data);
 
+namespace Internal {
+extern size_t compressionBatchSize; //< Must not be less than 256
+}
+
 } // namespace Brisk

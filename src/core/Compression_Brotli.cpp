@@ -24,7 +24,7 @@
 
 namespace Brisk {
 
-constexpr static size_t batchSize = 65536;
+using Internal::compressionBatchSize;
 
 struct BrotliDecoderDeleter {
     void operator()(BrotliDecoderState* s) {
@@ -41,7 +41,7 @@ struct BrotliEncoderDeleter {
 class BrotliDecoder : public SequentialReader {
 public:
     explicit BrotliDecoder(RC<Stream> reader) : reader(std::move(reader)) {
-        buffer.reset(new uint8_t[batchSize]);
+        buffer.reset(new uint8_t[compressionBatchSize]);
         bufferUsed = 0;
         state.reset(BrotliDecoderCreateInstance(nullptr, nullptr, nullptr));
     }
@@ -56,8 +56,8 @@ public:
 
         do {
             next_in = buffer.get();
-            if (bufferUsed < batchSize) {
-                Transferred sz = reader->read(buffer.get() + bufferUsed, batchSize - bufferUsed);
+            if (bufferUsed < compressionBatchSize) {
+                Transferred sz = reader->read(buffer.get() + bufferUsed, compressionBatchSize - bufferUsed);
                 if (sz.isError()) {
                     return sz;
                 }
@@ -104,14 +104,18 @@ private:
 
 constexpr static int brotliLgWin = (BROTLI_MIN_WINDOW_BITS + BROTLI_MAX_WINDOW_BITS) / 2;
 
-static int brotliQuality(CompressionLevel level) {
+constexpr int brotliQuality(CompressionLevel level) {
     return (static_cast<int>(level) - 1) * (BROTLI_MAX_QUALITY - BROTLI_MIN_QUALITY) / 8 + BROTLI_MIN_QUALITY;
 }
+
+static_assert(brotliQuality(CompressionLevel::Lowest) == BROTLI_MIN_QUALITY);
+static_assert(brotliQuality(CompressionLevel::Highest) == BROTLI_MAX_QUALITY);
+static_assert(brotliQuality(CompressionLevel::Normal) == (BROTLI_MAX_QUALITY + BROTLI_MIN_QUALITY) / 2);
 
 class BrotliEncoder final : public SequentialWriter {
 public:
     explicit BrotliEncoder(RC<Stream> writer, CompressionLevel level) : writer(std::move(writer)) {
-        buffer.reset(new uint8_t[batchSize]);
+        buffer.reset(new uint8_t[compressionBatchSize]);
 
         state.reset(BrotliEncoderCreateInstance(nullptr, nullptr, nullptr));
         BrotliEncoderSetParameter(state.get(), BROTLI_PARAM_QUALITY, brotliQuality(level));
@@ -124,13 +128,13 @@ public:
         const uint8_t* next_in = data;
         size_t available_in    = size;
         while (available_in > 0) {
-            size_t available_out = batchSize;
+            size_t available_out = compressionBatchSize;
             uint8_t* next_out    = buffer.get();
             if (!BrotliEncoderCompressStream(state.get(), BROTLI_OPERATION_PROCESS, &available_in, &next_in,
                                              &available_out, &next_out, nullptr)) {
                 return Transferred::Error;
             }
-            size_t flushSize = batchSize - available_out;
+            size_t flushSize = compressionBatchSize - available_out;
             if (flushSize) {
                 Transferred wr = writer->write(buffer.get(), flushSize);
                 if (wr.bytes() != flushSize) {
@@ -145,13 +149,13 @@ public:
         const uint8_t* next_in = nullptr;
         size_t avail_in        = 0;
         while (!BrotliEncoderIsFinished(state.get())) {
-            size_t avail_out  = batchSize;
+            size_t avail_out  = compressionBatchSize;
             uint8_t* next_out = buffer.get();
             if (!BrotliEncoderCompressStream(state.get(), BROTLI_OPERATION_FINISH, &avail_in, &next_in,
                                              &avail_out, &next_out, nullptr)) {
                 return false;
             }
-            size_t flushSize = batchSize - avail_out;
+            size_t flushSize = compressionBatchSize - avail_out;
             if (flushSize) {
                 Transferred wr = writer->write(buffer.get(), flushSize);
                 if (wr.bytes() != flushSize) {

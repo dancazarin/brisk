@@ -26,12 +26,12 @@ namespace Brisk {
 #define WRITE_GZIP_HEADER 16
 #define ACCEPT_GZIP_OR_ZLIB_HEADER 32
 
-constexpr static size_t batchSize = 65536;
+using Internal::compressionBatchSize;
 
 class ZLibDecoder : public SequentialReader {
 public:
     explicit ZLibDecoder(RC<Stream> reader) : reader(std::move(reader)) {
-        buffer.reset(new uint8_t[batchSize]);
+        buffer.reset(new uint8_t[compressionBatchSize]);
         bufferUsed  = 0;
 
         strm.zalloc = Z_NULL;
@@ -48,8 +48,8 @@ public:
         strm.next_out  = (Bytef*)data;
         do {
             strm.next_in = buffer.get();
-            if (bufferUsed < batchSize) {
-                Transferred sz = reader->read(buffer.get() + bufferUsed, batchSize - bufferUsed);
+            if (bufferUsed < compressionBatchSize) {
+                Transferred sz = reader->read(buffer.get() + bufferUsed, compressionBatchSize - bufferUsed);
                 if (sz.isError())
                     return sz;
                 bufferUsed += sz.bytes();
@@ -102,7 +102,7 @@ class ZLibEncoder final : public SequentialWriter {
 public:
     explicit ZLibEncoder(RC<Stream> writer, CompressionLevel level, bool gzip = false)
         : writer(std::move(writer)) {
-        buffer.reset(new uint8_t[batchSize]);
+        buffer.reset(new uint8_t[compressionBatchSize]);
 
         strm.zalloc = Z_NULL;
         strm.zfree  = Z_NULL;
@@ -112,7 +112,7 @@ public:
     }
 
     Transferred loop(int flush_flag) {
-        strm.avail_out = (uInt)batchSize;
+        strm.avail_out = (uInt)compressionBatchSize;
         strm.next_out  = (Bytef*)buffer.get();
         int e          = deflate(&strm, flush_flag);
         if (e != Z_OK && e != Z_STREAM_END && e != Z_BUF_ERROR) {
@@ -129,7 +129,7 @@ public:
         if (e == Z_STREAM_END) {
             return Transferred::Eof;
         }
-        return batchSize;
+        return compressionBatchSize;
     }
 
     [[nodiscard]] Transferred write(const uint8_t* data, size_t size) final {
