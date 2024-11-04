@@ -95,8 +95,6 @@ endif ()
 
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/licenses.txt" "")
 
-set(_BRISK_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
 include(GNUInstallDirs)
 
 include(cmake/add_autotests.cmake)

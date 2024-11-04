@@ -96,3 +96,5 @@ if (NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg.cmake" AND NOT DEFINED HAS_VCPKG)
 else ()
     message(STATUS "Vcpkg is already set up via toolchain. Brisk will use it for dependencies")
 endif ()
+
+set(_BRISK_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/../include)
