@@ -48,6 +48,9 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/gui/GUIApplication.cpp
     ${yogacore_SRC})
 
+set_property(TARGET brisk-gui PROPERTY EXPORT_NAME GUI)
+add_library(Brisk::GUI ALIAS brisk-gui)
+
 target_link_libraries(brisk-gui PUBLIC brisk-window)
 
 target_include_directories(brisk-gui PRIVATE ${CMAKE_CURRENT_LIST_DIR}/yoga)

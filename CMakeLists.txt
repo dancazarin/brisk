@@ -131,6 +131,8 @@ endif ()
 add_subdirectory(src)
 
 add_library(brisk-executable INTERFACE)
+set_property(TARGET brisk-executable PROPERTY EXPORT_NAME Executable)
+add_library(Brisk::Executable ALIAS brisk-executable)
 if (WIN32)
     target_sources(
         brisk-executable
@@ -253,6 +255,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/BriskConfig.cmake DESTINATION "${BRISK
 
 install(
     EXPORT BriskTargets
+    NAMESPACE Brisk::
     DESTINATION "${BRISK_INSTALL_CMAKEDIR}"
     CONFIGURATIONS Debug Release)
 

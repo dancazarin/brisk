@@ -4,6 +4,14 @@ include(${CMAKE_CURRENT_LIST_DIR}/BriskTargets.cmake)
 
 include(${CMAKE_CURRENT_LIST_DIR}/BriskConfigVersion.cmake)
 
+add_library(brisk-core ALIAS Brisk::Core)
+add_library(brisk-graphics ALIAS Brisk::Graphics)
+add_library(brisk-window ALIAS Brisk::Window)
+add_library(brisk-gui ALIAS Brisk::GUI)
+add_library(brisk-widgets ALIAS Brisk::Widgets)
+add_library(brisk-network ALIAS Brisk::Network)
+add_library(brisk-executable ALIAS Brisk::Executable)
+
 get_filename_component(_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 get_filename_component(_BRISK_INCLUDE_DIR "${_DIR}/../../../include" ABSOLUTE)
 

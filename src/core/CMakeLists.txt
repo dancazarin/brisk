@@ -84,8 +84,10 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/core/hash/sha1.c
     ${PROJECT_SOURCE_DIR}/src/core/hash/sha256.c
     ${PROJECT_SOURCE_DIR}/src/core/hash/sha512.c
-    ${PROJECT_SOURCE_DIR}/src/core/hash/sha3.c
-    )
+    ${PROJECT_SOURCE_DIR}/src/core/hash/sha3.c)
+
+set_property(TARGET brisk-core PROPERTY EXPORT_NAME Core)
+add_library(Brisk::Core ALIAS brisk-core)
 
 if (WIN32)
     target_sources(brisk-core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/COMInit.cpp)
@@ -140,6 +142,9 @@ endif ()
 target_compile_definitions(brisk-core PUBLIC BRISK_CFG_$<CONFIG>=1)
 
 add_executable(bin2c bin2c.cpp)
+set_property(TARGET bin2c PROPERTY EXPORT_NAME Bin2C)
+add_executable(Brisk::Bin2C ALIAS bin2c)
+
 target_link_libraries(bin2c PRIVATE brisk-core)
 set_target_properties(bin2c PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 

@@ -43,16 +43,24 @@ function (brisk_target_link_resource TARGET MODE NAME)
 
     string(MAKE_C_IDENTIFIER ${NAME} CNAME)
 
+    get_property(
+        _BRISK_BIN2C
+        TARGET Brisk::Bin2C
+        PROPERTY ALIASED_TARGET)
+    if ("${_BRISK_BIN2C}" STREQUAL "")
+        set(_BRISK_BIN2C Brisk::Bin2C)
+    endif ()
+
     add_custom_command(
         OUTPUT ${DATA} ${HDR}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMAND bin2c --id ${CNAME} ${FLAGS} ${DATA} ${HDR} ${EMBED_INPUT}
+        COMMAND ${_BRISK_BIN2C} --id ${CNAME} ${FLAGS} ${DATA} ${HDR} ${EMBED_INPUT}
         DEPENDS ${EMBED_INPUT}
         VERBATIM)
 
     set_source_files_properties(${DATA} ${HDR} PROPERTIES GENERATED TRUE)
 
     target_sources(${TARGET} PRIVATE ${DATA} ${HDR})
-    target_include_directories(${TARGET} ${MODE}  $<BUILD_INTERFACE:${_RESOURCES_DIR}>)
+    target_include_directories(${TARGET} ${MODE} $<BUILD_INTERFACE:${_RESOURCES_DIR}>)
     target_compile_definitions(${TARGET} PRIVATE BRISK_RESOURCE_${CNAME}=1)
 endfunction ()

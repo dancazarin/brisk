@@ -27,8 +27,8 @@ function (setup_executable_platform TARGET)
         set(HAS_ICON 0)
     endif ()
 
-    configure_file(${_BRISK_INCLUDE_DIR}/brisk/application/main/app.rc.in
-                   ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.app.rc @ONLY)
+    configure_file(${_BRISK_INCLUDE_DIR}/brisk/application/main/app.rc.in ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.app.rc
+                   @ONLY)
     if (NOT BRISK_FORCE_CONSOLE)
         set_target_properties(${TARGET} PROPERTIES WIN32_EXECUTABLE TRUE)
         target_compile_definitions(${TARGET} PRIVATE WIN32_GUI=1)
@@ -37,9 +37,17 @@ function (setup_executable_platform TARGET)
     if (APP_ICON)
         set(OUT_ICON ${ICON_OUT_DIR}/${TARGET}.ico)
 
+        get_property(
+            _BRISK_ICOWRITER
+            TARGET Brisk::IcoWriter
+            PROPERTY ALIASED_TARGET)
+        if ("${_BRISK_ICOWRITER}" STREQUAL "")
+            set(_BRISK_ICOWRITER Brisk::IcoWriter)
+        endif ()
+
         add_custom_command(
             OUTPUT ${OUT_ICON}
-            COMMAND icowriter ${APP_ICON} ${OUT_ICON}
+            COMMAND ${_BRISK_ICOWRITER} ${APP_ICON} ${OUT_ICON}
             DEPENDS ${APP_ICON}
             VERBATIM)
 

@@ -42,7 +42,7 @@ brisk_metadata(
 add_executable(main main.cpp)
 
 # Link necessary Brisk libraries to 'main'
-target_link_libraries(main PRIVATE brisk-widgets brisk-executable)
+target_link_libraries(main PRIVATE Brisk::Widgets Brisk::Executable)
 
 # Set up the executable 'main' with Brisk icons, metadata, and startup/shutdown code
 brisk_setup_executable(main)

@@ -99,6 +99,9 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/widgets/DialogComponent.cpp
     ${PROJECT_SOURCE_DIR}/src/widgets/Graphene.cpp)
 
+set_property(TARGET brisk-widgets PROPERTY EXPORT_NAME Widgets)
+add_library(Brisk::Widgets ALIAS brisk-widgets)
+
 target_link_libraries(brisk-widgets PUBLIC brisk-gui)
 
 set_target_properties(brisk-widgets PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_ARGS}")

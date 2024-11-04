@@ -37,10 +37,15 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/window/Display${PLATFORM_SPECIFIC_CPP}
     ${PROJECT_SOURCE_DIR}/src/window/KeyCodes${PLATFORM_SPECIFIC_CPP})
 
+set_property(TARGET brisk-window PROPERTY EXPORT_NAME Window)
+add_library(Brisk::Window ALIAS brisk-window)
+
 target_link_libraries(brisk-window PUBLIC brisk-graphics)
 
 if (WIN32)
     add_executable(icowriter ${PROJECT_SOURCE_DIR}/src/window/IcoWriter.cpp)
+    set_property(TARGET icowriter PROPERTY EXPORT_NAME IcoWriter)
+    add_executable(Brisk::IcoWriter ALIAS icowriter)
     target_link_libraries(icowriter PUBLIC brisk-graphics)
     set_target_properties(icowriter PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 endif ()

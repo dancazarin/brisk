@@ -67,6 +67,9 @@ add_library(
     ${PROJECT_SOURCE_DIR}/src/graphics/vector/freetype/v_ft_raster.cpp
     ${PROJECT_SOURCE_DIR}/src/graphics/vector/freetype/v_ft_stroker.cpp)
 
+set_property(TARGET brisk-graphics PROPERTY EXPORT_NAME Graphics)
+add_library(Brisk::Graphics ALIAS brisk-graphics)
+
 target_link_libraries(brisk-graphics PUBLIC brisk-core)
 
 target_include_directories(brisk-graphics PRIVATE ${PROJECT_SOURCE_DIR}/src/graphics/vector)

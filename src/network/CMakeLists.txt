@@ -23,6 +23,9 @@ add_library(
     ${PROJECT_SOURCE_DIR}/include/brisk/network/UserAgent.hpp ${PROJECT_SOURCE_DIR}/include/brisk/network/Fetch.hpp
     ${PROJECT_SOURCE_DIR}/src/network/UserAgent.cpp ${PROJECT_SOURCE_DIR}/src/network/Fetch.cpp)
 
+set_property(TARGET brisk-network PROPERTY EXPORT_NAME Network)
+add_library(Brisk::Network ALIAS brisk-network)
+
 target_link_libraries(brisk-network PUBLIC brisk-core)
 
 set(_DEP_PUBLIC PUBLIC)
