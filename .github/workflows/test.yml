@@ -30,6 +30,8 @@ jobs:
       uses: actions/checkout@v4
     - name: Vcpkg
       shell: bash
+      env:        
+        TMPDIR: ${{runner.temp}}
       run: |
         cmake -P upload-deps.cmake
 
