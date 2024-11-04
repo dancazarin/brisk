@@ -13,6 +13,15 @@
 1 VERSIONINFO
 FILEVERSION     VER_VERSION
 PRODUCTVERSION  VER_VERSION
+FILEFLAGSMASK   0x3fL
+#ifdef BRISK_CFG_Debug
+FILEFLAGS 0x1L
+#else
+FILEFLAGS 0x0L
+#endif
+FILEOS 0x40004L
+FILETYPE 0x0L
+FILESUBTYPE 0x0L
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
@@ -25,5 +34,9 @@ BEGIN
             VALUE "ProductName",      VER_PRODUCTNAME_STR
             VALUE "ProductVersion",   VER_VERSION_STR
         END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
     END
 END
