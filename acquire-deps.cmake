@@ -17,7 +17,7 @@ include(${ROOT}/dep-hash.cmake)
 # Define the URL and destination file for download
 string(REPLACE "{DEP_HASH}" "${DEP_HASH}" URL "${URL}")
 string(REPLACE "{TRIPLET}" "${VCPKG_TARGET_TRIPLET}" URL "${URL}")
-set(DEST_FILE ${ROOT}/deps-${VCPKG_TARGET_TRIPLET}-${DEP_HASH}.7z)
+set(DEST_FILE ${ROOT}/Brisk-Dependencies-${VCPKG_TARGET_TRIPLET}-${DEP_HASH}.7z)
 
 if (NOT EXISTS ${DEST_FILE})
 
