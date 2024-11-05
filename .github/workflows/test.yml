@@ -50,9 +50,6 @@ jobs:
       VCPKG_DEFAULT_HOST_TRIPLET: ${{matrix.triplet}}
       LLVM_DIR: "C:/Program Files/LLVM"
     steps:
-    - name: Install prerequisites
-      run: |
-        choco install llvm --no-progress -y
     - name: Checkout
       uses: actions/checkout@v4
     - name: Vcpkg
@@ -178,9 +175,6 @@ jobs:
       CFLAGS: ${{matrix.flags}}
       LLVM_DIR: "C:/Program Files/LLVM"
     steps:
-    - name: Install prerequisites
-      run: |
-        choco install llvm --no-progress -y
     - name: Checkout
       uses: actions/checkout@v4
     - name: Acquire dependencies
