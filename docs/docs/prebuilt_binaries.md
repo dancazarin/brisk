@@ -4,6 +4,9 @@ The Brisk library depends on several third-party libraries (such as libpng, zlib
 
 Below are instructions for acquiring the necessary binaries to build Brisk applications.
 
+> [!warning]
+> If you're using prebuilt dependencies, make sure to set the `VCPKG_MANIFEST_MODE` CMake variable to `OFF` to prevent Vcpkg from automatically rebuilding all dependencies.
+
 ## Acquiring Complete Brisk Binaries
 
 You can download the Brisk library binaries along with all required dependencies:
