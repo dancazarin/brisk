@@ -24,7 +24,7 @@
 
 #define BRISK_VERSION_MAJOR 0
 #define BRISK_VERSION_MINOR 9
-#define BRISK_VERSION_PATCH 1
+#define BRISK_VERSION_PATCH 2
 #define BRISK_VERSION_METADATA "-alpha"
 
 #define BRISK_VERSION                                                                                        \
