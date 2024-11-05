@@ -128,3 +128,29 @@ cmake ... -DCMAKE_PREFIX_PATH="<dist>/lib/cmake" -DCMAKE_TOOLCHAIN_FILE="<vcpkg_
 ```
 
 Replace `<dist>`, `<vcpkg_exported>`, and `<triplet>` with your actual paths and triplet values.
+
+## `add_subdirectory` Method
+
+Another method for including Brisk in your CMake-based project is by using `add_subdirectory`. This allows for tighter integration and enables automatic rebuilds whenever Brisk sources change. This approach is particularly suitable if you are developing the Brisk library alongside your application.
+
+The `BRISK_DIR` CMake variable must be set to the Brisk source directory.
+
+```cmake
+cmake_minimum_required(VERSION 3.16)
+
+# Initialize Brisk CMake modules. This must be done before the first project directive.
+include(${BRISK_DIR}/cmake/brisk.cmake)
+
+project(brisk-example)
+
+# Include Brisk source. This must be done after the first project directive.
+add_subdirectory(${BRISK_DIR} brisk-bin)
+
+add_executable(main ...)
+
+# Link the Brisk libraries to the 'main' target.
+target_link_libraries(main PRIVATE Brisk::Widgets Brisk::Executable ...)
+
+# Perform additional setup tasks specific to the executable target 'main'.
+brisk_setup_executable(main)
+```
