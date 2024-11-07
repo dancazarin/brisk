@@ -43,7 +43,7 @@ jobs:
   windows-deps:
     strategy:
       matrix:
-        triplet: ["x64-windows-static-md", "x86-windows-static-md"]
+        triplet: ["x64-windows-static-md", "x86-windows-static-md", "x64-windows-static", "x86-windows-static"]
     runs-on: windows-latest
     env:
       VCPKG_DEFAULT_TRIPLET: ${{matrix.triplet}}
@@ -174,6 +174,12 @@ jobs:
             arch: x64
             flags: ""
           - triplet: "x86-windows-static-md"
+            arch: x86
+            flags: "-m32"
+          - triplet: "x64-windows-static"
+            arch: x64
+            flags: ""
+          - triplet: "x86-windows-static"
             arch: x86
             flags: "-m32"
     runs-on: windows-latest
