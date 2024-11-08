@@ -1,37 +1,46 @@
 site_name: Brisk
 theme:
-  name: 'material'
+  name: "material"
+  font:
+    text: Open Sans
   features:
     - navigation.tabs
     - navigation.top
     - content.code.copy
-  palette: 
+  palette:
     # Palette toggle for light mode
     - scheme: default
       toggle:
-        icon: material/brightness-7 
+        icon: material/brightness-7
         name: Switch to dark mode
+      media: "(prefers-color-scheme: light)"
+      primary: deep purple
+      accent: light green
 
     # Palette toggle for dark mode
     - scheme: slate
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
-    
+      media: "(prefers-color-scheme: dark)"
+      primary: deep purple
+      accent: light green
+
 extra:
   search:
     language: en
 
   social:
     - icon: fontawesome/brands/github-alt
-      link: 'https://github.com/brisklib'
+      link: "https://github.com/brisklib"
     - icon: fontawesome/brands/twitter
-      link: 'https://twitter.com/brisklib'
+      link: "https://twitter.com/brisklib"
 
-copyright: 'Copyright &copy; 2024 Brisk'
+copyright: "Copyright &copy; 2024 Brisk"
 
 plugins:
-    - search
+  - search
+  - privacy
 
 markdown_extensions:
   - admonition
@@ -58,19 +67,19 @@ edit_uri: edit/main/docs/
 
 nav:
   - Brisk:
-    - index.md
-    - getting_started.md
-    - prerequisites.md
-    - prebuilt_binaries.md
+      - index.md
+      - getting_started.md
+      - prerequisites.md
+      - prebuilt_binaries.md
   - Modules:
-    - auto/core.md
-    - auto/graphics.md
-    - auto/window.md
-    - auto/gui.md
-    - auto/widgets.md
-    - auto/network.md
-    - auto/internal.md
+      - auto/core.md
+      - auto/graphics.md
+      - auto/window.md
+      - auto/gui.md
+      - auto/widgets.md
+      - auto/network.md
+      - auto/internal.md
   - Reference:
-    - auto/refindex.md
+      - auto/refindex.md
 
   - brisklib.com: https://brisklib.com
