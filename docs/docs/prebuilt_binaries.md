@@ -23,7 +23,7 @@ These files contain the Brisk binaries and all necessary dependencies.
 
 GitHub Actions artifacts include archives with header files and static libraries:
 
-https://github.com/brisklib/brisk/actions
+https://github.com/brisklib/brisk/actions/workflows/test.yml?query=branch%3Amain+
 
 These files include only the Brisk binaries. Please download the Brisk dependencies separately by following the instructions in the README.md file provided in the GitHub Actions artifacts archive.
 
