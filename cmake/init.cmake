@@ -86,8 +86,12 @@ if (NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg.cmake" AND NOT DEFINED HAS_VCPKG)
 
     if (NOT DEFINED VCPKG_TARGET_TRIPLET)
         if (WIN32)
-            set(VCPKG_HOST_TRIPLET "x64-windows-static-md" CACHE STRING "" FORCE)
-            set(VCPKG_TARGET_TRIPLET ${VCPKG_HOST_TRIPLET} CACHE STRING "" FORCE)
+            set(VCPKG_HOST_TRIPLET
+                "x64-windows-static-md"
+                CACHE STRING "" FORCE)
+            set(VCPKG_TARGET_TRIPLET
+                ${VCPKG_HOST_TRIPLET}
+                CACHE STRING "" FORCE)
         endif ()
     endif ()
 
@@ -98,3 +102,22 @@ else ()
 endif ()
 
 set(_BRISK_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/../include)
+
+if ("${VCPKG_TARGET_TRIPLET}" MATCHES "windows-static$")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif ()
+
+set(SUPPORTED_TRIPLETS
+    "x64-linux"
+    "x64-osx"
+    "arm64-osx"
+    "x64-windows-static"
+    "x86-windows-static"
+    "x64-windows-static-md"
+    "x86-windows-static-md")
+
+# Check if the specified triplet is in the list of supported triplets
+if (NOT VCPKG_TARGET_TRIPLET IN_LIST SUPPORTED_TRIPLETS)
+    message(WARNING "The specified VCPKG_TARGET_TRIPLET ${VCPKG_TARGET_TRIPLET} is not supported.")
+    message(WARNING "Supported triplets are: ${SUPPORTED_TRIPLETS}")
+endif ()

@@ -66,12 +66,15 @@ These directories are relocatable, so you can move them to another directory or 
 
 Brisk is tested with the following triplets:
 
-- **Linux**: `x64-linux` (x86_64 aka AMD64)
-- **Windows**: `x64-windows-static-md` (x86_64 aka AMD64) and `x86-windows-static-md` (Intel x86)
-- **macOS**: `x64-osx` (Intel 64-bit Macs) and `arm64-osx` (Apple Silicon)
+|       | Linux                        | macOS                        | Windows (static runtime)              | Windows (dynamic runtime)                |
+|-------|------------------------------|------------------------------|---------------------------------------|------------------------------------------|
+| x86   | —                            | —                            | :white_check_mark: x86-windows-static | :white_check_mark: x86-windows-static-md |
+| x64   | :white_check_mark: x64-linux | :white_check_mark: x64-osx   | :white_check_mark: x64-windows-static | :white_check_mark: x64-windows-static-md |
+| arm   | :construction:               | :construction:               | :construction:                        | :construction:                           |
+| arm64 | :construction:               | :white_check_mark: arm64-osx | :construction:                        | :construction:                           |
 
 > [!warning]
-> Currently, Brisk only supports static linking; dynamic linking will be available in a future release.
+> Currently, Brisk supports only static linking of dependencies; dynamic linking for Brisk libraries will be available in a future release.
 
 ## Configuring Your Project with Brisk
 
