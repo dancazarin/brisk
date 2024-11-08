@@ -2,11 +2,15 @@
 
 The Brisk library is in the alpha stage, so there may be breaking changes, and the documentation may not always be up to date.
 
-## Getting started
+## Getting Started
 
 * [Getting Started](getting_started.md)
 * [Installing Prerequisites](prerequisites.md)
 * [Prebuilt Binaries](prebuilt_binaries.md)
+
+## Core Concepts
+
+* [Data Binding](binding.md)
 
 ## Examples
 
