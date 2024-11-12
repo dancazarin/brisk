@@ -29,12 +29,6 @@
 #include <spdlog/sinks/stdout_sinks.h>
 #if defined(BRISK_WINDOWS)
 #include <spdlog/sinks/msvc_sink.h>
-#else
-#include <spdlog/sinks/stdout_sinks.h>
-#endif
-
-#ifdef BRISK_WINDOWS
-#include <windows.h>
 #endif
 
 #include <brisk/core/App.hpp>
