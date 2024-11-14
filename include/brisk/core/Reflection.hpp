@@ -84,7 +84,7 @@ struct ReflectionField {
     using FieldType = FieldType_; /**< The field type. */
 
     std::string_view name;                          /**< Name of the field. */
-    FieldType Class::*pointerToField;               /**< Pointer to the field in the class. */
+    FieldType Class::* pointerToField;              /**< Pointer to the field in the class. */
     ReflectionFlag flags = ReflectionFlag::Default; /**< Reflection flags for the field. */
 };
 

@@ -769,7 +769,7 @@ inline void removeValueByKey(KeyValueOrderedList<K, V>& list, const K& key) {
  * @return optional<V> The found value, or nullopt if not found.
  */
 template <typename V, typename K>
-inline optional<V> keyToValue(const std::vector<V>& list, K(V::*field), const K& fieldValue) {
+inline optional<V> keyToValue(const std::vector<V>& list, K(V::* field), const K& fieldValue) {
     for (size_t i = 0; i < list.size(); ++i) {
         if (list[i].*field == fieldValue)
             return list[i];
@@ -791,7 +791,7 @@ inline optional<V> keyToValue(const std::vector<V>& list, K(V::*field), const K&
  * @return optional<size_t> The index of the found key, or nullopt if not found.
  */
 template <typename V, typename K>
-inline optional<size_t> findKey(const std::vector<V>& list, K(V::*field), const K& fieldValue) {
+inline optional<size_t> findKey(const std::vector<V>& list, K(V::* field), const K& fieldValue) {
     for (size_t i = 0; i < list.size(); ++i) {
         if (list[i].*field == fieldValue)
             return i;

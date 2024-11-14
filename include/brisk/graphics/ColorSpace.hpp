@@ -215,7 +215,8 @@ struct Trichromatic {
 
     template <ColorSpace SrcSpace>
     Trichromatic(Trichromatic<T, SrcSpace> color) {
-        Trichromatic<T, SrcSpace> color_copy = color; // An extra copy is needed to work around a bug in VS2022
+        Trichromatic<T, SrcSpace> color_copy =
+            color; // An extra copy is needed to work around a bug in VS2022
         array = convertColorSpace<Space>(color_copy).array;
     }
 

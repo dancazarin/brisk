@@ -2162,7 +2162,7 @@ Bytes PlatformWindow::placement() const {
     return {};
 }
 
-void PlatformWindow::setPlacement(bytes_view data){};
+void PlatformWindow::setPlacement(bytes_view data) {}
 
 void PlatformWindow::setOwner(RC<Window> window) {}
 
