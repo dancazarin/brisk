@@ -39,6 +39,8 @@ protected:
     void onEvent(Event& event) override;
     Ptr cloneThis() override;
     explicit PopupBox(Construction construction, ArgumentsView<PopupBox> args);
+    using Base::append;
+    void append(Widget::Ptr widget) override;
 };
 
 } // namespace Brisk

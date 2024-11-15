@@ -19,6 +19,7 @@
  * license. For commercial licensing options, please visit: https://brisklib.com
  */
 #include <brisk/widgets/PopupBox.hpp>
+#include <brisk/widgets/Item.hpp>
 
 namespace Brisk {
 
@@ -52,6 +53,15 @@ void PopupBox::onEvent(Event& event) {
         if (m_rect.contains(e->point)) {
             event.stopPropagation();
         }
+    }
+}
+
+void PopupBox::append(Widget::Ptr widget) {
+    if (Item* it = dynamic_cast<Item*>(widget.get())) {
+        it->dynamicFocus = true;
+        Base::append(std::move(widget));
+    } else {
+        Base::append(std::move(widget));
     }
 }
 } // namespace Brisk

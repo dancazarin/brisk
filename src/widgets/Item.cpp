@@ -65,7 +65,7 @@ Widget::Ptr Item::cloneThis() {
 }
 
 Item::Item(Construction construction, ArgumentsView<Item> args)
-    : Widget(construction, std::tuple{ Arg::tabStop = true }) {
+    : Base(construction, std::tuple{ Arg::tabStop = true }) {
     m_processClicks = false;
     args.apply(this);
 }
