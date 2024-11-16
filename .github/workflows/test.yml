@@ -43,7 +43,7 @@ jobs:
   deps-windows:
     strategy:
       matrix:
-        triplet: ["x64-windows-static-md", "x86-windows-static-md", "x64-windows-static", "x86-windows-static"]
+        triplet: ["x64-windows-static-md", "x86-windows-static-md", "arm64-windows-static-md", "x64-windows-static", "x86-windows-static", "arm64-windows-static"]
     runs-on: windows-latest
     env:
       VCPKG_DEFAULT_TRIPLET: ${{matrix.triplet}}
@@ -161,21 +161,33 @@ jobs:
       matrix:
         include:
           - triplet: "x64-windows-static-md"
+            hosttriplet: "x64-windows-static-md"
             arch: x64
             flags: ""
           - triplet: "x86-windows-static-md"
-            arch: x86
+            hosttriplet: "x86-windows-static-md"
+            arch: amd64_x86
             flags: "-m32"
+          - triplet: "arm64-windows-static-md"
+            hosttriplet: "x64-windows-static-md"
+            arch: amd64_arm64
+            flags: "--target=arm64-pc-windows-msvc"
           - triplet: "x64-windows-static"
+            hosttriplet: "x64-windows-static"
             arch: x64
             flags: ""
           - triplet: "x86-windows-static"
-            arch: x86
+            hosttriplet: "x86-windows-static"
+            arch: amd64_x86
             flags: "-m32"
+          - triplet: "arm64-windows-static"
+            hosttriplet: "x64-windows-static"
+            arch: amd64_arm64
+            flags: "--target=arm64-pc-windows-msvc"
     runs-on: windows-latest
     needs: deps-windows
     env:
-      VCPKG_DEFAULT_TRIPLET: ${{matrix.triplet}}
+      VCPKG_DEFAULT_TRIPLET: ${{matrix.hosttriplet}}
       VCPKG_DEFAULT_HOST_TRIPLET: ${{matrix.triplet}}
       CXXFLAGS: ${{matrix.flags}}
       CFLAGS: ${{matrix.flags}}

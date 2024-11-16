@@ -111,6 +111,8 @@ set(SUPPORTED_TRIPLETS
     "x64-linux"
     "x64-osx"
     "arm64-osx"
+    "arm64-windows-static"
+    "arm64-windows-static-md"
     "x64-windows-static"
     "x86-windows-static"
     "x64-windows-static-md"
